@@ -8,6 +8,7 @@ import Explore from './Components/Explore/Explore';
 import Dream from './Components/Dream/Dream';
 import Profile from './Components/Profile/Profile';
 import COLORS from './Components/GlobalValues/Colors';
+import Market from './Components/Market/Market';
 
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {
@@ -48,7 +49,7 @@ function Home(): JSX.Element {
         }}
         component={Explore}
       />
-      {/* <Tab.Screen
+      <Tab.Screen
         name="Market"
         options={{
           tabBarLabel: 'Market',
@@ -58,8 +59,8 @@ function Home(): JSX.Element {
             );
           },
         }}
-        component={NFTAssets}
-      /> */}
+        component={Market}
+      />
       {/* <Tab.Screen
         name="PhantaSpace"
         options={{

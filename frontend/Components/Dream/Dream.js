@@ -6,13 +6,14 @@ import {Neomorph} from 'react-native-neomorph-shadows';
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 import COLORS from '../GlobalValues/Colors';
 import axios from 'axios';
+import {Buffer} from 'buffer';
 
 const options = {
   enableVibrateFallback: true,
   ignoreAndroidSystemSettings: false,
 };
 
-const size = 512 / PixelRatio.get();
+const size = 350;
 
 export default function Dream() {
   const [value, onChangeText] = React.useState('');
@@ -61,7 +62,7 @@ export default function Dream() {
           }}>
           <TextInput
             numberOfLines={20}
-            multiline={true}
+            multiline={false}
             onChangeText={text => onChangeText(text)}
             value={value}
             style={{
@@ -104,12 +105,19 @@ export default function Dream() {
               //     setImageURI(image_uri);
               //   });
 
-              // axios
-              //   .post("http://phantaspace.ddns.net:7863/txt2img", { prompt: value }, { responseType: "arraybuffer" })
-              //   .then(function (response) {
-              //     const image_data = Buffer.from(response.data, "binary").toString("base64");
-              //     setImageURI(`data:image/png;base64,${image_data}`);
-              //   });
+              axios
+                .post(
+                  'http://phantaspace.ddns.net:7863/txt2img',
+                  {prompt: value},
+                  {responseType: 'arraybuffer'},
+                )
+                .then(function (response) {
+                  const image_data = Buffer.from(
+                    response.data,
+                    'binary',
+                  ).toString('base64');
+                  setImageURI(`data:image/png;base64,${image_data}`);
+                });
             }}
             onPressOut={() => setPressed(false)}>
             <Neomorph
@@ -147,37 +155,21 @@ export default function Dream() {
               shadowRadius: 10,
               borderRadius: 25,
               backgroundColor: COLORS.primary,
-              width: 300,
-              height: 300,
+              width: size,
+              height: size,
               marginTop: 20,
-            }}></Neomorph>
-          <Neomorph
-            style={{
-              shadowRadius: 10,
-              borderRadius: 25,
-              backgroundColor: COLORS.primary,
-              width: 300,
-              height: 300,
-              marginTop: 20,
-            }}></Neomorph>
-          <Neomorph
-            style={{
-              shadowRadius: 10,
-              borderRadius: 25,
-              backgroundColor: COLORS.primary,
-              width: 300,
-              height: 300,
-              marginTop: 20,
-            }}></Neomorph>
-          <Neomorph
-            style={{
-              shadowRadius: 10,
-              borderRadius: 25,
-              backgroundColor: COLORS.primary,
-              width: 300,
-              height: 300,
-              marginTop: 20,
-            }}></Neomorph>
+            }}>
+            <Image
+              source={{
+                uri: 'https://cdn.midjourney.com/b4084579-d79e-4533-8825-27642f069c85/grid_0_640_N.webp',
+              }}
+              style={{
+                width: size,
+                height: size,
+
+                borderRadius: 25,
+              }}></Image>
+          </Neomorph>
         </View>
       </ScrollView>
     </View>
