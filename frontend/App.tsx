@@ -1,9 +1,5 @@
 import React from 'react';
-import {useMoralis} from 'react-moralis';
-import {
-  NavigationContainer,
-  getFocusedRouteNameFromRoute,
-} from '@react-navigation/native';
+import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {LogBox} from 'react-native';
 
@@ -93,15 +89,6 @@ const Tab = createMaterialBottomTabNavigator();
 const Stack = createStackNavigator();
 
 function App(): JSX.Element {
-  const {
-    authenticate,
-    authError,
-    isAuthenticating,
-    isAuthenticated,
-    logout,
-    Moralis,
-  } = useMoralis();
-
   return (
     <NavigationContainer>
       <Stack.Navigator
