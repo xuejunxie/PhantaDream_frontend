@@ -13,6 +13,8 @@ const options = {
   ignoreAndroidSystemSettings: false,
 };
 
+const loading_image = 'https://i.gifer.com/1amw.gif';
+
 const size = 350;
 
 export default function Dream() {
@@ -21,6 +23,7 @@ export default function Dream() {
     'https://cdn.midjourney.com/b4084579-d79e-4533-8825-27642f069c85/grid_0_640_N.webp',
   );
   const [pressed, setPressed] = useState(false);
+  const [loading, setLoading] = useState(false);
   // const nativeName = useMemo(() => getNativeByChain(options?.chain || chainId), [options, chainId]);
   return (
     <View
@@ -45,7 +48,7 @@ export default function Dream() {
             }}>
             <Image
               source={{
-                uri: imageURI,
+                uri: loading ? loading_image : imageURI,
               }}
               style={{
                 width: size,
@@ -87,6 +90,7 @@ export default function Dream() {
           <TouchableWithoutFeedback
             onPressIn={() => {
               setPressed(true);
+              setLoading(true);
               //haptic feedback
               ReactNativeHapticFeedback.trigger('impactMedium', options);
 
@@ -117,6 +121,7 @@ export default function Dream() {
                     'binary',
                   ).toString('base64');
                   setImageURI(`data:image/png;base64,${image_data}`);
+                  setLoading(false);
                 });
             }}
             onPressOut={() => setPressed(false)}>
