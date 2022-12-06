@@ -20,7 +20,7 @@ const size = 350;
 export default function Dream() {
   const [value, onChangeText] = React.useState('');
   const [imageURI, setImageURI] = useState(
-    'https://cdn.midjourney.com/b4084579-d79e-4533-8825-27642f069c85/grid_0_640_N.webp',
+    'https://www.canvaschamp.com/static/images/landingpage/blankprestretchedcanvas/streach-choice.jpg',
   );
   const [pressed, setPressed] = useState(false);
   const [loading, setLoading] = useState(false);

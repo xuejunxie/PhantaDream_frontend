@@ -19,6 +19,7 @@ const size = 280;
 const render_dummy = (start, end) =>
   dummy.slice(start, end).map((item, index) => (
     <View
+      key={index}
       style={{
         backgroundColor: 'rgba(0,0,0,0)',
         marginTop: 30,
