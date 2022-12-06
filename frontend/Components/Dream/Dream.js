@@ -64,13 +64,10 @@ export default function Dream() {
             backgroundColor: 'rgba(0,0,0,0)',
           }}>
           <TextInput
-            numberOfLines={20}
-            multiline={false}
+            multiline={true}
             onChangeText={text => onChangeText(text)}
             value={value}
             style={{
-              padding: 20,
-              height: 40,
               backgroundColor: 'rgba(0,0,0,0)',
               // align text to center
               textAlign: 'center',
