@@ -50,9 +50,9 @@ const render_dummy = (start, end) =>
     </View>
   ));
 
-const FirstRoute = () => <ScrollView>{render_dummy(12, 16)}</ScrollView>;
+const FirstRoute = () => <ScrollView>{render_dummy(12, 14)}</ScrollView>;
 
-const SecondRoute = () => <ScrollView>{render_dummy(12, 17)}</ScrollView>;
+const SecondRoute = () => <ScrollView>{render_dummy(14, 17)}</ScrollView>;
 
 const ThirdRoute = () => {
   const [pressed, setPressed] = useState(false);
@@ -102,7 +102,7 @@ const ThirdRoute = () => {
         </TouchableWithoutFeedback>
         <Text
           style={{
-            fontSize: 10,
+            fontSize: 20,
             color: 'black',
             textAlign: 'center',
             marginTop: 20,
@@ -125,7 +125,7 @@ export default function Market() {
 
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
-    // {key: 'first', title: 'Shop'},
+    {key: 'first', title: 'Auctions'},
     {key: 'second', title: 'Collections'},
     {key: 'third', title: 'Mint'},
   ]);

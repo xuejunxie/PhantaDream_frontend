@@ -8,11 +8,13 @@ import InfoText from './InfoText';
 
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {
+  faBitcoinSign,
   faChevronRight,
   faDollar,
   faGear,
   faHeart,
   faStar,
+  faThumbsUp,
   faUserFriends,
   faWarning,
 } from '@fortawesome/free-solid-svg-icons';
@@ -55,8 +57,16 @@ const list = [
     icon: faHeart,
   },
   {
+    title: 'Liked',
+    icon: faThumbsUp,
+  },
+  {
     title: 'Billing',
     icon: faDollar,
+  },
+  {
+    title: 'Revenue',
+    icon: faBitcoinSign,
   },
   {
     title: 'Settings',
