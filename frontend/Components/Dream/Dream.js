@@ -1,9 +1,11 @@
 import React, {useState} from 'react';
 import {View, ScrollView, Text, Image, PixelRatio} from 'react-native';
 import {TextInput} from 'react-native-paper';
+
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import {Neomorph} from 'react-native-neomorph-shadows';
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
+
 import COLORS from '../GlobalValues/Colors';
 import axios from 'axios';
 import {Buffer} from 'buffer';
@@ -25,6 +27,23 @@ export default function Dream() {
   const [pressed, setPressed] = useState(false);
   const [loading, setLoading] = useState(false);
   // const nativeName = useMemo(() => getNativeByChain(options?.chain || chainId), [options, chainId]);
+
+  const dreamButton = async () => {
+    axios
+      .post(
+        'http://phantaspace.ddns.net:7863/txt2img',
+        {prompt: value},
+        {responseType: 'arraybuffer'},
+      )
+      .then(function (response) {
+        const image_data = Buffer.from(response.data, 'binary').toString(
+          'base64',
+        );
+        setImageURI(`data:image/png;base64,${image_data}`);
+        setLoading(false);
+      });
+  };
+
   return (
     <View
       style={{width: '100%', height: '100%', backgroundColor: COLORS.primary}}>
@@ -90,36 +109,7 @@ export default function Dream() {
               setLoading(true);
               //haptic feedback
               ReactNativeHapticFeedback.trigger('impactMedium', options);
-
-              // get a image with axios
-              // axios
-              //   .get('https://phanta.space/favicon.png', {
-              //     responseType: 'arraybuffer',
-              //   })
-              //   .then(response => {
-              //     const image_data = Buffer.from(
-              //       response.data,
-              //       'binary',
-              //     ).toString('base64');
-
-              //     const image_uri = `data:image/png;base64,${image_data}`;
-              //     setImageURI(image_uri);
-              //   });
-
-              axios
-                .post(
-                  'http://phantaspace.ddns.net:7863/txt2img',
-                  {prompt: value},
-                  {responseType: 'arraybuffer'},
-                )
-                .then(function (response) {
-                  const image_data = Buffer.from(
-                    response.data,
-                    'binary',
-                  ).toString('base64');
-                  setImageURI(`data:image/png;base64,${image_data}`);
-                  setLoading(false);
-                });
+              dreamButton();
             }}
             onPressOut={() => setPressed(false)}>
             <Neomorph

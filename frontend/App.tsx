@@ -19,6 +19,8 @@ import {
   faExchangeAlt,
 } from '@fortawesome/free-solid-svg-icons';
 
+import SignIn from './Components/Auth/SignIn';
+
 LogBox.ignoreAllLogs();
 
 // const Activecolor =
@@ -97,22 +99,8 @@ function App(): JSX.Element {
         screenOptions={{
           headerShown: false,
         }}>
-        {/* Auth Navigator: Include Login and Signup */}
-        {/* <Stack.Screen
-          name="Auth"
-          component={CryptoAuth}
-          options={{headerShown: false}}
-        /> */}
-        {/* Navigation Drawer as a landing page */}
-        <Stack.Screen
-          name="DrawerNavigationRoutes"
-          component={Home}
-          // Hiding header for Navigation Drawer
-          // options={{headerTitle: props => <Header />}}
-          // options={({route}) => ({
-          //   headerTitle: getHeaderTitle(route),
-          // })}
-        />
+        <Stack.Screen name="Auth" component={SignIn} />
+        <Stack.Screen name="Home" component={Home} />
       </Stack.Navigator>
     </NavigationContainer>
   );
