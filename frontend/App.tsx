@@ -9,6 +9,7 @@ import Dream from './Components/Dream/Dream';
 import Profile from './Components/Profile/Profile';
 import COLORS from './Components/GlobalValues/Colors';
 import Market from './Components/Market/Market';
+import DeviceInfo from 'react-native-device-info';
 
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {
@@ -20,6 +21,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 import SignIn from './Components/Auth/SignIn';
+import {useEffect} from 'react';
 
 LogBox.ignoreAllLogs();
 
@@ -92,10 +94,14 @@ const Tab = createMaterialBottomTabNavigator();
 const Stack = createStackNavigator();
 
 function App(): JSX.Element {
+  useEffect(() => {
+    console.log(DeviceInfo.getDeviceId());
+  }, []);
+
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Auth"
+        initialRouteName="Home"
         screenOptions={{
           headerShown: false,
         }}>
