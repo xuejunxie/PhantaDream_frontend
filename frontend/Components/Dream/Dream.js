@@ -33,13 +33,11 @@ export default function Dream() {
   const [imageURI, setImageURI] = useState(
     'https://www.canvaschamp.com/static/images/landingpage/blankprestretchedcanvas/streach-choice.jpg',
   );
-  const [pressed, setPressed] = useState(false);
   const [loading, setLoading] = useState(false);
+
   const navBarHeight =
     getStatusBarHeight(Platform.OS === 'ios' ? false : true) + tabBarHeight;
   const [verticalOffest, setVerticalOffset] = useState(navBarHeight);
-
-  // const nativeName = useMemo(() => getNativeByChain(options?.chain || chainId), [options, chainId]);
 
   // load the image from AsyncStorage
   useEffect(() => {
@@ -50,6 +48,7 @@ export default function Dream() {
     });
   }, []);
 
+  // dynamically adjust vertical offset of keyboard avoiding view
   useEffect(() => {
     const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
       setVerticalOffset(0);
@@ -64,6 +63,7 @@ export default function Dream() {
     };
   }, []);
 
+  // send prompt to server
   const dreamButton = async () => {
     axios
       .post(
@@ -78,7 +78,6 @@ export default function Dream() {
         setImageURI(`data:image/png;base64,${image_data}`);
         setLoading(false);
         setPrompt('');
-
         // save the image locally with AsyncStorage
         AsyncStorage.setItem('01', image_data);
       });
@@ -128,12 +127,7 @@ export default function Dream() {
             </Neomorph>
           </View>
         </ScrollView>
-        <View
-          style={
-            {
-              // make it center
-            }
-          }>
+        <View>
           <TextInput
             multiline={true}
             onChangeText={text => setPrompt(text)}
@@ -157,45 +151,6 @@ export default function Dream() {
           />
         </View>
       </View>
-      {/* <View
-        style={{
-          backgroundColor: 'rgba(0,0,0,0)',
-          marginTop: 20,
-
-          // make it center
-          alignItems: 'center',
-        }}>
-        <TouchableWithoutFeedback
-          onPressIn={() => {
-            setPressed(true);
-            setLoading(true);
-            //haptic feedback
-            ReactNativeHapticFeedback.trigger('impactMedium', options);
-            dreamButton();
-          }}
-          onPressOut={() => setPressed(false)}>
-          <Neomorph
-            inner={pressed}
-            style={{
-              shadowRadius: 10,
-              borderRadius: 25,
-              backgroundColor: COLORS.primary,
-              width: 200,
-              height: 50,
-              marginTop: 20,
-            }}>
-            <Text
-              style={{
-                fontSize: 20,
-                color: 'black',
-                textAlign: 'center',
-                marginTop: 10,
-              }}>
-              Dream
-            </Text>
-          </Neomorph>
-        </TouchableWithoutFeedback>
-      </View> */}
     </KeyboardAvoidingView>
   );
 }
