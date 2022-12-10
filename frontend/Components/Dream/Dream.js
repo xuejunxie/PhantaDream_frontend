@@ -27,7 +27,7 @@ const options = {
 import uuid from 'react-native-uuid';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {
-  faEdit,
+  faCopy,
   faDownload,
   faShare,
   faTrash,
@@ -40,10 +40,12 @@ const empty_image =
 const canvasSize = 300;
 const tabBarHeight = 29;
 
+var scrollViewHeight = 0;
+
 export default function Dream() {
   const [prompt, setPrompt] = React.useState('');
 
-  const [editButtonPressed, setEditButtonPressed] = useState(false);
+  const [CopyButtonPressed, setCopyButtonPressed] = useState(false);
   const [saveButtonPressed, setSaveButtonPressed] = useState(false);
   const [shareButtonPressed, setShareButtonPressed] = useState(false);
   const [deleteButtonPressed, setDeleteButtonPressed] = useState(false);
@@ -131,44 +133,21 @@ export default function Dream() {
         const image_file = `data:image/png;base64,${image_data}`;
         setPrompt('');
         // save the image locally with AsyncStorage
-        if (pickedImage === null) {
-          const imageId = uuid.v1();
-          const image_entry = {
-            id: imageId,
-            image: image_file,
-            prompt: prompt,
-            date: new Date(),
-          };
-          AsyncStorage.setItem(imageId, JSON.stringify(image_entry));
-          // replace the last image with the new image
-          image_entry.loading = false;
-          image_entry.selected = true;
-          if (images[0].id === 'empty') {
-            setImages([image_entry]);
-          } else {
-            setImages([...images, image_entry]);
-          }
+        const imageId = uuid.v1();
+        const image_entry = {
+          id: imageId,
+          image: image_file,
+          prompt: prompt,
+          date: new Date(),
+        };
+        AsyncStorage.setItem(imageId, JSON.stringify(image_entry));
+        // replace the last image with the new image
+        image_entry.loading = false;
+        image_entry.selected = true;
+        if (images[0].id === 'empty') {
+          setImages([image_entry]);
         } else {
-          const image_entry = {
-            id: pickedImage.id,
-            image: image_file,
-            prompt: prompt,
-            date: pickedImage.date,
-          };
-          AsyncStorage.setItem(pickedImage.id, JSON.stringify(image_entry));
-          // replace the last image with the new image
-          image_entry.loading = false;
-          image_entry.selected = true;
-
-          setImages(
-            images.map(image => {
-              if (image.id === pickedImage.id) {
-                return image_entry;
-              } else {
-                return image;
-              }
-            }),
-          );
+          setImages([...images, image_entry]);
         }
       });
   };
@@ -215,9 +194,9 @@ export default function Dream() {
           justifyContent: 'space-evenly',
         }}>
         {operations(
-          editButtonPressed,
-          setEditButtonPressed,
-          renderIcon(faEdit),
+          CopyButtonPressed,
+          setCopyButtonPressed,
+          renderIcon(faCopy),
         )}
         {operations(
           saveButtonPressed,
@@ -240,11 +219,11 @@ export default function Dream() {
 
   useEffect(() => {
     if (pickedImage) {
-      if (editButtonPressed) {
+      if (CopyButtonPressed) {
         setPrompt(pickedImage.prompt);
       }
     }
-  }, [editButtonPressed]);
+  }, [CopyButtonPressed]);
 
   const imageView = item => {
     return (
@@ -324,14 +303,19 @@ export default function Dream() {
         }}>
         <ScrollView
           ref={scrollViewRef}
-          onContentSizeChange={() => {
+          onContentSizeChange={(contentWidth, contentHeight) => {
+            console.log(contentHeight, scrollViewHeight);
+
             if (pickedImage === null) {
-              scrollViewRef.current.scrollToEnd({animated: true});
+              if (contentHeight > scrollViewHeight) {
+                scrollViewRef.current.scrollToEnd({animated: true});
+              }
             } else {
               if (pickedImage.id === images[images.length - 1].id) {
                 scrollViewRef.current.scrollToEnd({animated: true});
               }
             }
+            scrollViewHeight = contentHeight;
           }}>
           {images.map((item, index) => {
             return imageView(item);
@@ -372,38 +356,22 @@ export default function Dream() {
               } else {
                 // add a new image with loading
 
-                if (pickedImage === null) {
-                  setImages([
-                    ...images.map(item => {
-                      item.selected = false;
-                      return item;
-                    }),
-                    {
-                      id: 'loading',
-                      image: loading_image,
-                      prompt: '',
-                      date: new Date(),
-                      loading: true,
-                      selected: false,
-                    },
-                  ]);
-                } else {
-                  // make the picked image loading
-                  setImages([
-                    ...images.map(item => {
-                      if (item.id === pickedImage.id) {
-                        // make the image loading
-                        item.image = loading_image;
-                        item.loading = true;
-                        return item;
-                      } else {
-                        return item;
-                      }
-                    }),
-                  ]);
-                }
+                setImages([
+                  ...images.map(item => {
+                    item.selected = false;
+                    return item;
+                  }),
+                  {
+                    id: 'loading',
+                    image: loading_image,
+                    prompt: '',
+                    date: new Date(),
+                    loading: true,
+                    selected: false,
+                  },
+                ]);
               }
-
+              setPickedImage(null);
               send();
             }}
           />
