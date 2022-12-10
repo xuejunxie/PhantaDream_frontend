@@ -302,8 +302,8 @@ export default function Dream() {
                 // add a new image with loading
 
                 setImages([
-                  ...images.slice(0, images.length - 1),
-                  {...images[images.length], selected: false},
+                  ...images.slice(0, images.length - 2),
+                  {...images[images.length - 1], selected: false},
                   {
                     id: 'loading',
                     image: loading_image,
