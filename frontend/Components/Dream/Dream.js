@@ -33,6 +33,8 @@ import {
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 
+import {CameraRoll} from '@react-native-camera-roll/camera-roll';
+
 const loading_image = 'https://i.gifer.com/1amw.gif';
 const empty_image =
   'https://www.canvaschamp.com/static/images/landingpage/blankprestretchedcanvas/streach-choice.jpg';
@@ -149,6 +151,7 @@ export default function Dream() {
         } else {
           setImages([...images, image_entry]);
         }
+        setPickedImage(image_entry);
       });
   };
   // buttom press components
@@ -217,6 +220,7 @@ export default function Dream() {
     );
   };
 
+  // copy prompt to input box
   useEffect(() => {
     if (pickedImage) {
       if (CopyButtonPressed) {
@@ -224,6 +228,15 @@ export default function Dream() {
       }
     }
   }, [CopyButtonPressed]);
+
+  // save photo to local cameral roll
+  useEffect(() => {
+    if (pickedImage) {
+      if (saveButtonPressed) {
+        CameraRoll.save(pickedImage.image);
+      }
+    }
+  }, [saveButtonPressed]);
 
   const imageView = item => {
     return (
@@ -304,9 +317,8 @@ export default function Dream() {
         <ScrollView
           ref={scrollViewRef}
           onContentSizeChange={(contentWidth, contentHeight) => {
-            console.log(contentHeight, scrollViewHeight);
-
             if (pickedImage === null) {
+              // if user unselected the image, don't scroll
               if (contentHeight > scrollViewHeight) {
                 scrollViewRef.current.scrollToEnd({animated: true});
               }
