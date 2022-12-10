@@ -389,12 +389,14 @@ export default function Dream() {
                   ]);
                 } else {
                   setImages([
-                    images.map(image => {
-                      if (image.id === pickedImage.id) {
-                        image.image = loading_image;
-                        return image;
+                    ...images.map(item => {
+                      if (item.id === pickedImage.id) {
+                        // make the image loading
+                        item.image = loading_image;
+                        item.loading = true;
+                        return item;
                       } else {
-                        return image;
+                        return item;
                       }
                     }),
                   ]);
