@@ -239,8 +239,8 @@ export default function Dream() {
   };
 
   useEffect(() => {
-    if (editButtonPressed) {
-      if (pickedImage) {
+    if (pickedImage) {
+      if (editButtonPressed) {
         setPrompt(pickedImage.prompt);
       }
     }
@@ -388,6 +388,7 @@ export default function Dream() {
                     },
                   ]);
                 } else {
+                  // make the picked image loading
                   setImages([
                     ...images.map(item => {
                       if (item.id === pickedImage.id) {
