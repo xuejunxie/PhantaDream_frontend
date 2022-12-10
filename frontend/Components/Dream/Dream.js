@@ -27,6 +27,7 @@ const options = {
 import uuid from 'react-native-uuid';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {
+  faBolt,
   faCopy,
   faDownload,
   faShare,
@@ -206,11 +207,11 @@ export default function Dream() {
           setSaveButtonPressed,
           renderIcon(faDownload),
         )}
-        {operations(
+        {/* {operations(
           shareButtonPressed,
           setShareButtonPressed,
           renderIcon(faShare),
-        )}
+        )} */}
         {operations(
           deleteButtonPressed,
           setDeleteButtonPressed,
@@ -317,6 +318,25 @@ export default function Dream() {
     );
   };
 
+  // show credit left with lighting symbol
+  const [credit, setCredit] = useState(0);
+  const creditLeft = () => {
+    return (
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginTop: 20,
+        }}>
+        <FontAwesomeIcon icon={faBolt} size={20} color={'gray'} />
+        <Text style={{color: 'gray', fontSize: 15, marginLeft: 10}}>
+          {credit}
+        </Text>
+      </View>
+    );
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -348,6 +368,7 @@ export default function Dream() {
           {images.map((item, index) => {
             return imageView(item);
           })}
+          {creditLeft()}
         </ScrollView>
 
         <View>
