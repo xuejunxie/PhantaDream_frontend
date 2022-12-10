@@ -238,6 +238,22 @@ export default function Dream() {
     }
   }, [saveButtonPressed]);
 
+  // delete photo
+  useEffect(() => {
+    if (pickedImage) {
+      if (deleteButtonPressed) {
+        setImages(
+          images.filter(image => {
+            return image.id !== pickedImage.id;
+          }),
+        );
+        AsyncStorage.removeItem(pickedImage.id);
+        setPickedImage(null);
+        setDeleteButtonPressed(false);
+      }
+    }
+  }, [deleteButtonPressed]);
+
   const imageView = item => {
     return (
       <View
