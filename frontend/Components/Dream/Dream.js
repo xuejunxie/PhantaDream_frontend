@@ -141,7 +141,7 @@ export default function Dream() {
         // replace the last image with the new image
         image_entry.loading = false;
         image_entry.selected = true;
-        setImages([...images.slice(0, images.length - 1), image_entry]);
+        setImages([...images, image_entry]);
       });
   };
   // buttom press components
@@ -223,6 +223,8 @@ export default function Dream() {
         }}>
         <TouchableWithoutFeedback
           onPress={() => {
+            ReactNativeHapticFeedback.trigger('impactMedium', options);
+
             setImages(
               images.map(image => {
                 if (image.id === item.id) {
@@ -260,6 +262,12 @@ export default function Dream() {
               }}></Image>
           </Neomorph>
         </TouchableWithoutFeedback>
+
+        {item.selected ? (
+          <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
+            {item.prompt}
+          </Text>
+        ) : null}
         {item.selected ? actions() : null}
       </View>
     );
