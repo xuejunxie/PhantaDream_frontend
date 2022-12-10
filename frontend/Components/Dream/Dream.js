@@ -25,6 +25,13 @@ const options = {
 };
 
 import uuid from 'react-native-uuid';
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {
+  faEdit,
+  faDownload,
+  faShare,
+  faTrash,
+} from '@fortawesome/free-solid-svg-icons';
 
 const loading_image = 'https://i.gifer.com/1amw.gif';
 const empty_image =
@@ -36,10 +43,10 @@ const tabBarHeight = 29;
 export default function Dream() {
   const [prompt, setPrompt] = React.useState('');
 
-  const [TweakButtonPressed, setTweakButtonPressed] = useState(false);
+  const [editButtonPressed, setEditButtonPressed] = useState(false);
   const [saveButtonPressed, setSaveButtonPressed] = useState(false);
   const [shareButtonPressed, setShareButtonPressed] = useState(false);
-  const [showActionButtons, setShowActionButtons] = useState(false);
+  const [deleteButtonPressed, setDeleteButtonPressed] = useState(false);
   const scrollViewRef = useRef();
 
   const navBarHeight =
@@ -67,6 +74,7 @@ export default function Dream() {
           prompt: '',
           date: new Date(),
           loading: false,
+          selected: false,
         },
       ]);
     } else {
@@ -104,7 +112,7 @@ export default function Dream() {
 
   // send prompt to server
 
-  const dreamButton = async () => {
+  const send = async () => {
     axios
       .post(
         'http://phantaspace.ddns.net:7863/txt2img',
@@ -116,7 +124,6 @@ export default function Dream() {
           'base64',
         );
         const image_file = `data:image/png;base64,${image_data}`;
-        setShowActionButtons(true);
         setPrompt('');
         // save the image locally with AsyncStorage
         const imageId = uuid.v1();
@@ -126,6 +133,7 @@ export default function Dream() {
           prompt: prompt,
           date: new Date(),
           loading: false,
+          selected: true,
         };
         AsyncStorage.setItem(imageId, JSON.stringify(image_entry));
         // replace the last image with the new image
@@ -133,7 +141,7 @@ export default function Dream() {
       });
   };
   // buttom press components
-  const operations = (press, setPress, name) => {
+  const operations = (press, setPress, icon) => {
     return (
       <View>
         <TouchableWithoutFeedback
@@ -148,22 +156,20 @@ export default function Dream() {
               shadowRadius: 10,
               borderRadius: 25,
               backgroundColor: COLORS.primary,
-              width: 100,
+              width: 60,
               height: 40,
+              justifyContent: 'center',
+              alignItems: 'center',
             }}>
-            <Text
-              style={{
-                fontSize: 20,
-                color: 'gray',
-                textAlign: 'center',
-                marginTop: 7,
-              }}>
-              {name}
-            </Text>
+            {icon}
           </Neomorph>
         </TouchableWithoutFeedback>
       </View>
     );
+  };
+
+  const renderIcon = name => {
+    return <FontAwesomeIcon icon={name} size={20} color={'gray'} />;
   };
 
   const actions = () => {
@@ -173,18 +179,36 @@ export default function Dream() {
           flexDirection: 'row',
           justifyContent: 'space-evenly',
           marginTop: 20,
+          marginBottom: 20,
         }}>
-        {operations(TweakButtonPressed, setTweakButtonPressed, 'Tweak')}
-        {operations(saveButtonPressed, setSaveButtonPressed, 'Save')}
-        {operations(shareButtonPressed, setShareButtonPressed, 'Share')}
+        {operations(
+          editButtonPressed,
+          setEditButtonPressed,
+          renderIcon(faEdit),
+        )}
+        {operations(
+          saveButtonPressed,
+          setSaveButtonPressed,
+          renderIcon(faDownload),
+        )}
+        {operations(
+          shareButtonPressed,
+          setShareButtonPressed,
+          renderIcon(faShare),
+        )}
+        {operations(
+          deleteButtonPressed,
+          setDeleteButtonPressed,
+          renderIcon(faTrash),
+        )}
       </View>
     );
   };
 
-  const imageView = (isLoading, URI, index) => {
+  const imageView = item => {
     return (
       <View
-        key={index}
+        key={item.id}
         style={{
           backgroundColor: 'rgba(0,0,0,0)',
           marginTop: 30,
@@ -203,7 +227,7 @@ export default function Dream() {
           }}>
           <Image
             source={{
-              uri: isLoading ? loading_image : URI,
+              uri: item.loading ? loading_image : item.image,
             }}
             style={{
               width: canvasSize,
@@ -212,6 +236,7 @@ export default function Dream() {
               borderRadius: 25,
             }}></Image>
         </Neomorph>
+        {item.selected ? actions() : null}
       </View>
     );
   };
@@ -235,10 +260,8 @@ export default function Dream() {
             scrollViewRef.current.scrollToEnd({animated: true})
           }>
           {images.map((item, index) => {
-            return imageView(item.loading, item.image, item.id);
+            return imageView(item);
           })}
-
-          {showActionButtons ? actions() : null}
         </ScrollView>
 
         <View>
@@ -256,15 +279,21 @@ export default function Dream() {
             numberOfLines={1}
             blurOnSubmit={true}
             onSubmitEditing={() => {
-              setShowActionButtons(false);
               //haptic feedback
               ReactNativeHapticFeedback.trigger('impactMedium', options);
 
               if (images[0].id === 'empty') {
                 // set the first image to loading
-                const newImages = images;
-                newImages[0].loading = true;
-                setImages(newImages);
+                setImages([
+                  {
+                    id: 'loading',
+                    image: loading_image,
+                    prompt: '',
+                    date: new Date(),
+                    loading: true,
+                    selected: false,
+                  },
+                ]);
                 // force update the view
               } else {
                 // add a new image with loading
@@ -278,11 +307,12 @@ export default function Dream() {
                     prompt: '',
                     date: new Date(),
                     loading: true,
+                    selected: false,
                   },
                 ]);
               }
 
-              dreamButton();
+              send();
             }}
           />
         </View>
