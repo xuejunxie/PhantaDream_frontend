@@ -82,6 +82,8 @@ export default function Dream() {
       const parsedResult = result.map((item, index) => {
         const imageId = item[0];
         const image = JSON.parse(item[1]);
+        image.loading = false;
+        image.selected = false;
         return image;
       });
       const sourtedResult = parsedResult.sort((a, b) => {
@@ -132,18 +134,21 @@ export default function Dream() {
           image: image_file,
           prompt: prompt,
           date: new Date(),
-          loading: false,
-          selected: true,
         };
         AsyncStorage.setItem(imageId, JSON.stringify(image_entry));
         // replace the last image with the new image
+        image_entry.loading = false;
+        image_entry.selected = true;
         setImages([...images.slice(0, images.length - 1), image_entry]);
       });
   };
   // buttom press components
   const operations = (press, setPress, icon) => {
     return (
-      <View>
+      <View
+        style={{
+          margin: 10,
+        }}>
         <TouchableWithoutFeedback
           onPressIn={() => {
             setPress(true);
@@ -178,8 +183,6 @@ export default function Dream() {
         style={{
           flexDirection: 'row',
           justifyContent: 'space-evenly',
-          marginTop: 20,
-          marginBottom: 20,
         }}>
         {operations(
           editButtonPressed,
@@ -299,8 +302,8 @@ export default function Dream() {
                 // add a new image with loading
 
                 setImages([
-                  ...images,
-
+                  ...images.slice(0, images.length - 1),
+                  {...images[images.length], selected: false},
                   {
                     id: 'loading',
                     image: loading_image,
