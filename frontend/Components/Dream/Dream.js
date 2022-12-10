@@ -96,6 +96,7 @@ export default function Dream() {
   };
 
   useEffect(() => {
+    // AsyncStorage.clear();
     loadImages();
   }, []);
 
@@ -141,7 +142,11 @@ export default function Dream() {
         // replace the last image with the new image
         image_entry.loading = false;
         image_entry.selected = true;
-        setImages([...images, image_entry]);
+        if (images[0].id === 'empty') {
+          setImages([image_entry]);
+        } else {
+          setImages([...images.slice(0, images.length), image_entry]);
+        }
       });
   };
   // buttom press components
@@ -324,7 +329,7 @@ export default function Dream() {
                 // set the first image to loading
                 setImages([
                   {
-                    id: 'loading',
+                    id: 'empty',
                     image: loading_image,
                     prompt: '',
                     date: new Date(),
