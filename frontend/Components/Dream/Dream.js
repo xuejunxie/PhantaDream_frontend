@@ -47,7 +47,7 @@ export default function Dream() {
   const [saveButtonPressed, setSaveButtonPressed] = useState(false);
   const [shareButtonPressed, setShareButtonPressed] = useState(false);
   const [deleteButtonPressed, setDeleteButtonPressed] = useState(false);
-  const [pickedImage, setPickedImage] = useState(null);
+  const [pickedImage, setPickedImage] = useState(null); // pickedImage = image object when user pick an image from the gallery
 
   const scrollViewRef = useRef();
 
@@ -131,21 +131,44 @@ export default function Dream() {
         const image_file = `data:image/png;base64,${image_data}`;
         setPrompt('');
         // save the image locally with AsyncStorage
-        const imageId = uuid.v1();
-        const image_entry = {
-          id: imageId,
-          image: image_file,
-          prompt: prompt,
-          date: new Date(),
-        };
-        AsyncStorage.setItem(imageId, JSON.stringify(image_entry));
-        // replace the last image with the new image
-        image_entry.loading = false;
-        image_entry.selected = true;
-        if (images[0].id === 'empty') {
-          setImages([image_entry]);
+        if (pickedImage === null) {
+          const imageId = uuid.v1();
+          const image_entry = {
+            id: imageId,
+            image: image_file,
+            prompt: prompt,
+            date: new Date(),
+          };
+          AsyncStorage.setItem(imageId, JSON.stringify(image_entry));
+          // replace the last image with the new image
+          image_entry.loading = false;
+          image_entry.selected = true;
+          if (images[0].id === 'empty') {
+            setImages([image_entry]);
+          } else {
+            setImages([...images, image_entry]);
+          }
         } else {
-          setImages([...images, image_entry]);
+          const image_entry = {
+            id: pickedImage.id,
+            image: image_file,
+            prompt: prompt,
+            date: pickedImage.date,
+          };
+          AsyncStorage.setItem(pickedImage.id, JSON.stringify(image_entry));
+          // replace the last image with the new image
+          image_entry.loading = false;
+          image_entry.selected = true;
+
+          setImages(
+            images.map(image => {
+              if (image.id === pickedImage.id) {
+                return image_entry;
+              } else {
+                return image;
+              }
+            }),
+          );
         }
       });
   };
@@ -214,6 +237,14 @@ export default function Dream() {
       </View>
     );
   };
+
+  useEffect(() => {
+    if (editButtonPressed) {
+      if (pickedImage) {
+        setPrompt(pickedImage.prompt);
+      }
+    }
+  }, [editButtonPressed]);
 
   const imageView = item => {
     return (
@@ -341,20 +372,33 @@ export default function Dream() {
               } else {
                 // add a new image with loading
 
-                setImages([
-                  ...images.map(item => {
-                    item.selected = false;
-                    return item;
-                  }),
-                  {
-                    id: 'loading',
-                    image: loading_image,
-                    prompt: '',
-                    date: new Date(),
-                    loading: true,
-                    selected: false,
-                  },
-                ]);
+                if (pickedImage === null) {
+                  setImages([
+                    ...images.map(item => {
+                      item.selected = false;
+                      return item;
+                    }),
+                    {
+                      id: 'loading',
+                      image: loading_image,
+                      prompt: '',
+                      date: new Date(),
+                      loading: true,
+                      selected: false,
+                    },
+                  ]);
+                } else {
+                  setImages([
+                    images.map(image => {
+                      if (image.id === pickedImage.id) {
+                        image.image = loading_image;
+                        return image;
+                      } else {
+                        return image;
+                      }
+                    }),
+                  ]);
+                }
               }
 
               send();
