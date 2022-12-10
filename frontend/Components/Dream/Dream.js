@@ -104,28 +104,6 @@ export default function Dream() {
 
   // send prompt to server
 
-  const beforeDreamButton = () => {
-    // check if the first image is empty
-    if (images[0].id === 'empty') {
-      // set the first image to loading
-      const newImages = images;
-      newImages[0].loading = true;
-      setImages(newImages);
-      // force update the view
-    } else {
-      // add a new image with loading
-      const newImages = images;
-      newImages.push({
-        id: 'loading',
-        image: loading_image,
-        prompt: '',
-        date: new Date(),
-        loading: true,
-      });
-      setImages(newImages);
-    }
-  };
-
   const dreamButton = async () => {
     axios
       .post(
@@ -151,10 +129,7 @@ export default function Dream() {
         };
         AsyncStorage.setItem(imageId, JSON.stringify(image_entry));
         // replace the last image with the new image
-        const newImages = images;
-        newImages.pop();
-        newImages.push(image_entry);
-        setImages(newImages);
+        setImages([...images.slice(0, images.length - 1), image_entry]);
       });
   };
   // buttom press components
@@ -284,7 +259,29 @@ export default function Dream() {
               setShowActionButtons(false);
               //haptic feedback
               ReactNativeHapticFeedback.trigger('impactMedium', options);
-              beforeDreamButton();
+
+              if (images[0].id === 'empty') {
+                // set the first image to loading
+                const newImages = images;
+                newImages[0].loading = true;
+                setImages(newImages);
+                // force update the view
+              } else {
+                // add a new image with loading
+
+                setImages([
+                  ...images,
+
+                  {
+                    id: 'loading',
+                    image: loading_image,
+                    prompt: '',
+                    date: new Date(),
+                    loading: true,
+                  },
+                ]);
+              }
+
               dreamButton();
             }}
           />
