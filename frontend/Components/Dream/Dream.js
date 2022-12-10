@@ -47,6 +47,8 @@ export default function Dream() {
   const [saveButtonPressed, setSaveButtonPressed] = useState(false);
   const [shareButtonPressed, setShareButtonPressed] = useState(false);
   const [deleteButtonPressed, setDeleteButtonPressed] = useState(false);
+  const [pickedImage, setPickedImage] = useState(null);
+
   const scrollViewRef = useRef();
 
   const navBarHeight =
@@ -219,26 +221,45 @@ export default function Dream() {
           // make it center
           alignItems: 'center',
         }}>
-        <Neomorph
-          style={{
-            shadowRadius: 10,
-            borderRadius: 25,
-            backgroundColor: COLORS.primary,
-            width: canvasSize,
-            height: canvasSize,
-            marginTop: 20,
+        <TouchableWithoutFeedback
+          onPress={() => {
+            setImages(
+              images.map(image => {
+                if (image.id === item.id) {
+                  image.selected = !image.selected;
+                  if (image.selected) {
+                    setPickedImage(image);
+                  } else {
+                    setPickedImage(null);
+                  }
+                } else {
+                  image.selected = false;
+                }
+                return image;
+              }),
+            );
           }}>
-          <Image
-            source={{
-              uri: item.loading ? loading_image : item.image,
-            }}
+          <Neomorph
             style={{
+              shadowRadius: 10,
+              borderRadius: 25,
+              backgroundColor: COLORS.primary,
               width: canvasSize,
               height: canvasSize,
+              marginTop: 20,
+            }}>
+            <Image
+              source={{
+                uri: item.loading ? loading_image : item.image,
+              }}
+              style={{
+                width: canvasSize,
+                height: canvasSize,
 
-              borderRadius: 25,
-            }}></Image>
-        </Neomorph>
+                borderRadius: 25,
+              }}></Image>
+          </Neomorph>
+        </TouchableWithoutFeedback>
         {item.selected ? actions() : null}
       </View>
     );
@@ -259,9 +280,15 @@ export default function Dream() {
         }}>
         <ScrollView
           ref={scrollViewRef}
-          onContentSizeChange={() =>
-            scrollViewRef.current.scrollToEnd({animated: true})
-          }>
+          onContentSizeChange={() => {
+            if (pickedImage === null) {
+              scrollViewRef.current.scrollToEnd({animated: true});
+            } else {
+              if (pickedImage.id === images[images.length - 1].id) {
+                scrollViewRef.current.scrollToEnd({animated: true});
+              }
+            }
+          }}>
           {images.map((item, index) => {
             return imageView(item);
           })}
@@ -302,7 +329,7 @@ export default function Dream() {
                 // add a new image with loading
 
                 setImages([
-                  ...images.slice(0, images.length).map(item => {
+                  ...images.map(item => {
                     item.selected = false;
                     return item;
                   }),
