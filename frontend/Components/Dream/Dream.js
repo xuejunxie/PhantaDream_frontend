@@ -24,37 +24,67 @@ const options = {
   ignoreAndroidSystemSettings: false,
 };
 
+import uuid from 'react-native-uuid';
+
 const loading_image = 'https://i.gifer.com/1amw.gif';
+const empty_image =
+  'https://www.canvaschamp.com/static/images/landingpage/blankprestretchedcanvas/streach-choice.jpg';
 
 const canvasSize = 300;
 const tabBarHeight = 29;
 
 export default function Dream() {
   const [prompt, setPrompt] = React.useState('');
-  const [imageURI, setImageURI] = useState(
-    'https://www.canvaschamp.com/static/images/landingpage/blankprestretchedcanvas/streach-choice.jpg',
-  );
-  const [loading, setLoading] = useState(false);
 
-  const [keepButtonPressed, setKeepButtonPressed] = useState(false);
+  const [TweakButtonPressed, setTweakButtonPressed] = useState(false);
   const [saveButtonPressed, setSaveButtonPressed] = useState(false);
   const [shareButtonPressed, setShareButtonPressed] = useState(false);
   const [showActionButtons, setShowActionButtons] = useState(false);
-
   const scrollViewRef = useRef();
 
   const navBarHeight =
     getStatusBarHeight(Platform.OS === 'ios' ? false : true) + tabBarHeight;
   const [verticalOffest, setVerticalOffset] = useState(navBarHeight);
 
-  // load the image from AsyncStorage
+  // load all the image from AsyncStorage
+  const [images, setImages] = useState([]);
+
+  // image object fields:
+  // id: imageId same as the key
+  // image: image_file (base64) in string
+  // prompt: prompt
+  // date: date
+  // loading: boolean
+  //
+
+  const loadImages = async () => {
+    const keys = await AsyncStorage.getAllKeys();
+    if (keys.length === 0) {
+      setImages([
+        {
+          id: 'empty',
+          image: empty_image,
+          prompt: '',
+          date: new Date(),
+          loading: false,
+        },
+      ]);
+    } else {
+      const result = await AsyncStorage.multiGet(keys);
+      const parsedResult = result.map((item, index) => {
+        const imageId = item[0];
+        const image = JSON.parse(item[1]);
+        return image;
+      });
+      const sourtedResult = parsedResult.sort((a, b) => {
+        return new Date(a.date) - new Date(b.date);
+      });
+      setImages(sourtedResult);
+    }
+  };
+
   useEffect(() => {
-    AsyncStorage.getItem('01').then(file => {
-      if (file !== null) {
-        setImageURI(file);
-        scrollViewRef.current.scrollToEnd();
-      }
-    });
+    loadImages();
   }, []);
 
   // dynamically adjust vertical offset of keyboard avoiding view
@@ -73,6 +103,29 @@ export default function Dream() {
   }, []);
 
   // send prompt to server
+
+  const beforeDreamButton = () => {
+    // check if the first image is empty
+    if (images[0].id === 'empty') {
+      // set the first image to loading
+      const newImages = images;
+      newImages[0].loading = true;
+      setImages(newImages);
+      // force update the view
+    } else {
+      // add a new image with loading
+      const newImages = images;
+      newImages.push({
+        id: 'loading',
+        image: loading_image,
+        prompt: '',
+        date: new Date(),
+        loading: true,
+      });
+      setImages(newImages);
+    }
+  };
+
   const dreamButton = async () => {
     axios
       .post(
@@ -85,13 +138,23 @@ export default function Dream() {
           'base64',
         );
         const image_file = `data:image/png;base64,${image_data}`;
-        setImageURI(image_file);
-        setLoading(false);
         setShowActionButtons(true);
         setPrompt('');
         // save the image locally with AsyncStorage
-        AsyncStorage.setItem('01', image_file);
-        scrollViewRef.current.scrollToEnd({animated: true});
+        const imageId = uuid.v1();
+        const image_entry = {
+          id: imageId,
+          image: image_file,
+          prompt: prompt,
+          date: new Date(),
+          loading: false,
+        };
+        AsyncStorage.setItem(imageId, JSON.stringify(image_entry));
+        // replace the last image with the new image
+        const newImages = images;
+        newImages.pop();
+        newImages.push(image_entry);
+        setImages(newImages);
       });
   };
   // buttom press components
@@ -136,16 +199,17 @@ export default function Dream() {
           justifyContent: 'space-evenly',
           marginTop: 20,
         }}>
-        {operations(keepButtonPressed, setKeepButtonPressed, 'Keep')}
+        {operations(TweakButtonPressed, setTweakButtonPressed, 'Tweak')}
         {operations(saveButtonPressed, setSaveButtonPressed, 'Save')}
         {operations(shareButtonPressed, setShareButtonPressed, 'Share')}
       </View>
     );
   };
 
-  const imageView = (isLoading, URI) => {
+  const imageView = (isLoading, URI, index) => {
     return (
       <View
+        key={index}
         style={{
           backgroundColor: 'rgba(0,0,0,0)',
           marginTop: 30,
@@ -190,11 +254,14 @@ export default function Dream() {
           height: '100%',
           justifyContent: 'flex-end',
         }}>
-        <ScrollView ref={scrollViewRef}>
-          {imageView(loading, imageURI)}
-          {imageView(loading, imageURI)}
-
-          {imageView(loading, imageURI)}
+        <ScrollView
+          ref={scrollViewRef}
+          onContentSizeChange={() =>
+            scrollViewRef.current.scrollToEnd({animated: true})
+          }>
+          {images.map((item, index) => {
+            return imageView(item.loading, item.image, item.id);
+          })}
 
           {showActionButtons ? actions() : null}
         </ScrollView>
@@ -214,10 +281,10 @@ export default function Dream() {
             numberOfLines={1}
             blurOnSubmit={true}
             onSubmitEditing={() => {
-              setLoading(true);
               setShowActionButtons(false);
               //haptic feedback
               ReactNativeHapticFeedback.trigger('impactMedium', options);
+              beforeDreamButton();
               dreamButton();
             }}
           />
