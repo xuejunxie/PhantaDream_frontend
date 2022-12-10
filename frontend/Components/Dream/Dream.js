@@ -145,7 +145,7 @@ export default function Dream() {
         if (images[0].id === 'empty') {
           setImages([image_entry]);
         } else {
-          setImages([...images.slice(0, images.length), image_entry]);
+          setImages([...images, image_entry]);
         }
       });
   };
