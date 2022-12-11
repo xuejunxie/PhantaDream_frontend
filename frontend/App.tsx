@@ -43,7 +43,7 @@ function Home(): JSX.Element {
         }}
         component={Dream}
       />
-      {/* <Tab.Screen
+      <Tab.Screen
         name="Explorer"
         options={{
           tabBarLabel: 'Explore',
@@ -52,8 +52,8 @@ function Home(): JSX.Element {
           ),
         }}
         component={Explore}
-      /> */}
-      {/* <Tab.Screen
+      />
+      <Tab.Screen
         name="Market"
         options={{
           tabBarLabel: 'Market',
@@ -64,7 +64,7 @@ function Home(): JSX.Element {
           },
         }}
         component={Market}
-      /> */}
+      />
       {/* <Tab.Screen
         name="PhantaSpace"
         options={{

@@ -7,6 +7,9 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
+  TouchableOpacity,
+  Modal,
+  Button,
 } from 'react-native';
 import {TextInput} from 'react-native-paper';
 
@@ -47,7 +50,7 @@ var scrollViewHeight = 0;
 
 export default function Dream() {
   const [prompt, setPrompt] = React.useState('');
-
+  const [loading, setLoading] = useState(false);
   const [CopyButtonPressed, setCopyButtonPressed] = useState(false);
   const [saveButtonPressed, setSaveButtonPressed] = useState(false);
   const [shareButtonPressed, setShareButtonPressed] = useState(false);
@@ -152,6 +155,7 @@ export default function Dream() {
         } else {
           setImages([...images, image_entry]);
         }
+        setLoading(false);
         setPickedImage(image_entry);
       });
   };
@@ -207,11 +211,11 @@ export default function Dream() {
           setSaveButtonPressed,
           renderIcon(faDownload),
         )}
-        {/* {operations(
+        {operations(
           shareButtonPressed,
           setShareButtonPressed,
           renderIcon(faShare),
-        )} */}
+        )}
         {operations(
           deleteButtonPressed,
           setDeleteButtonPressed,
@@ -318,22 +322,120 @@ export default function Dream() {
     );
   };
 
-  // show credit left with lighting symbol
-  const [credit, setCredit] = useState(0);
-  const creditLeft = () => {
+  // show charge left with lighting symbol
+  const [Charge, setCharge] = useState(0);
+  const ChargeLeft = () => {
     return (
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginTop: 20,
+      <TouchableOpacity
+        onPress={() => {
+          setModalVisible(true);
         }}>
-        <FontAwesomeIcon icon={faBolt} size={20} color={'gray'} />
-        <Text style={{color: 'gray', fontSize: 15, marginLeft: 10}}>
-          {credit}
-        </Text>
-      </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: 20,
+          }}>
+          <FontAwesomeIcon icon={faBolt} size={20} color={'gray'} />
+          <Text style={{color: 'gray', fontSize: 15, marginLeft: 10}}>
+            {Charge}
+          </Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  // show modal to purchase charge when user press the Charge icon
+  const [modalVisible, setModalVisible] = useState(false);
+  const ChargeModal = () => {
+    return (
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'rgba(0,0,0,0.5)',
+          }}>
+          <View
+            style={{
+              backgroundColor: COLORS.primary,
+              width: '80%',
+              height: '50%',
+              borderRadius: 25,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <Text style={{color: 'gray', fontSize: 20, marginBottom: 20}}>
+              Purchase
+            </Text>
+            <FontAwesomeIcon icon={faBolt} size={20} color={'gray'} />
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-evenly',
+                width: '100%',
+              }}>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: COLORS.primary,
+                  width: 100,
+                  height: 100,
+                  borderRadius: 25,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+                onPress={() => {
+                  setCharge(Charge + 1);
+                  setModalVisible(false);
+                }}>
+                <Text style={{color: 'gray', fontSize: 20}}>$1</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: COLORS.primary,
+                  width: 100,
+                  height: 100,
+                  borderRadius: 25,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+                onPress={() => {
+                  setCharge(Charge + 5);
+                  setModalVisible(false);
+                }}>
+                <Text style={{color: 'gray', fontSize: 20}}>$5</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: COLORS.primary,
+                  width: 100,
+                  height: 100,
+                  borderRadius: 25,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+                onPress={() => {
+                  setCharge(Charge + 10);
+                  setModalVisible(false);
+                }}>
+                <Text style={{color: 'gray', fontSize: 20}}>$10</Text>
+              </TouchableOpacity>
+            </View>
+            <Button
+              title="Close"
+              onPress={() => setModalVisible(!modalVisible)}
+            />
+          </View>
+        </View>
+      </Modal>
     );
   };
 
@@ -368,63 +470,66 @@ export default function Dream() {
           {images.map((item, index) => {
             return imageView(item);
           })}
-          {creditLeft()}
+          {ChargeLeft()}
         </ScrollView>
 
         <View>
-          <TextInput
-            multiline={true}
-            onChangeText={text => setPrompt(text)}
-            value={prompt}
-            style={{
-              backgroundColor: 'rgba(0,0,0,0)',
-              // align text to center
-              textAlign: 'center',
-            }}
-            placeholder="🤯 Tap here to write down your dream "
-            returnKeyType="send"
-            numberOfLines={1}
-            blurOnSubmit={true}
-            onSubmitEditing={() => {
-              //haptic feedback
-              ReactNativeHapticFeedback.trigger('impactMedium', options);
+          {!loading && (
+            <TextInput
+              multiline={true}
+              onChangeText={text => setPrompt(text)}
+              value={prompt}
+              style={{
+                backgroundColor: 'rgba(0,0,0,0)',
+                // align text to center
+                textAlign: 'center',
+              }}
+              placeholder="🤯 Tap here to write down your dream "
+              returnKeyType="send"
+              numberOfLines={1}
+              blurOnSubmit={true}
+              onSubmitEditing={() => {
+                //haptic feedback
+                ReactNativeHapticFeedback.trigger('impactMedium', options);
+                setLoading(true);
+                if (images[0].id === 'empty') {
+                  // set the first image to loading
+                  setImages([
+                    {
+                      id: 'empty',
+                      image: loading_image,
+                      prompt: '',
+                      date: new Date(),
+                      loading: true,
+                      selected: false,
+                    },
+                  ]);
+                  // force update the view
+                } else {
+                  // add a new image with loading
 
-              if (images[0].id === 'empty') {
-                // set the first image to loading
-                setImages([
-                  {
-                    id: 'empty',
-                    image: loading_image,
-                    prompt: '',
-                    date: new Date(),
-                    loading: true,
-                    selected: false,
-                  },
-                ]);
-                // force update the view
-              } else {
-                // add a new image with loading
-
-                setImages([
-                  ...images.map(item => {
-                    item.selected = false;
-                    return item;
-                  }),
-                  {
-                    id: 'loading',
-                    image: loading_image,
-                    prompt: '',
-                    date: new Date(),
-                    loading: true,
-                    selected: false,
-                  },
-                ]);
-              }
-              setPickedImage(null);
-              send();
-            }}
-          />
+                  setImages([
+                    ...images.map(item => {
+                      item.selected = false;
+                      return item;
+                    }),
+                    {
+                      id: 'loading',
+                      image: loading_image,
+                      prompt: '',
+                      date: new Date(),
+                      loading: true,
+                      selected: false,
+                    },
+                  ]);
+                }
+                setPickedImage(null);
+                send();
+              }}
+            />
+          )}
         </View>
+        {ChargeModal()}
       </View>
     </KeyboardAvoidingView>
   );
