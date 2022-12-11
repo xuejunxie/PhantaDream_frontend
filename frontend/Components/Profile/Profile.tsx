@@ -1,5 +1,11 @@
 import React from 'react';
-import {StyleSheet, Switch, View, Text, ScrollView} from 'react-native';
+import {
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  Text,
+  ScrollView,
+} from 'react-native';
 // import { useMoralis, useMoralisWeb3Api, useMoralisWeb3ApiCall } from "react-moralis";
 import COLORS from '../GlobalValues/Colors';
 import {Avatar, ListItem} from '@rneui/themed';
@@ -7,8 +13,12 @@ import {Avatar, ListItem} from '@rneui/themed';
 import InfoText from './InfoText';
 
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+
+import ApplePay, {DetailsData, MethodData} from 'react-native-apple-payment';
+
 import {
   faBitcoinSign,
+  faBolt,
   faChevronRight,
   faDollar,
   faGear,
@@ -49,33 +59,51 @@ const firstEmail = {
 
 const list = [
   {
-    title: 'Private clubs',
-    icon: faUserFriends,
+    title: 'Recharge',
+    icon: faBolt,
   },
-  {
-    title: 'Following',
-    icon: faHeart,
-  },
-  {
-    title: 'Liked',
-    icon: faThumbsUp,
-  },
-  {
-    title: 'Billing',
-    icon: faDollar,
-  },
-  {
-    title: 'Revenue',
-    icon: faBitcoinSign,
-  },
-  {
-    title: 'Settings',
-    icon: faGear,
-  },
+  // {
+  //   title: 'Private clubs',
+  //   icon: faUserFriends,
+  // },
+  // {
+  //   title: 'Following',
+  //   icon: faHeart,
+  // },
+  // {
+  //   title: 'Liked',
+  //   icon: faThumbsUp,
+  // },
+  // {
+  //   title: 'Billing',
+  //   icon: faDollar,
+  // },
+  // {
+  //   title: 'Revenue',
+  //   icon: faBitcoinSign,
+  // },
+  // {
+  //   title: 'Settings',
+  //   icon: faGear,
+  // },
 ];
 
 const Profile = ({navigation}) => {
-  // const { authenticate, authError, isAuthenticating, isAuthenticated, logout, Moralis } = useMoralis();
+  const Method: MethodData = {
+    countryCode: 'US',
+    currencyCode: 'USD',
+    merchantIdentifier: 'merchant.phantadream',
+    supportedNetworks: ['Visa', 'MasterCard', 'AmEx'],
+  };
+
+  const Options: DetailsData = {
+    total: {
+      label: 'PhantaCharge',
+      amount: 10,
+    },
+  };
+
+  const payment = new ApplePay(Method, Options);
 
   return (
     <ScrollView
@@ -111,6 +139,26 @@ const Profile = ({navigation}) => {
             <FontAwesomeIcon icon={faChevronRight} />
           </ListItem>
         ))}
+      </View>
+
+      <View>
+        <TouchableOpacity
+          onPress={() => {
+            payment.canMakePayments().then((can: any) => {
+              console.log(can);
+              if (can) {
+                payment.initApplePay().then(console.warn);
+              }
+            });
+          }}>
+          <ListItem key={1} bottomDivider>
+            <FontAwesomeIcon icon={faBolt} />
+            <ListItem.Content>
+              <ListItem.Title>Apple pay</ListItem.Title>
+            </ListItem.Content>
+            <FontAwesomeIcon icon={faChevronRight} />
+          </ListItem>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
