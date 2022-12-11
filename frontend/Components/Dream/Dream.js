@@ -328,7 +328,7 @@ export default function Dream() {
     return (
       <TouchableOpacity
         onPress={() => {
-          setModalVisible(true);
+          setChargeModalVisible(true);
         }}>
         <View
           style={{
@@ -347,15 +347,15 @@ export default function Dream() {
   };
 
   // show modal to purchase charge when user press the Charge icon
-  const [modalVisible, setModalVisible] = useState(false);
+  const [chargeModalVisible, setChargeModalVisible] = useState(false);
   const ChargeModal = () => {
     return (
       <Modal
         animationType="slide"
         transparent={true}
-        visible={modalVisible}
+        visible={chargeModalVisible}
         onRequestClose={() => {
-          setModalVisible(!modalVisible);
+          setChargeModalVisible(!chargeModalVisible);
         }}>
         <View
           style={{
@@ -394,7 +394,7 @@ export default function Dream() {
                 }}
                 onPress={() => {
                   setCharge(Charge + 1);
-                  setModalVisible(false);
+                  setChargeModalVisible(false);
                 }}>
                 <Text style={{color: 'gray', fontSize: 20}}>$1</Text>
               </TouchableOpacity>
@@ -409,7 +409,7 @@ export default function Dream() {
                 }}
                 onPress={() => {
                   setCharge(Charge + 5);
-                  setModalVisible(false);
+                  setChargeModalVisible(false);
                 }}>
                 <Text style={{color: 'gray', fontSize: 20}}>$5</Text>
               </TouchableOpacity>
@@ -424,14 +424,14 @@ export default function Dream() {
                 }}
                 onPress={() => {
                   setCharge(Charge + 10);
-                  setModalVisible(false);
+                  setChargeModalVisible(false);
                 }}>
                 <Text style={{color: 'gray', fontSize: 20}}>$10</Text>
               </TouchableOpacity>
             </View>
             <Button
               title="Close"
-              onPress={() => setModalVisible(!modalVisible)}
+              onPress={() => setChargeModalVisible(!chargeModalVisible)}
             />
           </View>
         </View>
