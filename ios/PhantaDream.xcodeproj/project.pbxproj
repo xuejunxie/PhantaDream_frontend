@@ -505,7 +505,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = art.phantadream;
+				PRODUCT_BUNDLE_IDENTIFIER = ai.phantadream.app;
 				PRODUCT_NAME = PhantaDream;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -532,7 +532,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = art.phantadream;
+				PRODUCT_BUNDLE_IDENTIFIER = ai.phantadream.app;
 				PRODUCT_NAME = PhantaDream;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
