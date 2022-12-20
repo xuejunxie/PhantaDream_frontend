@@ -18,17 +18,50 @@ import {
 } from 'react-native';
 import COLORS from '../GlobalValues/Colors';
 
+import auth from '@react-native-firebase/auth';
+import {appleAuth} from '@invertase/react-native-apple-authentication';
+
+import jwtDecode from 'jwt-decode';
+
 export default function SignIn({navigation}) {
   const [pressed, setPressed] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
 
-  async function signInButton() {}
+  async function signInButton() {
+    // Start the sign-in request
+    const appleAuthRequestResponse = await appleAuth.performRequest({
+      requestedOperation: appleAuth.Operation.LOGIN,
+      requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+    });
+
+    const userData = jwtDecode(appleAuthRequestResponse.identityToken);
+
+    console.log(appleAuthRequestResponse);
+    console.log(userData);
+
+    // Ensure Apple returned a user identityToken
+    if (!appleAuthRequestResponse.identityToken) {
+      throw new Error('Apple Sign-In failed - no identify token returned');
+    }
+
+    // Create a Firebase credential from the response
+    const {identityToken, nonce} = appleAuthRequestResponse;
+    const appleCredential = auth.AppleAuthProvider.credential(
+      identityToken,
+      nonce,
+    );
+
+    // Sign the user in with the credential
+    return auth().signInWithCredential(appleCredential);
+  }
 
   return (
     <View
       style={{
         backgroundColor: COLORS.primary,
         justifyContent: 'flex-end',
+        width: '100%',
+        height: '100%',
       }}>
       <View
         style={{
@@ -60,7 +93,9 @@ export default function SignIn({navigation}) {
           onPressIn={() => {
             setPressed(true);
             ReactNativeHapticFeedback.trigger('impactMedium', options);
-            signInButton();
+            signInButton().then(res => {
+              console.log(res);
+            });
           }}
           onPressOut={() => setPressed(false)}>
           <Neomorph

@@ -101,7 +101,7 @@ function App(): JSX.Element {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Home"
+        initialRouteName="Auth"
         screenOptions={{
           headerShown: false,
         }}>
