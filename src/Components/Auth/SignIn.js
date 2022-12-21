@@ -20,8 +20,11 @@ import COLORS from '../GlobalValues/Colors';
 
 import auth from '@react-native-firebase/auth';
 import {appleAuth} from '@invertase/react-native-apple-authentication';
+import firestore from '@react-native-firebase/firestore';
+import realtime from '@react-native-firebase/database';
 
-import jwtDecode from 'jwt-decode';
+const newUserCharge = 20;
+const newUserHeart = 20;
 
 export default function SignIn({navigation}) {
   const [pressed, setPressed] = useState(false);
@@ -33,11 +36,6 @@ export default function SignIn({navigation}) {
       requestedOperation: appleAuth.Operation.LOGIN,
       requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
     });
-
-    const userData = jwtDecode(appleAuthRequestResponse.identityToken);
-
-    console.log(appleAuthRequestResponse);
-    console.log(userData);
 
     // Ensure Apple returned a user identityToken
     if (!appleAuthRequestResponse.identityToken) {
@@ -52,7 +50,23 @@ export default function SignIn({navigation}) {
     );
 
     // Sign the user in with the credential
-    return auth().signInWithCredential(appleCredential);
+    auth()
+      .signInWithCredential(appleCredential)
+      .then(res => {
+        const user = res.user;
+        if (res.additionalUserInfo.isNewUser) {
+          // create a new user data entry in the database
+          realtime()
+            .ref('/users/' + user.uid)
+            .set({
+              email: appleAuthRequestResponse.email,
+              fullName: appleAuthRequestResponse.fullName,
+              charge: newUserCharge,
+              heart: newUserHeart,
+            });
+        }
+        navigation.navigate('Home');
+      });
   }
 
   return (
@@ -65,24 +79,6 @@ export default function SignIn({navigation}) {
       }}>
       <View
         style={{
-          marginTop: 20,
-          backgroundColor: 'rgba(0,0,0,0)',
-        }}>
-        <TextInput
-          multiline={true}
-          onChangeText={text => setPhoneNumber(text)}
-          value={phoneNumber}
-          style={{
-            backgroundColor: 'rgba(0,0,0,0)',
-            // align text to center
-            textAlign: 'center',
-          }}
-          placeholder="Type in your phone Number to sign in"
-        />
-      </View>
-
-      <View
-        style={{
           backgroundColor: 'rgba(0,0,0,0)',
           marginTop: 20,
 
@@ -93,9 +89,7 @@ export default function SignIn({navigation}) {
           onPressIn={() => {
             setPressed(true);
             ReactNativeHapticFeedback.trigger('impactMedium', options);
-            signInButton().then(res => {
-              console.log(res);
-            });
+            signInButton();
           }}
           onPressOut={() => setPressed(false)}>
           <Neomorph
@@ -111,11 +105,11 @@ export default function SignIn({navigation}) {
             <Text
               style={{
                 fontSize: 20,
-                color: 'black',
+                color: 'gray',
                 textAlign: 'center',
                 marginTop: 10,
               }}>
-              Sign In
+              Sign In with Apple
             </Text>
           </Neomorph>
         </TouchableWithoutFeedback>

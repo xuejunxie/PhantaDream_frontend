@@ -32,6 +32,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {
   faBolt,
   faCopy,
+  faDatabase,
   faDownload,
   faShare,
   faTrash,
@@ -39,6 +40,8 @@ import {
 
 import {CameraRoll} from '@react-native-camera-roll/camera-roll';
 
+import realtime from '@react-native-firebase/database';
+import auth from '@react-native-firebase/auth';
 const loading_image = 'https://i.gifer.com/1amw.gif';
 const empty_image =
   'https://www.canvaschamp.com/static/images/landingpage/blankprestretchedcanvas/streach-choice.jpg';
@@ -51,6 +54,8 @@ var scrollViewHeight = 0;
 export default function Dream() {
   const [prompt, setPrompt] = React.useState('');
   const [loading, setLoading] = useState(false);
+  const [Charge, setCharge] = useState(0);
+
   const [CopyButtonPressed, setCopyButtonPressed] = useState(false);
   const [saveButtonPressed, setSaveButtonPressed] = useState(false);
   const [shareButtonPressed, setShareButtonPressed] = useState(false);
@@ -108,6 +113,13 @@ export default function Dream() {
     loadImages();
   }, []);
 
+  // sync user charge
+  realtime()
+    .ref('/users/' + auth().currentUser.uid)
+    .on('value', snapshot => {
+      setCharge(snapshot.val().charge);
+    });
+
   // dynamically adjust vertical offset of keyboard avoiding view
   useEffect(() => {
     const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
@@ -157,6 +169,11 @@ export default function Dream() {
         }
         setLoading(false);
         setPickedImage(image_entry);
+        realtime()
+          .ref('/users/' + auth().currentUser.uid)
+          .update({
+            charge: Charge - 1,
+          });
       });
   };
   // buttom press components
@@ -323,7 +340,6 @@ export default function Dream() {
   };
 
   // show charge left with lighting symbol
-  const [Charge, setCharge] = useState(0);
   const ChargeLeft = () => {
     return (
       <TouchableOpacity
