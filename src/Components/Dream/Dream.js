@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   Modal,
   Button,
+  Alert,
 } from 'react-native';
 import {TextInput} from 'react-native-paper';
 
@@ -45,6 +46,8 @@ import {CameraRoll} from '@react-native-camera-roll/camera-roll';
 import realtime from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import storage from '@react-native-firebase/storage';
+import {utils} from '@react-native-firebase/app';
 
 import artists from './artists.json';
 
@@ -272,10 +275,53 @@ export default function Dream() {
   useEffect(() => {
     if (pickedImage) {
       if (saveButtonPressed) {
-        CameraRoll.save(pickedImage.image);
+        CameraRoll.save(pickedImage.image).then(() => {
+          Alert.alert('Photo Saved!');
+        });
       }
     }
   }, [saveButtonPressed]);
+
+  useEffect(() => {
+    // upload image to firebase storage create an entry on firestore
+    if (pickedImage) {
+      if (shareButtonPressed) {
+        const imageId = pickedImage.id;
+        const image = pickedImage.image;
+        const prompt = pickedImage.prompt;
+        const date = pickedImage.date;
+        const artist = pickedImage.artist;
+        const storageRef = storage().ref();
+        const imageRef = storageRef.child('images/' + imageId + '.png');
+        imageRef
+          .putString(image, 'data_url')
+          .then(() => {
+            imageRef.getDownloadURL().then(url => {
+              firestore()
+                .collection('images')
+                .doc(imageId)
+                .set({
+                  image: url,
+                  prompt: prompt,
+                  date: date,
+                  artist: artist,
+                  creator: auth().currentUser.uid,
+                  owner: auth().currentUser.uid,
+                  public: true,
+                  likes: 0,
+                })
+                .then(() => {
+                  Alert.alert('Image Shared!');
+                  console.log('imageRef: ', imageRef);
+                });
+            });
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      }
+    }
+  }, [shareButtonPressed]);
 
   // delete photo
   useEffect(() => {
