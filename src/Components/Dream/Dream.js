@@ -423,83 +423,72 @@ export default function Dream() {
   // show modal to purchase charge when user press the Charge icon
   const [chargeModalVisible, setChargeModalVisible] = useState(false);
   const [price, setPrice] = useState(0);
+  const [chargeOrder, setChargeOrder] = useState(0);
 
   const ChargeModal = () => {
     return (
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={chargeModalVisible}
-        onRequestClose={() => {
-          setChargeModalVisible(!chargeModalVisible);
-        }}>
+      chargeModalVisible && (
         <View
           style={{
-            flex: 1,
+            backgroundColor: COLORS.primary,
             justifyContent: 'center',
             alignItems: 'center',
-            backgroundColor: 'rgba(0,0,0,0.5)',
           }}>
           <View
             style={{
-              backgroundColor: COLORS.primary,
-              width: '80%',
-              height: '50%',
-              borderRadius: 25,
+              position: 'absolute',
+              top: '10%',
+              right: 0,
+            }}>
+            <TouchableOpacity
+              style={{
+                alignItems: 'flex-end',
+              }}
+              onPress={() => {
+                setChargeModalVisible(!chargeModalVisible);
+                scrollViewRef.current.scrollToEnd({animated: true});
+              }}>
+              <FontAwesomeIcon
+                icon={faTimes}
+                size={20}
+                color={'gray'}
+                style={{marginRight: 20, marginTop: 20}}
+              />
+            </TouchableOpacity>
+          </View>
+
+          <RadioButtonRN
+            data={chargePurchaseSelection}
+            selectedBtn={e => {
+              setPrice(e.price);
+              setChargeOrder(e.charge);
+            }}
+            box={false}
+            circleSize={10}
+            textStyle={{color: 'black', fontSize: 15}}
+            textColor={'black'}
+            activeColor={'black'}
+            deactiveColor={'gray'}
+            boxActiveBgColor={'white'}
+            boxDeactiveBgColor={COLORS.primary}
+            duration={0}
+          />
+
+          <View
+            style={{
+              flexDirection: 'row',
               justifyContent: 'center',
               alignItems: 'center',
+              marginTop: 20,
             }}>
-            <View
-              style={{
-                position: 'absolute',
-                top: 0,
-                right: 0,
-              }}>
-              <TouchableOpacity
-                style={{
-                  alignItems: 'flex-end',
-                }}
-                onPress={() => {
-                  setChargeModalVisible(!chargeModalVisible);
-                  scrollViewRef.current.scrollToEnd({animated: true});
-                }}>
-                <FontAwesomeIcon
-                  icon={faTimes}
-                  size={20}
-                  color={'gray'}
-                  style={{marginRight: 20, marginTop: 20}}
-                />
-              </TouchableOpacity>
-            </View>
-
-            <RadioButtonRN
-              data={chargePurchaseSelection}
-              selectedBtn={e => {
-                setPrice(e.price);
-              }}
-              box={true}
-              circleSize={10}
-              textStyle={{color: 'black', fontSize: 15}}
-              textColor={'black'}
-              activeColor={'black'}
-              deactiveColor={'gray'}
-              boxActiveBgColor={'white'}
-              boxDeactiveBgColor={COLORS.primary}
-              duration={0}
+            <Payment
+              price={price}
+              chargeOrder={chargeOrder}
+              updateCharge={updateCharge}
             />
-
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: 20,
-              }}>
-              <Payment price={price} />
-            </View>
           </View>
         </View>
-      </Modal>
+      )
     );
   };
 
@@ -572,6 +561,7 @@ export default function Dream() {
             return imageView(item);
           })}
           {ChargeLeft()}
+          {ChargeModal()}
         </ScrollView>
 
         <View>
@@ -643,7 +633,6 @@ export default function Dream() {
           )}
         </View>
         {artistSuggestionVisible && artistView()}
-        {ChargeModal()}
       </View>
     </KeyboardAvoidingView>
   );

@@ -1,0 +1,11 @@
+diff --git a/node_modules/react-native-apple-payment/src/index.d.ts b/node_modules/react-native-apple-payment/src/index.d.ts
+index 431ded9..411b1ed 100644
+--- a/node_modules/react-native-apple-payment/src/index.d.ts
++++ b/node_modules/react-native-apple-payment/src/index.d.ts
+@@ -1,5 +1,5 @@
+ declare module 'react-native-apple-payment' {
+-  type Network = 'Visa' | 'MasterCard' | 'AmEx';
++  type Network = 'Visa' | 'MasterCard' | 'AmEx'| 'Discover';
+ 
+   export type SupportedNetworks = Network[];
+ 

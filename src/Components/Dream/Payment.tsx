@@ -2,12 +2,12 @@ import React, {useEffect} from 'react';
 import ApplePay, {DetailsData, MethodData} from 'react-native-apple-payment';
 import {TouchableOpacity, View, Button} from 'react-native';
 
-export default function Payment({price}) {
+export default function Payment({price, chargeOrder, updateCharge}) {
   const Method: MethodData = {
     countryCode: 'US',
     currencyCode: 'USD',
     merchantIdentifier: 'merchant.phantadream',
-    supportedNetworks: ['Visa', 'MasterCard', 'AmEx'],
+    supportedNetworks: ['Visa', 'MasterCard', 'AmEx', 'Discover'],
   };
 
   const Options: DetailsData = {
@@ -28,7 +28,9 @@ export default function Payment({price}) {
             console.log(can);
             console.log(price);
             // if (can) {
-            payment.initApplePay().then(console.warn);
+            payment
+              .initApplePay()
+              .then((res: any) => updateCharge(chargeOrder));
             // }
           });
         }}></Button>
