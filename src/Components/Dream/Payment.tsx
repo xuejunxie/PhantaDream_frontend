@@ -1,14 +1,8 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import ApplePay, {DetailsData, MethodData} from 'react-native-apple-payment';
-import {
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  Text,
-  ScrollView,
-} from 'react-native';
+import {TouchableOpacity, View, Button} from 'react-native';
 
-export default function Charge() {
+export default function Payment({price}) {
   const Method: MethodData = {
     countryCode: 'US',
     currencyCode: 'USD',
@@ -19,7 +13,7 @@ export default function Charge() {
   const Options: DetailsData = {
     total: {
       label: 'PhantaCharge',
-      amount: 10,
+      amount: price,
     },
   };
 
@@ -27,17 +21,17 @@ export default function Charge() {
 
   return (
     <View>
-      <TouchableOpacity
+      <Button
+        title={'Buy'}
         onPress={() => {
           payment.canMakePayments().then((can: any) => {
             console.log(can);
-            if (can) {
-              payment.initApplePay().then(console.warn);
-            }
+            console.log(price);
+            // if (can) {
+            payment.initApplePay().then(console.warn);
+            // }
           });
-        }}>
-        <Text>Charge</Text>
-      </TouchableOpacity>
+        }}></Button>
     </View>
   );
 }

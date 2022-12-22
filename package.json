@@ -34,7 +34,6 @@
     "deprecated-react-native-prop-types": "^2.3.0",
     "dotenv": "^16.0.3",
     "env": "^0.0.2",
-    "jwt-decode": "^3.1.2",
     "patch-package": "^6.5.0",
     "radio-buttons-react-native": "^1.0.4",
     "react": "18.1.0",

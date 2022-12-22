@@ -35,6 +35,7 @@ import {
   faDatabase,
   faDownload,
   faShare,
+  faTimes,
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 
@@ -46,6 +47,11 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
 import artists from './artists.json';
+
+import RadioButtonRN from 'radio-buttons-react-native';
+import Payment from './Payment';
+
+import Profile from '../Profile/Profile';
 
 const loading_image = 'https://i.gifer.com/1amw.gif';
 const empty_image =
@@ -374,8 +380,50 @@ export default function Dream() {
     );
   };
 
+  const chargePurchaseSelection = [
+    // {
+    //   label: '$0.99/month for 40',
+    //   subscription: true,
+    //   price: 0.99,
+    //   charge: 40,
+    // },
+    // {
+    //   label: '$1.99/month for 100',
+    //   subscription: true,
+    //   price: 1.99,
+    //   charge: 100,
+    // },
+    // {
+    //   label: '$3.99/month for 240',
+    //   subscription: true,
+    //   price: 3.99,
+    //   charge: 240,
+    // },
+
+    {
+      label: '$0.99 for 30',
+      subscription: false,
+      price: 0.99,
+      charge: 30,
+    },
+    {
+      label: '$1.99 for 80',
+      subscription: false,
+      price: 1.99,
+      charge: 80,
+    },
+    {
+      label: '$3.99 for 200',
+      subscription: false,
+      price: 3.99,
+      charge: 200,
+    },
+  ];
+
   // show modal to purchase charge when user press the Charge icon
   const [chargeModalVisible, setChargeModalVisible] = useState(false);
+  const [price, setPrice] = useState(0);
+
   const ChargeModal = () => {
     return (
       <Modal
@@ -401,69 +449,54 @@ export default function Dream() {
               justifyContent: 'center',
               alignItems: 'center',
             }}>
-            <Text style={{color: 'gray', fontSize: 20, marginBottom: 20}}>
-              Purchase
-            </Text>
-            <FontAwesomeIcon icon={faBolt} size={20} color={'gray'} />
             <View
               style={{
-                flexDirection: 'row',
-                justifyContent: 'space-evenly',
-                width: '100%',
+                position: 'absolute',
+                top: 0,
+                right: 0,
               }}>
               <TouchableOpacity
                 style={{
-                  backgroundColor: COLORS.primary,
-                  width: 100,
-                  height: 100,
-                  borderRadius: 25,
-                  justifyContent: 'center',
-                  alignItems: 'center',
+                  alignItems: 'flex-end',
                 }}
                 onPress={() => {
-                  updateCharge(Charge + 1);
-                  setChargeModalVisible(false);
+                  setChargeModalVisible(!chargeModalVisible);
+                  scrollViewRef.current.scrollToEnd({animated: true});
                 }}>
-                <Text style={{color: 'gray', fontSize: 20}}>$1</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{
-                  backgroundColor: COLORS.primary,
-                  width: 100,
-                  height: 100,
-                  borderRadius: 25,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-                onPress={() => {
-                  updateCharge(Charge + 5);
-                  setChargeModalVisible(false);
-                }}>
-                <Text style={{color: 'gray', fontSize: 20}}>$5</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{
-                  backgroundColor: COLORS.primary,
-                  width: 100,
-                  height: 100,
-                  borderRadius: 25,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-                onPress={() => {
-                  updateCharge(Charge + 10);
-                  setChargeModalVisible(false);
-                }}>
-                <Text style={{color: 'gray', fontSize: 20}}>$10</Text>
+                <FontAwesomeIcon
+                  icon={faTimes}
+                  size={20}
+                  color={'gray'}
+                  style={{marginRight: 20, marginTop: 20}}
+                />
               </TouchableOpacity>
             </View>
-            <Button
-              title="Close"
-              onPress={() => {
-                setChargeModalVisible(!chargeModalVisible);
-                scrollViewRef.current.scrollToEnd({animated: true});
+
+            <RadioButtonRN
+              data={chargePurchaseSelection}
+              selectedBtn={e => {
+                setPrice(e.price);
               }}
+              box={true}
+              circleSize={10}
+              textStyle={{color: 'black', fontSize: 15}}
+              textColor={'black'}
+              activeColor={'black'}
+              deactiveColor={'gray'}
+              boxActiveBgColor={'white'}
+              boxDeactiveBgColor={COLORS.primary}
+              duration={0}
             />
+
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: 20,
+              }}>
+              <Payment price={price} />
+            </View>
           </View>
         </View>
       </Modal>

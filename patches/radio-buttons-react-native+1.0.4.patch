@@ -1,0 +1,63 @@
+diff --git a/node_modules/radio-buttons-react-native/RadioButtonRN.js b/node_modules/radio-buttons-react-native/RadioButtonRN.js
+index 4756e29..951e37a 100644
+--- a/node_modules/radio-buttons-react-native/RadioButtonRN.js
++++ b/node_modules/radio-buttons-react-native/RadioButtonRN.js
+@@ -1,7 +1,8 @@
+ import React from 'react';
+ import PropTypes from 'prop-types';
+ import { StyleSheet, View, Text, Animated, TouchableOpacity } from 'react-native';
+-
++import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
++import { faBolt } from '@fortawesome/free-solid-svg-icons';
+ 
+ class RadioButtonRN extends React.Component {
+ 
+@@ -103,13 +104,14 @@ class RadioButtonRN extends React.Component {
+         Animated.timing(this.state.fadeAnim, {
+           toValue: 0,
+           duration: 0,
+-          useNativeDriver: true,
++          useNativeDriver: false
+         }).start(() => {
+             Animated.timing(this.state.fadeAnim, {
+                 toValue: 1,
+                 duration: this.props.duration,
+-                delay: 10,
+-                useNativeDriver: true,
++                delay: 0,
++                useNativeDriver: false
++
+             }).start();
+         });
+     }
+@@ -173,7 +175,10 @@ class RadioButtonRN extends React.Component {
+                                     color: textColor
+                                 }, textStyle]}>
+                                     {item.label}
++                                    <FontAwesomeIcon icon={faBolt} size={15} color={'gray'} />
++                                    {item.subscription && "/month"}
+                                 </Text>
++
+                             </View>
+                         </TouchableOpacity>
+                     )
+@@ -200,15 +205,12 @@ const styles = StyleSheet.create({
+         marginTop: 10
+     },
+     leftProductBox: {
+-        flex: 1,
+-        alignItems: 'center',
+-        justifyContent: 'center'
+     },
+     centerProductBox: {
+-        flex: 6,
+-        justifyContent: 'center',
+-        alignItems: 'flex-start',
+-        paddingHorizontal:4
++        direction: 'ltr',
++        alignContent: 'flex-start',
++        marginLeft: 10,
++        marginRight: 0,
+     },
+     circle: {
+         borderWidth: 1,
