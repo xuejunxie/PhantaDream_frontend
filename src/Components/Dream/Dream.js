@@ -40,8 +40,13 @@ import {
 
 import {CameraRoll} from '@react-native-camera-roll/camera-roll';
 
+// firebase things
 import realtime from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+
+import artists from './artists.json';
+
 const loading_image = 'https://i.gifer.com/1amw.gif';
 const empty_image =
   'https://www.canvaschamp.com/static/images/landingpage/blankprestretchedcanvas/streach-choice.jpg';
@@ -120,6 +125,14 @@ export default function Dream() {
       setCharge(snapshot.val().charge);
     });
 
+  const updateCharge = change => {
+    realtime()
+      .ref('/users/' + auth().currentUser.uid)
+      .update({
+        charge: Charge + change,
+      });
+  };
+
   // dynamically adjust vertical offset of keyboard avoiding view
   useEffect(() => {
     const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
@@ -157,6 +170,7 @@ export default function Dream() {
           image: image_file,
           prompt: prompt,
           date: new Date(),
+          artist: artistsUsed,
         };
         AsyncStorage.setItem(imageId, JSON.stringify(image_entry));
         // replace the last image with the new image
@@ -169,11 +183,8 @@ export default function Dream() {
         }
         setLoading(false);
         setPickedImage(image_entry);
-        realtime()
-          .ref('/users/' + auth().currentUser.uid)
-          .update({
-            charge: Charge - 1,
-          });
+        setArtistsUsed([]);
+        updateCharge(-1);
       });
   };
   // buttom press components
@@ -352,6 +363,7 @@ export default function Dream() {
             justifyContent: 'center',
             alignItems: 'center',
             marginTop: 20,
+            marginBottom: 20,
           }}>
           <FontAwesomeIcon icon={faBolt} size={20} color={'gray'} />
           <Text style={{color: 'gray', fontSize: 15, marginLeft: 10}}>
@@ -409,7 +421,7 @@ export default function Dream() {
                   alignItems: 'center',
                 }}
                 onPress={() => {
-                  setCharge(Charge + 1);
+                  updateCharge(Charge + 1);
                   setChargeModalVisible(false);
                 }}>
                 <Text style={{color: 'gray', fontSize: 20}}>$1</Text>
@@ -424,7 +436,7 @@ export default function Dream() {
                   alignItems: 'center',
                 }}
                 onPress={() => {
-                  setCharge(Charge + 5);
+                  updateCharge(Charge + 5);
                   setChargeModalVisible(false);
                 }}>
                 <Text style={{color: 'gray', fontSize: 20}}>$5</Text>
@@ -439,7 +451,7 @@ export default function Dream() {
                   alignItems: 'center',
                 }}
                 onPress={() => {
-                  setCharge(Charge + 10);
+                  updateCharge(Charge + 10);
                   setChargeModalVisible(false);
                 }}>
                 <Text style={{color: 'gray', fontSize: 20}}>$10</Text>
@@ -447,11 +459,51 @@ export default function Dream() {
             </View>
             <Button
               title="Close"
-              onPress={() => setChargeModalVisible(!chargeModalVisible)}
+              onPress={() => {
+                setChargeModalVisible(!chargeModalVisible);
+                scrollViewRef.current.scrollToEnd({animated: true});
+              }}
             />
           </View>
         </View>
       </Modal>
+    );
+  };
+
+  const [artistSeggestion, setArtistSeggestion] = useState('');
+  const [artistSuggestionVisible, setArtistSuggestionVisible] = useState(false);
+  const [artistsUsed, setArtistsUsed] = useState([]);
+  const refreshArtist = () => {
+    const artist = artists[Math.floor(Math.random() * artists.length)];
+    setArtistSeggestion(artist.artist);
+  };
+
+  useEffect(() => {
+    refreshArtist();
+  }, []);
+
+  const artistView = () => {
+    return (
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginTop: 20,
+          marginBottom: 20,
+        }}>
+        <TouchableOpacity
+          onPress={() => {
+            refreshArtist();
+            setPrompt(prompt + ' ' + artistSeggestion);
+            setArtistsUsed([...artistsUsed, artistSeggestion]);
+            refreshArtist();
+          }}>
+          <Text style={{color: 'gray', fontSize: 15, marginRight: 10}}>
+            Artist Suggestion: {artistSeggestion}
+          </Text>
+        </TouchableOpacity>
+      </View>
     );
   };
 
@@ -493,7 +545,14 @@ export default function Dream() {
           {!loading && (
             <TextInput
               multiline={true}
-              onChangeText={text => setPrompt(text)}
+              onChangeText={text => {
+                setPrompt(text);
+                setArtistSuggestionVisible(true);
+                refreshArtist();
+              }}
+              onBlur={() => {
+                setArtistSuggestionVisible(false);
+              }}
               value={prompt}
               style={{
                 backgroundColor: 'rgba(0,0,0,0)',
@@ -507,44 +566,50 @@ export default function Dream() {
               onSubmitEditing={() => {
                 //haptic feedback
                 ReactNativeHapticFeedback.trigger('impactMedium', options);
-                setLoading(true);
-                if (images[0].id === 'empty') {
-                  // set the first image to loading
-                  setImages([
-                    {
-                      id: 'empty',
-                      image: loading_image,
-                      prompt: '',
-                      date: new Date(),
-                      loading: true,
-                      selected: false,
-                    },
-                  ]);
-                  // force update the view
-                } else {
-                  // add a new image with loading
+                if (Charge > 0) {
+                  setLoading(true);
+                  if (images[0].id === 'empty') {
+                    // set the first image to loading
+                    setImages([
+                      {
+                        id: 'empty',
+                        image: loading_image,
+                        prompt: '',
+                        date: new Date(),
+                        loading: true,
+                        selected: false,
+                      },
+                    ]);
+                    // force update the view
+                  } else {
+                    // add a new image with loading
 
-                  setImages([
-                    ...images.map(item => {
-                      item.selected = false;
-                      return item;
-                    }),
-                    {
-                      id: 'loading',
-                      image: loading_image,
-                      prompt: '',
-                      date: new Date(),
-                      loading: true,
-                      selected: false,
-                    },
-                  ]);
+                    setImages([
+                      ...images.map(item => {
+                        item.selected = false;
+                        return item;
+                      }),
+                      {
+                        id: 'loading',
+                        image: loading_image,
+                        prompt: '',
+                        date: new Date(),
+                        loading: true,
+                        selected: false,
+                      },
+                    ]);
+                  }
+                  setPickedImage(null);
+                  send();
+                } else {
+                  setChargeModalVisible(true);
                 }
-                setPickedImage(null);
-                send();
+                setArtistSuggestionVisible(false);
               }}
             />
           )}
         </View>
+        {artistSuggestionVisible && artistView()}
         {ChargeModal()}
       </View>
     </KeyboardAvoidingView>
