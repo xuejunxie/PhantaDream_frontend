@@ -10,6 +10,7 @@ import {
 import {Neomorph} from 'react-native-neomorph-shadows';
 
 import COLORS from '../GlobalValues/Colors';
+import Leaderboard from './Leaderboard';
 
 const dummy = require('./dummy.json');
 const size = 280;
@@ -46,7 +47,7 @@ const render_dummy = (start, end) =>
     </View>
   ));
 
-const FirstRoute = () => <ScrollView>{render_dummy(0, 4)}</ScrollView>;
+const FirstRoute = () => <Leaderboard />;
 
 const SecondRoute = () => <ScrollView>{render_dummy(4, 8)}</ScrollView>;
 
