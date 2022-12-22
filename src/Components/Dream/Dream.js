@@ -517,7 +517,7 @@ export default function Dream() {
         <TouchableOpacity
           onPress={() => {
             refreshArtist();
-            setPrompt(prompt + ' ' + artistSeggestion);
+            setPrompt(prompt + ', ' + artistSeggestion);
             setArtistsUsed([...artistsUsed, artistSeggestion]);
             refreshArtist();
           }}>

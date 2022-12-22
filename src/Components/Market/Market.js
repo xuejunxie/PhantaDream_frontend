@@ -114,10 +114,13 @@ const ThirdRoute = () => {
   );
 };
 
+const ForthRoute = () => <ScrollView>{render_dummy(18, 20)}</ScrollView>;
+
 const renderScene = SceneMap({
   first: FirstRoute,
   second: SecondRoute,
   third: ThirdRoute,
+  forth: ForthRoute,
 });
 
 export default function Market() {
@@ -125,9 +128,10 @@ export default function Market() {
 
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
-    {key: 'first', title: 'Auctions'},
-    {key: 'second', title: 'Collections'},
+    {key: 'first', title: 'Auction'},
+    {key: 'second', title: 'Owned'},
     {key: 'third', title: 'Mint'},
+    {key: 'forth', title: 'Shop'},
   ]);
 
   const frame = useSafeAreaFrame();

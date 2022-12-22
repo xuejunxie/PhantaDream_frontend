@@ -16,6 +16,9 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 
 import ApplePay, {DetailsData, MethodData} from 'react-native-apple-payment';
 
+import auth from '@react-native-firebase/auth';
+import realtime from '@react-native-firebase/database';
+
 import {
   faBitcoinSign,
   faBolt,
@@ -28,10 +31,11 @@ import {
   faUserFriends,
   faWarning,
 } from '@fortawesome/free-solid-svg-icons';
+import {useEffect} from 'react';
 
 const styles = StyleSheet.create({
   scroll: {
-    backgroundColor: 'white',
+    backgroundColor: COLORS.primary,
   },
   userRow: {
     alignItems: 'center',
@@ -45,65 +49,61 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   listItemContainer: {
-    height: 55,
     borderWidth: 0.5,
-    borderColor: '#ECECEC',
+    borderColor: COLORS.primary,
+    backgroundColor: COLORS.primary,
   },
 });
 
-const avatar = 'https://i.pravatar.cc/300';
-const name = 'John Doe';
+const avatar = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
 const firstEmail = {
   email: '',
 };
 
 const list = [
   {
-    title: 'Recharge',
-    icon: faBolt,
+    title: 'Private clubs',
+    icon: faUserFriends,
   },
-  // {
-  //   title: 'Private clubs',
-  //   icon: faUserFriends,
-  // },
-  // {
-  //   title: 'Following',
-  //   icon: faHeart,
-  // },
-  // {
-  //   title: 'Liked',
-  //   icon: faThumbsUp,
-  // },
-  // {
-  //   title: 'Billing',
-  //   icon: faDollar,
-  // },
-  // {
-  //   title: 'Revenue',
-  //   icon: faBitcoinSign,
-  // },
-  // {
-  //   title: 'Settings',
-  //   icon: faGear,
-  // },
+  {
+    title: 'Following',
+    icon: faHeart,
+  },
+  {
+    title: 'Liked',
+    icon: faThumbsUp,
+  },
+  {
+    title: 'Billing',
+    icon: faDollar,
+  },
+  {
+    title: 'Revenue',
+    icon: faBitcoinSign,
+  },
+  {
+    title: 'Settings',
+    icon: faGear,
+  },
 ];
 
 const Profile = ({navigation}) => {
-  const Method: MethodData = {
-    countryCode: 'US',
-    currencyCode: 'USD',
-    merchantIdentifier: 'merchant.phantadream',
-    supportedNetworks: ['Visa', 'MasterCard', 'AmEx'],
-  };
+  // set user name
 
-  const Options: DetailsData = {
-    total: {
-      label: 'PhantaCharge',
-      amount: 10,
-    },
-  };
+  const [name, setName] = React.useState('');
 
-  const payment = new ApplePay(Method, Options);
+  useEffect(() => {
+    realtime()
+      .ref(`/users/${auth().currentUser.uid}`)
+      .once('value')
+      .then(snapshot => {
+        setName(
+          snapshot.val().fullName.givenName +
+            ' ' +
+            snapshot.val().fullName.familyName,
+        );
+      });
+  }, []);
 
   return (
     <ScrollView
@@ -131,7 +131,7 @@ const Profile = ({navigation}) => {
 
       <View>
         {list.map((item, i) => (
-          <ListItem key={i} bottomDivider>
+          <ListItem key={i} bottomDivider style={styles.listItemContainer}>
             <FontAwesomeIcon icon={item.icon} />
             <ListItem.Content>
               <ListItem.Title>{item.title}</ListItem.Title>
@@ -139,26 +139,6 @@ const Profile = ({navigation}) => {
             <FontAwesomeIcon icon={faChevronRight} />
           </ListItem>
         ))}
-      </View>
-
-      <View>
-        <TouchableOpacity
-          onPress={() => {
-            payment.canMakePayments().then((can: any) => {
-              console.log(can);
-              if (can) {
-                payment.initApplePay().then(console.warn);
-              }
-            });
-          }}>
-          <ListItem key={1} bottomDivider>
-            <FontAwesomeIcon icon={faBolt} />
-            <ListItem.Content>
-              <ListItem.Title>Apple pay</ListItem.Title>
-            </ListItem.Content>
-            <FontAwesomeIcon icon={faChevronRight} />
-          </ListItem>
-        </TouchableOpacity>
       </View>
     </ScrollView>
   );

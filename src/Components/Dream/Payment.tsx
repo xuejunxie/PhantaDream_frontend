@@ -25,13 +25,11 @@ export default function Payment({price, chargeOrder, updateCharge}) {
         title={'Buy'}
         onPress={() => {
           payment.canMakePayments().then((can: any) => {
-            console.log(can);
-            console.log(price);
-            // if (can) {
-            payment
-              .initApplePay()
-              .then((res: any) => updateCharge(chargeOrder));
-            // }
+            if (can) {
+              payment
+                .initApplePay()
+                .then((res: any) => updateCharge(chargeOrder));
+            }
           });
         }}></Button>
     </View>
