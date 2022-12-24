@@ -1,4 +1,4 @@
-import {View, Image} from 'react-native';
+import {View, Image, ScrollView} from 'react-native';
 import React, {useEffect} from 'react';
 import firestore from '@react-native-firebase/firestore';
 import {Neomorph} from 'react-native-neomorph-shadows';
@@ -34,7 +34,7 @@ export default function Leaderboard() {
   }, []);
 
   return (
-    <View>
+    <ScrollView>
       {images.map(image => (
         <View
           key={image.key}
@@ -66,6 +66,6 @@ export default function Leaderboard() {
           </Neomorph>
         </View>
       ))}
-    </View>
+    </ScrollView>
   );
 }

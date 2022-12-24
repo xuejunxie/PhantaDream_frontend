@@ -159,41 +159,65 @@ export default function Dream() {
 
   // send prompt to server
 
+  const serverURL = 'http://phantaspace.ddns.net:7863/';
+
   const send = async () => {
+    const imageId = uuid.v1();
+    const userId = auth().currentUser.uid;
     axios
-      .post(
-        'http://phantaspace.ddns.net:7863/txt2img',
-        {prompt: prompt},
-        {responseType: 'arraybuffer'},
-      )
+      .post(serverURL + 'txt2img', {
+        prompt: prompt,
+        user: userId,
+        img_name: imageId,
+      })
       .then(function (response) {
-        const image_data = Buffer.from(response.data, 'binary').toString(
-          'base64',
-        );
-        const image_file = `data:image/png;base64,${image_data}`;
-        setPrompt('');
-        // save the image locally with AsyncStorage
-        const imageId = uuid.v1();
-        const image_entry = {
-          id: imageId,
-          image: image_file,
-          prompt: prompt,
-          date: new Date(),
-          artist: artistsUsed,
+        const taskID = response.data.task_id;
+
+        const statusURL = serverURL + 'status/' + taskID;
+        const imageURL = serverURL + userId + '/' + imageId;
+
+        const getImage = async () => {
+          await axios.get(statusURL).then(function (response) {
+            if (response.data.state === 'SUCCESS') {
+              axios
+                .get(imageURL, {responseType: 'arraybuffer'})
+                .then(function (response) {
+                  const image_data = Buffer.from(
+                    response.data,
+                    'binary',
+                  ).toString('base64');
+                  const image_file = `data:image/png;base64,${image_data}`;
+                  // const image_file = URL.createObjectURL(response.data);
+                  setPrompt('');
+                  // save the image locally with AsyncStorage
+                  const image_entry = {
+                    id: imageId,
+                    image: image_file,
+                    imageURL: imageURL,
+                    prompt: prompt,
+                    date: new Date(),
+                    artist: artistsUsed,
+                  };
+                  AsyncStorage.setItem(imageId, JSON.stringify(image_entry));
+                  // replace the last image with the new image
+                  image_entry.loading = false;
+                  image_entry.selected = true;
+                  if (images[0].id === 'empty') {
+                    setImages([image_entry]);
+                  } else {
+                    setImages([...images, image_entry]);
+                  }
+                  setLoading(false);
+                  setPickedImage(image_entry);
+                  setArtistsUsed([]);
+                  updateCharge(-1);
+                });
+            } else {
+              setTimeout(getImage, 5000);
+            }
+          });
         };
-        AsyncStorage.setItem(imageId, JSON.stringify(image_entry));
-        // replace the last image with the new image
-        image_entry.loading = false;
-        image_entry.selected = true;
-        if (images[0].id === 'empty') {
-          setImages([image_entry]);
-        } else {
-          setImages([...images, image_entry]);
-        }
-        setLoading(false);
-        setPickedImage(image_entry);
-        setArtistsUsed([]);
-        updateCharge(-1);
+        getImage();
       });
   };
   // buttom press components
@@ -281,6 +305,12 @@ export default function Dream() {
       }
     }
   }, [saveButtonPressed]);
+
+  // modal for sharing to public or private and show sharing progress
+  const [shareModalVisible, setShareModalVisible] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [shareToPbulic, setShareToPublic] = useState(false);
 
   useEffect(() => {
     // upload image to firebase storage create an entry on firestore
