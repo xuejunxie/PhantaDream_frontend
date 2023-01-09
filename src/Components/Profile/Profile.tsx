@@ -14,10 +14,9 @@ import InfoText from './InfoText';
 
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 
-import ApplePay, {DetailsData, MethodData} from 'react-native-apple-payment';
-
 import auth from '@react-native-firebase/auth';
 import realtime from '@react-native-firebase/database';
+import storage from '@react-native-firebase/storage';
 
 import {
   faBitcoinSign,
@@ -26,6 +25,7 @@ import {
   faDollar,
   faGear,
   faHeart,
+  faMailBulk,
   faStar,
   faThumbsUp,
   faUserFriends,
@@ -55,14 +55,13 @@ const styles = StyleSheet.create({
   },
 });
 
-const avatar = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
 const firstEmail = {
   email: '',
 };
 
 const list = [
   {
-    title: 'Private clubs',
+    title: 'Friends',
     icon: faUserFriends,
   },
   {
@@ -85,12 +84,17 @@ const list = [
     title: 'Settings',
     icon: faGear,
   },
+  {
+    title: 'Messages',
+    icon: faMailBulk,
+  },
 ];
 
 const Profile = ({navigation}) => {
   // set user name
 
   const [name, setName] = React.useState('');
+  const [avatar, setAvatar] = React.useState('');
 
   useEffect(() => {
     realtime()
@@ -105,6 +109,9 @@ const Profile = ({navigation}) => {
       });
   }, []);
 
+  // select an avatar from photo and upload the picture to the database
+  const uploadAvatar = () => {};
+
   return (
     <ScrollView
       style={{
@@ -113,9 +120,15 @@ const Profile = ({navigation}) => {
         backgroundColor: COLORS.primary,
       }}>
       <View style={styles.userRow}>
-        <View style={styles.userImage}>
-          <Avatar rounded size="large" source={{uri: avatar}} />
-        </View>
+        <TouchableOpacity
+          onPress={() => {
+            // click the avatar to change the avatar
+            uploadAvatar();
+          }}>
+          <View style={styles.userImage}>
+            <Avatar rounded size="large" source={{uri: avatar}} />
+          </View>
+        </TouchableOpacity>
         <View>
           <Text style={{fontSize: 16}}>{name}</Text>
           <Text

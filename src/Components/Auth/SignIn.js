@@ -80,6 +80,40 @@ export default function SignIn({navigation}) {
       <View
         style={{
           backgroundColor: 'rgba(0,0,0,0)',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: 100,
+        }}>
+        <Image
+          source={require('./logo.png')}
+          style={{
+            width: 200,
+            height: 200,
+          }}
+        />
+        <Text
+          style={{
+            fontSize: 30,
+            color: 'gray',
+            textAlign: 'center',
+            marginTop: 20,
+          }}>
+          Welcome to
+        </Text>
+        <Text
+          style={{
+            fontSize: 30,
+            color: 'gray',
+            textAlign: 'center',
+            marginTop: 10,
+          }}>
+          PhantaDream
+        </Text>
+      </View>
+
+      <View
+        style={{
+          backgroundColor: 'rgba(0,0,0,0)',
           marginTop: 20,
 
           // make it center

@@ -107,7 +107,7 @@ const ThirdRoute = () => {
             textAlign: 'center',
             marginTop: 20,
           }}>
-          Distribution: Artists 10% + 👍er 10% + Creator 77.5 % + Platform 2.5%
+          Distribution: Artists 10% + ❤️er 10% + Creator 77.5 % + Platform 2.5%
         </Text>
       </View>
     </ScrollView>

@@ -69,6 +69,7 @@ export default function Dream() {
   const [prompt, setPrompt] = React.useState('');
   const [loading, setLoading] = useState(false);
   const [Charge, setCharge] = useState(0);
+  const [Heart, setHeart] = useState(false);
 
   const [CopyButtonPressed, setCopyButtonPressed] = useState(false);
   const [saveButtonPressed, setSaveButtonPressed] = useState(false);
@@ -132,6 +133,7 @@ export default function Dream() {
     .ref('/users/' + auth().currentUser.uid)
     .on('value', snapshot => {
       setCharge(snapshot.val().charge);
+      setHeart(snapshot.val().heart);
     });
 
   const updateCharge = change => {
@@ -139,6 +141,7 @@ export default function Dream() {
       .ref('/users/' + auth().currentUser.uid)
       .update({
         charge: Charge + change,
+        heart: Heart + change,
       });
   };
 
@@ -306,52 +309,180 @@ export default function Dream() {
     }
   }, [saveButtonPressed]);
 
-  // modal for sharing to public or private and show sharing progress
+  // modal for sharing to public or private
   const [shareModalVisible, setShareModalVisible] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [shareToPbulic, setShareToPublic] = useState(false);
+  const [shareToPbulic, setShareToPublic] = useState(true);
+  const ShareModal = () => {
+    return (
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={shareModalVisible}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'rgba(0,0,0,0.5)',
+          }}>
+          <View
+            style={{
+              width: '80%',
+              height: '30%',
+              backgroundColor: COLORS.primary,
+              borderRadius: 20,
+              justifyContent: 'space-evenly',
+              alignItems: 'center',
+            }}>
+            <View
+              style={{
+                position: 'absolute',
+                top: 0,
+                right: 0,
+              }}>
+              <TouchableOpacity
+                style={{
+                  alignItems: 'flex-end',
+                }}
+                onPress={() => {
+                  setShareModalVisible(!shareModalVisible);
+                }}>
+                <FontAwesomeIcon
+                  icon={faTimes}
+                  size={20}
+                  color={'gray'}
+                  style={{marginRight: 20, marginTop: 20}}
+                />
+              </TouchableOpacity>
+            </View>
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: 'bold',
+                color: 'gray',
+              }}>
+              Share to?
+            </Text>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-evenly',
+                width: '100%',
+              }}>
+              <TouchableOpacity
+                onPress={() => {
+                  setShareToPublic(true);
+                  excuteShare();
+                  setShareModalVisible(false);
+                }}>
+                <Neomorph
+                  inner={false}
+                  style={{
+                    shadowRadius: 10,
+                    borderRadius: 25,
+                    backgroundColor: COLORS.primary,
+                    width: 120,
+                    height: 40,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      fontWeight: 'bold',
+                      color: 'gray',
+                    }}>
+                    Public
+                  </Text>
+                </Neomorph>
+              </TouchableOpacity>
+              {/* <TouchableOpacity
+                onPress={() => {
+                  setShareToPublic(false);
+                  excuteShare();
+                  setShareModalVisible(false);
+                }}>
+                <Neomorph
+                  inner={false}
+                  style={{
+                    shadowRadius: 10,
+                    borderRadius: 25,
+                    backgroundColor: COLORS.primary,
+                    width: 120,
+                    height: 40,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      fontWeight: 'bold',
+                      color: COLORS.white,
+                    }}>
+                    Prive club
+                  </Text>
+                </Neomorph>
+              </TouchableOpacity> */}
+            </View>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
+  // header to the image element for sharing progress
+  const [shareProgress, setShareProgress] = useState(0);
+  const [shareProgressVisible, setShareProgressVisible] = useState(false);
+  const ShareProgress = () => {
+    // share progress bar on top of the image
+  };
 
   useEffect(() => {
-    // upload image to firebase storage create an entry on firestore
     if (pickedImage) {
       if (shareButtonPressed) {
-        const imageId = pickedImage.id;
-        const image = pickedImage.image;
-        const prompt = pickedImage.prompt;
-        const date = pickedImage.date;
-        const artist = pickedImage.artist;
-        const storageRef = storage().ref();
-        const imageRef = storageRef.child('images/' + imageId + '.png');
-        imageRef
-          .putString(image, 'data_url')
-          .then(() => {
-            imageRef.getDownloadURL().then(url => {
-              firestore()
-                .collection('images')
-                .doc(imageId)
-                .set({
-                  image: url,
-                  prompt: prompt,
-                  date: date,
-                  artist: artist,
-                  creator: auth().currentUser.uid,
-                  owner: auth().currentUser.uid,
-                  public: true,
-                  likes: 0,
-                })
-                .then(() => {
-                  Alert.alert('Image Shared!');
-                  console.log('imageRef: ', imageRef);
-                });
-            });
-          })
-          .catch(error => {
-            console.log(error);
-          });
+        setShareModalVisible(true);
       }
     }
   }, [shareButtonPressed]);
+
+  const excuteShare = () => {
+    // upload image to firebase storage create an entry on firestore
+
+    const imageId = pickedImage.id;
+    const image = pickedImage.image;
+    const prompt = pickedImage.prompt;
+    const date = pickedImage.date;
+    const artist = pickedImage.artist;
+    const storageRef = storage().ref();
+    const imageRef = storageRef.child('images/' + imageId + '.png');
+    imageRef
+      .putString(image, 'data_url')
+      .then(() => {
+        imageRef.getDownloadURL().then(url => {
+          firestore()
+            .collection('images')
+            .doc(imageId)
+            .set({
+              url: url,
+              id: imageId,
+              prompt: prompt,
+              date: date,
+              artist: artist,
+              creator: auth().currentUser.uid,
+              owner: auth().currentUser.uid,
+              public: shareToPbulic,
+              likes: 0,
+            })
+            .then(() => {
+              Alert.alert('Image Shared!');
+              console.log('imageRef: ', imageRef);
+            });
+        });
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  };
 
   // delete photo
   useEffect(() => {
@@ -477,21 +608,21 @@ export default function Dream() {
     // },
 
     {
-      label: '$0.99 for 30',
+      label: '$0.99 for 30 ',
       subscription: false,
       price: 0.99,
       charge: 30,
     },
     {
-      label: '$1.99 for 80',
+      label: '$19.9 for 800 ',
       subscription: false,
       price: 1.99,
       charge: 80,
     },
     {
-      label: '$3.99 for 200',
+      label: '$399.99 for 20000 ',
       subscription: false,
-      price: 3.99,
+      price: 39.99,
       charge: 200,
     },
   ];
@@ -598,7 +729,7 @@ export default function Dream() {
             refreshArtist();
           }}>
           <Text style={{color: 'gray', fontSize: 15, marginRight: 10}}>
-            Artist Suggestion: {artistSeggestion}
+            Tap here to add artist style: {artistSeggestion}
           </Text>
         </TouchableOpacity>
       </View>
@@ -618,6 +749,7 @@ export default function Dream() {
           height: '100%',
           justifyContent: 'flex-end',
         }}>
+        {ShareModal()}
         <ScrollView
           ref={scrollViewRef}
           onContentSizeChange={(contentWidth, contentHeight) => {

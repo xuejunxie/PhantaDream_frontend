@@ -10,7 +10,9 @@ import {
 import {Neomorph} from 'react-native-neomorph-shadows';
 
 import COLORS from '../GlobalValues/Colors';
-import Leaderboard from './Leaderboard';
+import Hot from './Hot';
+import Liked from './Liked';
+import ForYou from './ForYou';
 
 const dummy = require('./dummy.json');
 const size = 280;
@@ -47,9 +49,9 @@ const render_dummy = (start, end) =>
     </View>
   ));
 
-const FirstRoute = () => <Leaderboard />;
+const FirstRoute = () => <ForYou />;
 
-const SecondRoute = () => <ScrollView>{render_dummy(4, 8)}</ScrollView>;
+const SecondRoute = () => <Hot />;
 
 const ThirdRoute = () => <ScrollView>{render_dummy(8, 12)}</ScrollView>;
 
@@ -64,8 +66,8 @@ export default function Explore() {
 
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
-    {key: 'first', title: 'Leaderboard'},
-    {key: 'second', title: 'Following'},
+    {key: 'first', title: 'For you'},
+    {key: 'second', title: 'Hot'},
     {key: 'third', title: 'Private club'},
   ]);
 
