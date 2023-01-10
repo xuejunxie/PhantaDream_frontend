@@ -4,4 +4,9 @@ const COLORS = {
   red: '#E2725B', // terracotta red
 };
 
-export default COLORS;
+const SIZES = {
+  // Global sizes
+  canvas: 300,
+};
+
+export {COLORS, SIZES};

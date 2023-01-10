@@ -7,7 +7,7 @@ import {
   ScrollView,
 } from 'react-native';
 // import { useMoralis, useMoralisWeb3Api, useMoralisWeb3ApiCall } from "react-moralis";
-import COLORS from '../GlobalValues/Colors';
+import {COLORS} from '../GlobalValues/Colors';
 import {Avatar, ListItem} from '@rneui/themed';
 
 import InfoText from './InfoText';

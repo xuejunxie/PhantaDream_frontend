@@ -6,7 +6,7 @@ import firestore from '@react-native-firebase/firestore';
 import realtime from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import {Neomorph} from 'react-native-neomorph-shadows';
-import COLORS from '../GlobalValues/Colors';
+import {COLORS, SIZES} from '../GlobalValues/Colors';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faHeart} from '@fortawesome/free-solid-svg-icons';
 import {faHeart as faHeartO} from '@fortawesome/free-regular-svg-icons';
@@ -24,7 +24,7 @@ export default function ForYou() {
   const [images, setImages] = React.useState([]);
   useEffect(() => {
     // load 10 random images from firestore images
-    const subscriber = firestore()
+    const unsubscriber = firestore()
       .collection('images')
       .orderBy('id', 'desc')
       .limit(loadSize + 2)
@@ -39,15 +39,16 @@ export default function ForYou() {
         });
 
         setImages(images);
-      });
+        console.log('set images');
 
+        unsubscriber();
+      });
     // Unsubscribe from events when no longer in use
-    return () => subscriber();
   }, []);
 
   // load more images when the user scrolls down
   const loadMore = () => {
-    firestore()
+    const unsubscriber = firestore()
       .collection('images')
       .orderBy('id', 'desc')
       .startAfter(images[images.length - 1].id)
@@ -63,7 +64,10 @@ export default function ForYou() {
             },
           ]);
         });
+        unsubscriber();
       });
+
+    // Unsubscribe from events when no longer in use
   };
 
   const [hearts, setHearts] = React.useState(0);
@@ -118,7 +122,7 @@ export default function ForYou() {
   // load more when the user scrolls down to the bottom of the page
   return (
     <View>
-      <ScrollView onScrollEndDrag={loadMore}>
+      <ScrollView onScrollBeginDrag={loadMore}>
         {images.map(image => (
           <View
             key={image.key}
@@ -138,13 +142,17 @@ export default function ForYou() {
                   shadowRadius: 5,
                   borderRadius: 10,
                   backgroundColor: COLORS.primary,
-                  width: 280,
-                  height: 280,
+                  width: SIZES.canvas,
+                  height: SIZES.canvas,
                   margin: 10,
                 }}>
                 <Image
                   source={{uri: image.url}}
-                  style={{width: 280, height: 280, borderRadius: 10}}
+                  style={{
+                    width: SIZES.canvas,
+                    height: SIZES.canvas,
+                    borderRadius: 10,
+                  }}
                 />
                 <View
                   style={{
@@ -172,9 +180,22 @@ export default function ForYou() {
               </Neomorph>
             </TouchableWithoutFeedback>
             {likedImages.find(likedImage => likedImage.id === image.id) ? (
-              <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
-                {image.prompt}
-              </Text>
+              <View
+                style={{
+                  width: SIZES.canvas,
+                }}>
+                <Text
+                  style={{
+                    color: COLORS.red,
+                    fontSize: 15,
+                    marginTop: 10,
+                  }}>
+                  Likes: {image.likes}
+                </Text>
+                <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
+                  Prompt: {image.prompt}
+                </Text>
+              </View>
             ) : null}
           </View>
         ))}

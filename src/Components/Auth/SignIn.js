@@ -16,7 +16,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import COLORS from '../GlobalValues/Colors';
+import {COLORS} from '../GlobalValues/Colors';
 
 import auth from '@react-native-firebase/auth';
 import {appleAuth} from '@invertase/react-native-apple-authentication';

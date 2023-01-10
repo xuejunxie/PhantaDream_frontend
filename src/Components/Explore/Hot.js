@@ -4,15 +4,13 @@ import firestore from '@react-native-firebase/firestore';
 import realtime from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import {Neomorph} from 'react-native-neomorph-shadows';
-import COLORS from '../GlobalValues/Colors';
+import {COLORS, SIZES} from '../GlobalValues/Colors';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faHeart} from '@fortawesome/free-solid-svg-icons';
 import {faHeart as faHeartO} from '@fortawesome/free-regular-svg-icons';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import like from './Like';
 import {useDispatch, useSelector} from 'react-redux';
-
-const size = 280;
 
 export default function Hot() {
   // load all images from firestore images
@@ -22,7 +20,7 @@ export default function Hot() {
 
   useEffect(() => {
     // load all images from firestore images
-    const subscriber = firestore()
+    const unsubscriber = firestore()
       .collection('images')
       .orderBy('likes', 'desc')
       .onSnapshot(querySnapshot => {
@@ -36,10 +34,11 @@ export default function Hot() {
         });
 
         setImages(images);
+
+        unsubscriber();
       });
 
     // Unsubscribe from events when no longer in use
-    return () => subscriber();
   }, []);
 
   // Sync user hearts number
@@ -75,8 +74,8 @@ export default function Hot() {
                   shadowRadius: 10,
                   borderRadius: 25,
                   backgroundColor: COLORS.primary,
-                  width: size,
-                  height: size,
+                  width: SIZES.canvas,
+                  height: SIZES.canvas,
                   marginTop: 20,
                 }}>
                 <Image
@@ -84,8 +83,8 @@ export default function Hot() {
                     uri: image.url,
                   }}
                   style={{
-                    width: size,
-                    height: size,
+                    width: SIZES.canvas,
+                    height: SIZES.canvas,
 
                     borderRadius: 25,
                   }}></Image>
@@ -115,9 +114,22 @@ export default function Hot() {
               </Neomorph>
             </TouchableWithoutFeedback>
             {likedImages.find(likedImage => likedImage.id === image.id) ? (
-              <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
-                {image.prompt}
-              </Text>
+              <View
+                style={{
+                  width: SIZES.canvas,
+                }}>
+                <Text
+                  style={{
+                    color: COLORS.red,
+                    fontSize: 15,
+                    marginTop: 10,
+                  }}>
+                  Likes: {image.likes}
+                </Text>
+                <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
+                  Prompt: {image.prompt}
+                </Text>
+              </View>
             ) : null}
           </View>
         ))}

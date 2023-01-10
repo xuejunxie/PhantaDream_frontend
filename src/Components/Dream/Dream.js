@@ -18,7 +18,7 @@ import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import {Neomorph} from 'react-native-neomorph-shadows';
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 
-import COLORS from '../GlobalValues/Colors';
+import {COLORS, SIZES} from '../GlobalValues/Colors';
 import axios from 'axios';
 import {Buffer} from 'buffer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -60,7 +60,6 @@ const loading_image = 'https://i.gifer.com/1amw.gif';
 const empty_image =
   'https://www.canvaschamp.com/static/images/landingpage/blankprestretchedcanvas/streach-choice.jpg';
 
-const canvasSize = 300;
 const tabBarHeight = 29;
 
 var scrollViewHeight = 0;
@@ -536,8 +535,8 @@ export default function Dream() {
               shadowRadius: 10,
               borderRadius: 25,
               backgroundColor: COLORS.primary,
-              width: canvasSize,
-              height: canvasSize,
+              width: SIZES.canvas,
+              height: SIZES.canvas,
               marginTop: 20,
             }}>
             <Image
@@ -545,8 +544,8 @@ export default function Dream() {
                 uri: item.loading ? loading_image : item.image,
               }}
               style={{
-                width: canvasSize,
-                height: canvasSize,
+                width: SIZES.canvas,
+                height: SIZES.canvas,
 
                 borderRadius: 25,
               }}></Image>

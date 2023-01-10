@@ -9,7 +9,7 @@ import {
 
 import {Neomorph} from 'react-native-neomorph-shadows';
 
-import COLORS from '../GlobalValues/Colors';
+import {COLORS} from '../GlobalValues/Colors';
 import Hot from './Hot';
 import ForYou from './ForYou';
 
@@ -67,7 +67,8 @@ export default function Explore() {
   const [routes] = React.useState([
     {key: 'first', title: 'For you'},
     {key: 'second', title: 'Hot'},
-    {key: 'third', title: 'Private club'},
+    {key: 'third', title: 'Liked'},
+    // {key: 'fourth', title: 'Private club'},
   ]);
 
   const frame = useSafeAreaFrame();
