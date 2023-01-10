@@ -587,26 +587,17 @@ export default function Dream() {
     );
   };
 
-  const chargePurchaseSelection = [
-    // {
-    //   label: '$0.99/month for 40',
-    //   subscription: true,
-    //   price: 0.99,
-    //   charge: 40,
-    // },
-    // {
-    //   label: '$1.99/month for 100',
-    //   subscription: true,
-    //   price: 1.99,
-    //   charge: 100,
-    // },
-    // {
-    //   label: '$3.99/month for 240',
-    //   subscription: true,
-    //   price: 3.99,
-    //   charge: 240,
-    // },
+  // animate the lighting symbol
+  const [chargeColor, setChargeColor] = useState('gray');
+  useEffect(() => {
+    if (Charge > 0) {
+      setChargeColor('yellow');
+    } else {
+      setChargeColor('gray');
+    }
+  }, [Charge]);
 
+  const chargePurchaseSelection = [
     {
       label: '$0.99 for 30 ',
       subscription: false,

@@ -10,6 +10,7 @@ import {faHeart} from '@fortawesome/free-solid-svg-icons';
 import {faHeart as faHeartO} from '@fortawesome/free-regular-svg-icons';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import like from './Like';
+import {useDispatch, useSelector} from 'react-redux';
 
 const size = 280;
 
@@ -50,27 +51,15 @@ export default function Hot() {
     });
 
   // Get user liked images
-  const [likedImages, setLikedImages] = React.useState([]);
-
-  useEffect(() => {
-    realtime()
-      .ref('users/' + auth().currentUser.uid + '/liked_images')
-      .once('value', snapshot => {
-        const likedImages = [];
-        snapshot.forEach(childSnapshot => {
-          likedImages.push(childSnapshot.val());
-        });
-        setLikedImages(likedImages);
-      });
-    console.log(likedImages);
-  }, []);
+  const likedImages = useSelector(state => state.like.likedImages);
+  const dispatch = useDispatch();
 
   return (
     <View>
       <ScrollView>
         {images.map(image => (
           <View
-            key={image.key}
+            key={image.id}
             style={{
               backgroundColor: 'rgba(0,0,0,0)',
               marginTop: 30,
@@ -79,7 +68,7 @@ export default function Hot() {
             }}>
             <TouchableWithoutFeedback
               onPress={() => {
-                like(image, likedImages, setLikedImages);
+                like(image, likedImages, dispatch);
               }}>
               <Neomorph
                 style={{
@@ -112,7 +101,7 @@ export default function Hot() {
                     flexDirection: 'column',
                   }}>
                   {likedImages.find(
-                    likedImage => likedImage.id === image.key,
+                    likedImage => likedImage.id === image.id,
                   ) ? (
                     <FontAwesomeIcon
                       icon={faHeart}
@@ -125,6 +114,11 @@ export default function Hot() {
                 </View>
               </Neomorph>
             </TouchableWithoutFeedback>
+            {likedImages.find(likedImage => likedImage.id === image.id) ? (
+              <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
+                {image.prompt}
+              </Text>
+            ) : null}
           </View>
         ))}
       </ScrollView>

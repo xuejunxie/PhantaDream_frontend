@@ -3,8 +3,9 @@ import React from 'react';
 import auth from '@react-native-firebase/auth';
 import realtime from '@react-native-firebase/database';
 import firestore from '@react-native-firebase/firestore';
+import {REMOVE_LIKED_IMAGES, ADD_LIKED_IMAGES} from '../../redux/types';
 
-export default function like(image, likedImages, setLikedImages) {
+export default function like(image, likedImages, dispatch) {
   // check if the image is liked by user
   // if it is liked, unlike it
   // if it is not liked, like it
@@ -12,6 +13,7 @@ export default function like(image, likedImages, setLikedImages) {
     // unlike the image
     // remove the image from the user's liked images
 
+    dispatch({type: REMOVE_LIKED_IMAGES, payload: image});
     realtime()
       .ref('users/' + auth().currentUser.uid + '/liked_images/' + image.key)
       .remove();
@@ -38,12 +40,13 @@ export default function like(image, likedImages, setLikedImages) {
       });
 
     // update likedImages state
-    setLikedImages(
-      likedImages.filter(likedImage => likedImage.id !== image.key),
-    );
+    // setLikedImages(
+    //   likedImages.filter(likedImage => likedImage.id !== image.key),
+    // );
   } else {
     // like the image
     // increase the image's likes by 1
+    dispatch({type: ADD_LIKED_IMAGES, payload: image});
     firestore()
       .collection('images')
       .doc(image.key)
@@ -76,12 +79,12 @@ export default function like(image, likedImages, setLikedImages) {
       });
 
     // update likedImages state
-    setLikedImages([
-      ...likedImages,
-      {
-        liked: true,
-        id: image.key,
-      },
-    ]);
+    // setLikedImages([
+    //   ...likedImages,
+    //   {
+    //     liked: true,
+    //     id: image.key,
+    //   },
+    // ]);
   }
 }

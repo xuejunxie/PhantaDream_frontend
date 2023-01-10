@@ -15,6 +15,8 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native-gesture-handler';
 import like from './Like';
+import {useDispatch, useSelector} from 'react-redux';
+import {LOAD_LIKED_IMAGES} from '../../redux/types';
 
 const loadSize = 1;
 
@@ -96,9 +98,10 @@ export default function ForYou() {
       </View>
     );
   };
-
   // Get user liked images
-  const [likedImages, setLikedImages] = React.useState([]);
+
+  const dispatch = useDispatch();
+  const likedImages = useSelector(state => state.like.likedImages);
 
   useEffect(() => {
     realtime()
@@ -108,9 +111,8 @@ export default function ForYou() {
         snapshot.forEach(childSnapshot => {
           likedImages.push(childSnapshot.val());
         });
-        setLikedImages(likedImages);
+        dispatch({type: LOAD_LIKED_IMAGES, payload: likedImages});
       });
-    console.log(likedImages);
   }, []);
 
   // load more when the user scrolls down to the bottom of the page
@@ -128,7 +130,7 @@ export default function ForYou() {
             }}>
             <TouchableWithoutFeedback
               onPress={() => {
-                like(image, likedImages, setLikedImages);
+                like(image, likedImages, dispatch);
               }}>
               <Neomorph
                 key={image.key}
@@ -169,6 +171,11 @@ export default function ForYou() {
                 </View>
               </Neomorph>
             </TouchableWithoutFeedback>
+            {likedImages.find(likedImage => likedImage.id === image.id) ? (
+              <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
+                {image.prompt}
+              </Text>
+            ) : null}
           </View>
         ))}
       </ScrollView>

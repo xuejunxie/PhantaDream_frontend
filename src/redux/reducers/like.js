@@ -1,4 +1,8 @@
-import {ADD_LIKED_IMAGES, REMOVE_LIKED_IMAGES} from '../types';
+import {
+  ADD_LIKED_IMAGES,
+  LOAD_LIKED_IMAGES,
+  REMOVE_LIKED_IMAGES,
+} from '../types';
 
 const initialState = {
   likedImages: [],
@@ -15,8 +19,13 @@ export default function (state = initialState, action) {
       return {
         ...state,
         likedImages: state.likedImages.filter(
-          likedImage => likedImage.id !== action.payload,
+          likedImage => likedImage.id !== action.payload.id,
         ),
+      };
+    case LOAD_LIKED_IMAGES:
+      return {
+        ...state,
+        likedImages: action.payload,
       };
 
     default:
