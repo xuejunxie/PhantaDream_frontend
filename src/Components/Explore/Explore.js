@@ -11,7 +11,6 @@ import {Neomorph} from 'react-native-neomorph-shadows';
 
 import COLORS from '../GlobalValues/Colors';
 import Hot from './Hot';
-import Liked from './Liked';
 import ForYou from './ForYou';
 
 const dummy = require('./dummy.json');

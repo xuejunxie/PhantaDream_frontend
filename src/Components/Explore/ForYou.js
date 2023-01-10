@@ -14,6 +14,7 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
 } from 'react-native-gesture-handler';
+import like from './Like';
 
 const loadSize = 1;
 
@@ -96,6 +97,22 @@ export default function ForYou() {
     );
   };
 
+  // Get user liked images
+  const [likedImages, setLikedImages] = React.useState([]);
+
+  useEffect(() => {
+    realtime()
+      .ref('users/' + auth().currentUser.uid + '/liked_images')
+      .once('value', snapshot => {
+        const likedImages = [];
+        snapshot.forEach(childSnapshot => {
+          likedImages.push(childSnapshot.val());
+        });
+        setLikedImages(likedImages);
+      });
+    console.log(likedImages);
+  }, []);
+
   // load more when the user scrolls down to the bottom of the page
   return (
     <View>
@@ -109,21 +126,49 @@ export default function ForYou() {
               // make it center
               alignItems: 'center',
             }}>
-            <Neomorph
-              key={image.key}
-              style={{
-                shadowRadius: 5,
-                borderRadius: 10,
-                backgroundColor: COLORS.primary,
-                width: 280,
-                height: 280,
-                margin: 10,
+            <TouchableWithoutFeedback
+              onPress={() => {
+                like(image, likedImages, setLikedImages);
               }}>
-              <Image
-                source={{uri: image.url}}
-                style={{width: 280, height: 280, borderRadius: 10}}
-              />
-            </Neomorph>
+              <Neomorph
+                key={image.key}
+                style={{
+                  shadowRadius: 5,
+                  borderRadius: 10,
+                  backgroundColor: COLORS.primary,
+                  width: 280,
+                  height: 280,
+                  margin: 10,
+                }}>
+                <Image
+                  source={{uri: image.url}}
+                  style={{width: 280, height: 280, borderRadius: 10}}
+                />
+                <View
+                  style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    right: 0,
+                    width: 50,
+                    height: 50,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexDirection: 'column',
+                  }}>
+                  {likedImages.find(
+                    likedImage => likedImage.id === image.key,
+                  ) ? (
+                    <FontAwesomeIcon
+                      icon={faHeart}
+                      size={25}
+                      color={COLORS.red}
+                    />
+                  ) : (
+                    <FontAwesomeIcon icon={faHeartO} size={25} color={'gray'} />
+                  )}
+                </View>
+              </Neomorph>
+            </TouchableWithoutFeedback>
           </View>
         ))}
       </ScrollView>
