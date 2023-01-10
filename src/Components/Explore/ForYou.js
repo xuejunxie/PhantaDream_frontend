@@ -14,7 +14,7 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
 } from 'react-native-gesture-handler';
-import like from './Like';
+import like from './like';
 import {useDispatch, useSelector} from 'react-redux';
 import {LOAD_LIKED_IMAGES} from '../../redux/types';
 
@@ -32,10 +32,7 @@ export default function ForYou() {
         const images = [];
 
         querySnapshot.forEach(documentSnapshot => {
-          images.push({
-            ...documentSnapshot.data(),
-            key: documentSnapshot.id,
-          });
+          images.push(documentSnapshot.data());
         });
 
         setImages(images);
@@ -43,7 +40,6 @@ export default function ForYou() {
 
         unsubscriber();
       });
-    // Unsubscribe from events when no longer in use
   }, []);
 
   // load more images when the user scrolls down
@@ -56,18 +52,11 @@ export default function ForYou() {
       .onSnapshot(querySnapshot => {
         // if the query is less then 10, then there are no more images to load
         querySnapshot.forEach(documentSnapshot => {
-          setImages([
-            ...images,
-            {
-              ...documentSnapshot.data(),
-              key: documentSnapshot.id,
-            },
-          ]);
+          setImages([...images, documentSnapshot.data()]);
         });
+        // Unsubscribe from events after load once
         unsubscriber();
       });
-
-    // Unsubscribe from events when no longer in use
   };
 
   const [hearts, setHearts] = React.useState(0);
@@ -125,7 +114,7 @@ export default function ForYou() {
       <ScrollView onScrollBeginDrag={loadMore}>
         {images.map(image => (
           <View
-            key={image.key}
+            key={image.id}
             style={{
               backgroundColor: 'rgba(0,0,0,0)',
               marginTop: 30,
@@ -137,7 +126,7 @@ export default function ForYou() {
                 like(image, likedImages, dispatch);
               }}>
               <Neomorph
-                key={image.key}
+                key={image.id}
                 style={{
                   shadowRadius: 5,
                   borderRadius: 10,
@@ -166,7 +155,7 @@ export default function ForYou() {
                     flexDirection: 'column',
                   }}>
                   {likedImages.find(
-                    likedImage => likedImage.id === image.key,
+                    likedImage => likedImage.id === image.id,
                   ) ? (
                     <FontAwesomeIcon
                       icon={faHeart}
@@ -190,7 +179,7 @@ export default function ForYou() {
                     fontSize: 15,
                     marginTop: 10,
                   }}>
-                  Likes: {image.likes}
+                  Likes: {image.likes + 1}
                 </Text>
                 <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
                   Prompt: {image.prompt}

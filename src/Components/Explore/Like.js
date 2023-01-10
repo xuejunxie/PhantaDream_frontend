@@ -9,22 +9,22 @@ export default function like(image, likedImages, dispatch) {
   // check if the image is liked by user
   // if it is liked, unlike it
   // if it is not liked, like it
-  if (likedImages.find(likedImage => likedImage.id === image.key)) {
+  if (likedImages.find(likedImage => likedImage.id === image.id)) {
     // unlike the image
     // remove the image from the user's liked images
 
     dispatch({type: REMOVE_LIKED_IMAGES, payload: image});
     realtime()
-      .ref('users/' + auth().currentUser.uid + '/liked_images/' + image.key)
+      .ref('users/' + auth().currentUser.uid + '/liked_images/' + image.id)
       .remove();
 
     // remove the user from the image's like collection
-    firestore().collection(image.key).doc(auth().currentUser.uid).delete();
+    firestore().collection(image.id).doc(auth().currentUser.uid).delete();
 
     // decrease the image's likes by 1
     firestore()
       .collection('images')
-      .doc(image.key)
+      .doc(image.id)
       .update({
         likes: image.likes - 1,
       });
@@ -41,7 +41,7 @@ export default function like(image, likedImages, dispatch) {
 
     // update likedImages state
     // setLikedImages(
-    //   likedImages.filter(likedImage => likedImage.id !== image.key),
+    //   likedImages.filter(likedImage => likedImage.id !== image.id),
     // );
   } else {
     // like the image
@@ -49,24 +49,21 @@ export default function like(image, likedImages, dispatch) {
     dispatch({type: ADD_LIKED_IMAGES, payload: image});
     firestore()
       .collection('images')
-      .doc(image.key)
+      .doc(image.id)
       .update({
         likes: image.likes + 1,
       });
 
     // store the user information in the image's like collection
-    firestore().collection(image.key).doc(auth().currentUser.uid).set({
+    firestore().collection(image.id).doc(auth().currentUser.uid).set({
       time: new Date(),
     });
 
     // save the image to the user's liked images
     realtime()
       .ref('users/' + auth().currentUser.uid + '/liked_images')
-      .child(image.key)
-      .set({
-        liked: true,
-        id: image.key,
-      });
+      .child(image.id)
+      .set(image);
 
     // reduce user hearts by 1
     realtime()
@@ -83,7 +80,7 @@ export default function like(image, likedImages, dispatch) {
     //   ...likedImages,
     //   {
     //     liked: true,
-    //     id: image.key,
+    //     id: image.id,
     //   },
     // ]);
   }

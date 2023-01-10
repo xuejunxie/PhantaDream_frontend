@@ -12,6 +12,7 @@ import {Neomorph} from 'react-native-neomorph-shadows';
 import {COLORS} from '../GlobalValues/Colors';
 import Hot from './Hot';
 import ForYou from './ForYou';
+import Liked from './Liked';
 
 const dummy = require('./dummy.json');
 const size = 280;
@@ -52,7 +53,7 @@ const FirstRoute = () => <ForYou />;
 
 const SecondRoute = () => <Hot />;
 
-const ThirdRoute = () => <ScrollView>{render_dummy(8, 12)}</ScrollView>;
+const ThirdRoute = () => <Liked />;
 
 const renderScene = SceneMap({
   first: FirstRoute,

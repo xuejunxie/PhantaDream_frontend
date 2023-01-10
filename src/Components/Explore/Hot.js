@@ -9,7 +9,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faHeart} from '@fortawesome/free-solid-svg-icons';
 import {faHeart as faHeartO} from '@fortawesome/free-regular-svg-icons';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
-import like from './Like';
+import like from './like';
 import {useDispatch, useSelector} from 'react-redux';
 
 export default function Hot() {
@@ -27,18 +27,13 @@ export default function Hot() {
         const images = [];
 
         querySnapshot.forEach(documentSnapshot => {
-          images.push({
-            ...documentSnapshot.data(),
-            key: documentSnapshot.id,
-          });
+          images.push(documentSnapshot.data());
         });
 
         setImages(images);
 
         unsubscriber();
       });
-
-    // Unsubscribe from events when no longer in use
   }, []);
 
   // Sync user hearts number
@@ -113,24 +108,22 @@ export default function Hot() {
                 </View>
               </Neomorph>
             </TouchableWithoutFeedback>
-            {likedImages.find(likedImage => likedImage.id === image.id) ? (
-              <View
+            <View
+              style={{
+                width: SIZES.canvas,
+              }}>
+              <Text
                 style={{
-                  width: SIZES.canvas,
+                  color: COLORS.red,
+                  fontSize: 15,
+                  marginTop: 10,
                 }}>
-                <Text
-                  style={{
-                    color: COLORS.red,
-                    fontSize: 15,
-                    marginTop: 10,
-                  }}>
-                  Likes: {image.likes}
-                </Text>
-                <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
-                  Prompt: {image.prompt}
-                </Text>
-              </View>
-            ) : null}
+                Likes: {image.likes + 1}
+              </Text>
+              <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
+                Prompt: {image.prompt}
+              </Text>
+            </View>
           </View>
         ))}
       </ScrollView>
