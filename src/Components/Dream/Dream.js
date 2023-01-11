@@ -541,7 +541,7 @@ export default function Dream() {
         </TouchableWithoutFeedback>
 
         {item.selected ? (
-          <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
+          <Text style={{color: 'gray', fontSize: 15, margin: 10}}>
             {item.prompt}
           </Text>
         ) : null}

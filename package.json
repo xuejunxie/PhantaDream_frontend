@@ -46,6 +46,7 @@
     "react-native-dotenv": "^3.4.2",
     "react-native-gesture-handler": "^2.8.0",
     "react-native-haptic-feedback": "^1.14.0",
+    "react-native-image-marker": "^0.6.3",
     "react-native-neomorph-shadows": "^1.1.2",
     "react-native-pager-view": "^6.1.2",
     "react-native-reanimated": "^2.13.0",
@@ -56,6 +57,9 @@
     "react-native-tab-view": "^3.3.2",
     "react-native-uuid": "^2.0.1",
     "react-native-web": "~0.18.9",
+    "react-redux": "^8.0.5",
+    "redux-devtools-extension": "^2.13.9",
+    "redux-thunk": "^2.4.2",
     "typescript": "^4.6.3"
   },
   "devDependencies": {
