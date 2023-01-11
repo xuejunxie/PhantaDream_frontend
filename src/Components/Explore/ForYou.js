@@ -44,8 +44,6 @@ export default function ForYou() {
 
         setImages(images);
         console.log('set images');
-
-        unsubscriber();
       });
   }, []);
 
@@ -103,6 +101,24 @@ export default function ForYou() {
   const likedImages = useSelector(state => state.like.likedImages);
   const dispatch = useDispatch();
 
+  const isLiked = image => {
+    return likedImages.find(likedImage => likedImage.id === image.id);
+  };
+
+  const setLike = (image, change) => {
+    setImages(
+      images.map(img => {
+        if (img.id === image.id) {
+          return {
+            ...image,
+            likes: image.likes + change,
+          };
+        }
+        return img;
+      }),
+    );
+  };
+
   // load more when the user scrolls down to the bottom of the page
   return (
     <View>
@@ -123,6 +139,11 @@ export default function ForYou() {
                   'impactMedium',
                   hapticOptions,
                 );
+                if (isLiked(image)) {
+                  setLike(image, -1);
+                } else {
+                  setLike(image, 1);
+                }
               }}>
               <Neomorph
                 key={image.id}

@@ -15,7 +15,7 @@ export default function Published() {
   // Get user published images
   const [publishedImages, setPublishedImages] = useState([]);
 
-  useEffect(() => {
+  const loadPublished = () => {
     realtime()
       .ref('users/' + auth().currentUser.uid + '/published')
       .once('value', snapshot => {
@@ -36,11 +36,14 @@ export default function Published() {
           setPublishedImages(publishedImages);
         }
       });
+  };
+  useEffect(() => {
+    loadPublished();
   }, []);
 
   return (
     <View>
-      <ScrollView>
+      <ScrollView onScrollBeginDrag={loadPublished}>
         {publishedImages.map(image => (
           <View
             key={image.id}

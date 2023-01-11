@@ -25,10 +25,11 @@ export default function Hot() {
   const [images, setImages] = React.useState([]);
 
   useEffect(() => {
-    // load all images from firestore images
+    // load 10 random images from firestore images
     const unsubscriber = firestore()
       .collection('images')
       .orderBy('likes', 'desc')
+      .limit(10)
       .onSnapshot(querySnapshot => {
         const images = [];
 
@@ -37,8 +38,7 @@ export default function Hot() {
         });
 
         setImages(images);
-
-        unsubscriber();
+        console.log('set images');
       });
   }, []);
 
@@ -53,6 +53,24 @@ export default function Hot() {
   // Get user liked images
   const likedImages = useSelector(state => state.like.likedImages);
   const dispatch = useDispatch();
+
+  const isLiked = image => {
+    return likedImages.find(likedImage => likedImage.id === image.id);
+  };
+
+  const setLike = (image, change) => {
+    setImages(
+      images.map(img => {
+        if (img.id === image.id) {
+          return {
+            ...image,
+            likes: image.likes + change,
+          };
+        }
+        return img;
+      }),
+    );
+  };
 
   return (
     <View>
@@ -128,7 +146,7 @@ export default function Hot() {
                   fontSize: 15,
                   marginTop: 10,
                 }}>
-                Likes: {image.likes + 1}
+                Likes: {image.likes}
               </Text>
               <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
                 Prompt: {image.prompt}
