@@ -7,7 +7,7 @@ import {createMaterialBottomTabNavigator} from '@react-navigation/material-botto
 import Explore from './Components/Explore/Explore';
 import Dream from './Components/Dream/Dream';
 import Profile from './Components/Profile/Profile';
-import {COLORS} from './Components/GlobalValues/Colors';
+import {COLORS} from './Components/common/globalValues';
 import Market from './Components/Market/Market';
 import DeviceInfo from 'react-native-device-info';
 
@@ -26,6 +26,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {LOAD_LIKED_IMAGES} from './redux/types';
 import realtime from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 LogBox.ignoreAllLogs();
 
@@ -39,10 +40,19 @@ function Home(): JSX.Element {
     realtime()
       .ref('users/' + auth().currentUser.uid + '/liked_images')
       .once('value', snapshot => {
+        var liked = snapshot.val();
         const likedImages = [];
-        snapshot.forEach(childSnapshot => {
-          likedImages.push(childSnapshot.val());
-        });
+        for (const key in liked) {
+          // get latest like count from database
+          firestore()
+            .collection('images')
+            .doc(liked[key].id)
+            .get()
+            .then(documentSnapshot => {
+              liked[key] = documentSnapshot.data();
+            });
+          likedImages.push(liked[key]);
+        }
         dispatch({type: LOAD_LIKED_IMAGES, payload: likedImages});
       });
   }, []);

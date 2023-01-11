@@ -21,7 +21,7 @@ const hapticOptions = {
   ignoreAndroidSystemSettings: false,
 };
 
-import {COLORS, SIZES} from '../GlobalValues/Colors';
+import {COLORS, SIZES} from '../common/globalValues';
 import axios from 'axios';
 import {Buffer} from 'buffer';
 import AsyncStorage from '@react-native-async-storage/async-storage';

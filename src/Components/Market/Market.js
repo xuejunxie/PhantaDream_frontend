@@ -11,7 +11,7 @@ import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import {Neomorph} from 'react-native-neomorph-shadows';
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 
-import {COLORS} from '../GlobalValues/Colors';
+import {COLORS} from '../common/globalValues';
 import {Button} from 'react-native';
 
 const dummy = require('../Explore/dummy.json');

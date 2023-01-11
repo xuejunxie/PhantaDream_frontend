@@ -7,7 +7,7 @@ import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 
-import {COLORS} from '../GlobalValues/Colors';
+import {COLORS} from '../common/globalValues';
 
 import Published from './Published';
 import Liked from './Liked';

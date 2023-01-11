@@ -4,7 +4,7 @@ import firestore from '@react-native-firebase/firestore';
 import realtime from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import {Neomorph} from 'react-native-neomorph-shadows';
-import {COLORS, SIZES} from '../GlobalValues/Colors';
+import {COLORS, SIZES} from '../common/globalValues';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faHeart} from '@fortawesome/free-solid-svg-icons';
 import {faHeart as faHeartO} from '@fortawesome/free-regular-svg-icons';

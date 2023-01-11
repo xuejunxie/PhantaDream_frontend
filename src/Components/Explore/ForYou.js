@@ -6,7 +6,7 @@ import firestore from '@react-native-firebase/firestore';
 import realtime from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import {Neomorph} from 'react-native-neomorph-shadows';
-import {COLORS, SIZES} from '../GlobalValues/Colors';
+import {COLORS, SIZES} from '../common/globalValues';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faHeart} from '@fortawesome/free-solid-svg-icons';
 import {faHeart as faHeartO} from '@fortawesome/free-regular-svg-icons';
@@ -23,6 +23,7 @@ const hapticOptions = {
 import like from './like';
 import {useDispatch, useSelector} from 'react-redux';
 import {LOAD_LIKED_IMAGES} from '../../redux/types';
+import getLike from '../common/getLike';
 
 const loadSize = 1;
 
@@ -177,7 +178,7 @@ export default function ForYou() {
                     fontSize: 15,
                     marginTop: 10,
                   }}>
-                  Likes: {image.likes + 1}
+                  Likes: {image.likes}
                 </Text>
                 <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
                   Prompt: {image.prompt}

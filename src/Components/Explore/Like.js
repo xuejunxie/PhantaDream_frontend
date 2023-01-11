@@ -26,7 +26,7 @@ export default function like(image, likedImages, dispatch) {
       .collection('images')
       .doc(image.id)
       .update({
-        likes: image.likes - 1,
+        likes: firestore.FieldValue.increment(-1),
       });
 
     // increase user hearts by 1
@@ -51,7 +51,7 @@ export default function like(image, likedImages, dispatch) {
       .collection('images')
       .doc(image.id)
       .update({
-        likes: image.likes + 1,
+        likes: firestore.FieldValue.increment(1),
       });
 
     // store the user information in the image's like collection

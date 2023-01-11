@@ -7,24 +7,17 @@ import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 
-import {COLORS} from '../GlobalValues/Colors';
+import {COLORS} from '../common/globalValues';
 import Hot from './Hot';
 import ForYou from './ForYou';
-import Liked from './Liked';
 
 const FirstRoute = () => <ForYou />;
 
 const SecondRoute = () => <Hot />;
 
-const ThirdRoute = () => <Liked />;
-
-const ForthRoute = () => null;
-
 const renderScene = SceneMap({
   first: FirstRoute,
   second: SecondRoute,
-  third: ThirdRoute,
-  fourth: ForthRoute,
 });
 
 export default function Explore() {
