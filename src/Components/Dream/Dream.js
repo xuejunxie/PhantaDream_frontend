@@ -578,7 +578,7 @@ export default function Dream() {
             marginTop: 20,
             marginBottom: 20,
           }}>
-          <FontAwesomeIcon icon={faBolt} size={20} color={'gray'} />
+          <FontAwesomeIcon icon={faBolt} size={20} color={chargeColor} />
           <Text style={{color: 'gray', fontSize: 15, marginLeft: 10}}>
             {Charge}
           </Text>
@@ -589,11 +589,32 @@ export default function Dream() {
 
   // animate the lighting symbol
   const [chargeColor, setChargeColor] = useState('gray');
+  function usePrevious(value) {
+    const ref = useRef();
+    useEffect(() => {
+      ref.current = value;
+    });
+    return ref.current;
+  }
+
+  const lastCharge = usePrevious(Charge);
+  function timeUnit(n) {
+    return 1000 + 300 * n;
+  }
   useEffect(() => {
-    if (Charge > 0) {
+    console.log(Charge, lastCharge);
+    if (Charge > lastCharge) {
       setChargeColor('yellow');
-    } else {
-      setChargeColor('gray');
+      // set charge color to red and blue and back to gray in sequence
+      setTimeout(() => {
+        setChargeColor('gray');
+      }, timeUnit(1));
+      setTimeout(() => {
+        setChargeColor('yellow');
+      }, timeUnit(2));
+      setTimeout(() => {
+        setChargeColor('gray');
+      }, timeUnit(3));
     }
   }, [Charge]);
 

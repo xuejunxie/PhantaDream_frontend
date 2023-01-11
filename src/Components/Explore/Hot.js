@@ -38,7 +38,6 @@ export default function Hot() {
         });
 
         setImages(images);
-        console.log('set images');
       });
   }, []);
 

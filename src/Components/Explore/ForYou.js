@@ -25,7 +25,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {LOAD_LIKED_IMAGES} from '../../redux/types';
 import getLike from '../common/getLike';
 
-const loadSize = 1;
+const loadSize = 2;
 
 export default function ForYou() {
   const [images, setImages] = React.useState([]);
@@ -43,7 +43,6 @@ export default function ForYou() {
         });
 
         setImages(images);
-        console.log('set images');
       });
   }, []);
 
