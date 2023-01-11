@@ -85,7 +85,7 @@ export default function Published() {
                   fontSize: 15,
                   marginTop: 10,
                 }}>
-                Likes: {image.likes + 1}
+                Likes: {image.likes}
               </Text>
               <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
                 Prompt: {image.prompt}

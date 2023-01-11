@@ -17,18 +17,12 @@ const FirstRoute = () => <Published />;
 
 const SecondRoute = () => <Liked />;
 
-const ThirdRoute = () => null;
-
-const ForthRoute = () => null;
-
-const FifthRoute = () => <Settings />;
+const ThirdRoute = () => <Settings />;
 
 const renderScene = SceneMap({
   first: FirstRoute,
   second: SecondRoute,
   third: ThirdRoute,
-  fourth: ForthRoute,
-  fifth: FifthRoute,
 });
 
 export default function Profile() {
@@ -38,9 +32,7 @@ export default function Profile() {
   const [routes] = React.useState([
     {key: 'first', title: 'Published'},
     {key: 'second', title: 'Liked'},
-    // {key: 'third', title: 'Minted'},
-    // {key: 'fourth', title: 'Private club'},
-    // {key: 'fifth', title: 'Settings'},
+    // {key: 'third', title: 'Settings'},
   ]);
 
   const frame = useSafeAreaFrame();

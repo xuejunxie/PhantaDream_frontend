@@ -66,7 +66,7 @@ export default function like(image, isLiked, dispatch) {
       .ref('users/' + auth().currentUser.uid + '/liked_images')
       .child(image.id)
       .set({
-        // ...image,
+        ...image,
         likedTime: Date(),
       });
 

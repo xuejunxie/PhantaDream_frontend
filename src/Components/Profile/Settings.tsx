@@ -17,6 +17,8 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import auth from '@react-native-firebase/auth';
 import realtime from '@react-native-firebase/database';
 import storage from '@react-native-firebase/storage';
+import firestore from '@react-native-firebase/firestore';
+import {CameraRoll} from '@react-native-camera-roll/camera-roll';
 
 import {
   faBitcoinSign,
@@ -61,18 +63,6 @@ const firstEmail = {
 
 const list = [
   {
-    title: 'Friends',
-    icon: faUserFriends,
-  },
-  {
-    title: 'Following',
-    icon: faHeart,
-  },
-  {
-    title: 'Liked',
-    icon: faThumbsUp,
-  },
-  {
     title: 'Billing',
     icon: faDollar,
   },
@@ -112,7 +102,32 @@ const Settings = () => {
   }, []);
 
   // select an avatar from photo and upload the picture to the database
-  const uploadAvatar = () => {};
+  const uploadAvatar = () => {
+    // select a photo from the photo library
+    CameraRoll.getPhotos({
+      first: 1,
+      assetType: 'Photos',
+    })
+      .then(r => {
+        // upload the photo to the database
+        storage()
+          .ref(`/users/${auth().currentUser.uid}/avatar`)
+          .putFile(r.edges[0].node.image.uri)
+          .then(() => {
+            // get the download url
+            storage()
+              .ref(`/users/${auth().currentUser.uid}/avatar`)
+              .getDownloadURL()
+              .then(url => {
+                // update the avatar
+                setAvatar(url);
+              });
+          });
+      })
+      .catch(err => {
+        //Error Loading Images
+      });
+  };
 
   return (
     <ScrollView
@@ -122,7 +137,7 @@ const Settings = () => {
         backgroundColor: COLORS.primary,
       }}>
       <View style={styles.userRow}>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => {
             // click the avatar to change the avatar
             uploadAvatar();
@@ -130,7 +145,7 @@ const Settings = () => {
           <View style={styles.userImage}>
             <Avatar rounded size="large" source={{uri: avatar}} />
           </View>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <View>
           <Text style={{fontSize: 16}}>{name}</Text>
           <Text
