@@ -602,7 +602,6 @@ export default function Dream() {
     return 1000 + 300 * n;
   }
   useEffect(() => {
-    console.log(Charge, lastCharge);
     if (Charge > lastCharge) {
       setChargeColor('yellow');
       // set charge color to red and blue and back to gray in sequence

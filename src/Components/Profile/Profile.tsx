@@ -40,7 +40,7 @@ export default function Profile() {
     {key: 'second', title: 'Liked'},
     // {key: 'third', title: 'Minted'},
     // {key: 'fourth', title: 'Private club'},
-    {key: 'fifth', title: 'Settings'},
+    // {key: 'fifth', title: 'Settings'},
   ]);
 
   const frame = useSafeAreaFrame();

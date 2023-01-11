@@ -4,12 +4,14 @@ import auth from '@react-native-firebase/auth';
 import realtime from '@react-native-firebase/database';
 import firestore from '@react-native-firebase/firestore';
 import {REMOVE_LIKED_IMAGES, ADD_LIKED_IMAGES} from '../../redux/types';
+import {useSelector} from 'react-redux';
 
-export default function like(image, likedImages, dispatch) {
+export default function like(image, isLiked, dispatch) {
   // check if the image is liked by user
   // if it is liked, unlike it
   // if it is not liked, like it
-  if (likedImages.find(likedImage => likedImage.id === image.id)) {
+
+  if (isLiked) {
     // unlike the image
     // remove the image from the user's liked images
 
@@ -56,14 +58,17 @@ export default function like(image, likedImages, dispatch) {
 
     // store the user information in the image's like collection
     firestore().collection(image.id).doc(auth().currentUser.uid).set({
-      time: new Date(),
+      time: Date(),
     });
 
     // save the image to the user's liked images
     realtime()
       .ref('users/' + auth().currentUser.uid + '/liked_images')
       .child(image.id)
-      .set(image);
+      .set({
+        // ...image,
+        likedTime: Date(),
+      });
 
     // reduce user hearts by 1
     realtime()

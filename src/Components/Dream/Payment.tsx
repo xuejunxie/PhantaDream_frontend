@@ -1,6 +1,8 @@
 import React, {useEffect} from 'react';
 import ApplePay, {DetailsData, MethodData} from 'react-native-apple-payment';
 import {TouchableOpacity, View, Button} from 'react-native';
+import auth from '@react-native-firebase/auth';
+import realtime from '@react-native-firebase/database';
 
 export default function Payment({price, chargeOrder, updateCharge}) {
   const Method: MethodData = {
@@ -26,9 +28,15 @@ export default function Payment({price, chargeOrder, updateCharge}) {
         onPress={() => {
           payment.canMakePayments().then((can: any) => {
             if (can) {
-              payment
-                .initApplePay()
-                .then((res: any) => updateCharge(chargeOrder));
+              payment.initApplePay().then((res: any) => {
+                updateCharge(chargeOrder);
+                // save bill to user database
+                realtime().ref(`/users/${auth().currentUser.uid}/bills`).push({
+                  amount: price,
+                  chargeOrder: chargeOrder,
+                  date: new Date().toLocaleString(),
+                });
+              });
             }
           });
         }}></Button>

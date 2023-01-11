@@ -57,103 +57,84 @@ export default function Hot() {
     return likedImages.find(likedImage => likedImage.id === image.id);
   };
 
-  const setLike = (image, change) => {
-    setImages(
-      images.map(img => {
-        if (img.id === image.id) {
-          return {
-            ...image,
-            likes: image.likes + change,
-          };
-        }
-        return img;
-      }),
+  const imageView = image => {
+    let liked = isLiked(image);
+
+    return (
+      <View
+        key={image.id}
+        style={{
+          backgroundColor: 'rgba(0,0,0,0)',
+          marginTop: 30,
+          // make it center
+          alignItems: 'center',
+        }}>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            like(image, liked, dispatch);
+            ReactNativeHapticFeedback.trigger('impactMedium', hapticOptions);
+          }}>
+          <Neomorph
+            style={{
+              shadowRadius: 10,
+              borderRadius: 25,
+              backgroundColor: COLORS.primary,
+              width: SIZES.canvas,
+              height: SIZES.canvas,
+              marginTop: 20,
+            }}>
+            <Image
+              source={{
+                uri: image.url,
+              }}
+              style={{
+                width: SIZES.canvas,
+                height: SIZES.canvas,
+
+                borderRadius: 25,
+              }}></Image>
+            <View
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                right: 0,
+                width: 50,
+                height: 50,
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexDirection: 'column',
+              }}>
+              {liked ? (
+                <FontAwesomeIcon icon={faHeart} size={25} color={COLORS.red} />
+              ) : (
+                <FontAwesomeIcon icon={faHeartO} size={25} color={'gray'} />
+              )}
+            </View>
+          </Neomorph>
+        </TouchableWithoutFeedback>
+        <View
+          style={{
+            width: SIZES.canvas,
+          }}>
+          <Text
+            style={{
+              color: COLORS.red,
+              fontSize: 15,
+              marginTop: 10,
+            }}>
+            Likes: {image.likes}
+          </Text>
+          <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
+            Prompt: {image.prompt}
+          </Text>
+        </View>
+      </View>
     );
   };
 
   return (
     <View>
-      <ScrollView>
-        {images.map(image => (
-          <View
-            key={image.id}
-            style={{
-              backgroundColor: 'rgba(0,0,0,0)',
-              marginTop: 30,
-              // make it center
-              alignItems: 'center',
-            }}>
-            <TouchableWithoutFeedback
-              onPress={() => {
-                like(image, likedImages, dispatch);
-                ReactNativeHapticFeedback.trigger(
-                  'impactMedium',
-                  hapticOptions,
-                );
-              }}>
-              <Neomorph
-                style={{
-                  shadowRadius: 10,
-                  borderRadius: 25,
-                  backgroundColor: COLORS.primary,
-                  width: SIZES.canvas,
-                  height: SIZES.canvas,
-                  marginTop: 20,
-                }}>
-                <Image
-                  source={{
-                    uri: image.url,
-                  }}
-                  style={{
-                    width: SIZES.canvas,
-                    height: SIZES.canvas,
-
-                    borderRadius: 25,
-                  }}></Image>
-                <View
-                  style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    right: 0,
-                    width: 50,
-                    height: 50,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexDirection: 'column',
-                  }}>
-                  {likedImages.find(
-                    likedImage => likedImage.id === image.id,
-                  ) ? (
-                    <FontAwesomeIcon
-                      icon={faHeart}
-                      size={25}
-                      color={COLORS.red}
-                    />
-                  ) : (
-                    <FontAwesomeIcon icon={faHeartO} size={25} color={'gray'} />
-                  )}
-                </View>
-              </Neomorph>
-            </TouchableWithoutFeedback>
-            <View
-              style={{
-                width: SIZES.canvas,
-              }}>
-              <Text
-                style={{
-                  color: COLORS.red,
-                  fontSize: 15,
-                  marginTop: 10,
-                }}>
-                Likes: {image.likes}
-              </Text>
-              <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
-                Prompt: {image.prompt}
-              </Text>
-            </View>
-          </View>
-        ))}
-      </ScrollView>
+      <ScrollView>{images.map(image => imageView(image))}</ScrollView>
       {/* show a heart overlay on the bottom right of Hots */}
       <View
         style={{
