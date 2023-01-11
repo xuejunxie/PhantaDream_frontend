@@ -161,11 +161,13 @@ export default function Dream() {
   const send = async () => {
     const imageId = uuid.v1();
     const userId = auth().currentUser.uid;
+    const seed = Math.floor(Math.random() * 1e10);
     axios
       .post(serverURL + 'txt2img', {
         prompt: prompt,
         user: userId,
         img_name: imageId,
+        seed: seed,
       })
       .then(function (response) {
         const taskID = response.data.task_id;
@@ -194,6 +196,7 @@ export default function Dream() {
                     prompt: prompt,
                     date: new Date(),
                     artist: artistsUsed,
+                    seed: seed,
                   };
                   AsyncStorage.setItem(imageId, JSON.stringify(image_entry));
                   // replace the last image with the new image
@@ -390,34 +393,16 @@ export default function Dream() {
                   </Text>
                 </Neomorph>
               </TouchableOpacity>
-              {/* <TouchableOpacity
-                onPress={() => {
-                  setShareToPublic(false);
-                  excuteShare();
-                  setShareModalVisible(false);
-                }}>
-                <Neomorph
-                  inner={false}
-                  style={{
-                    shadowRadius: 10,
-                    borderRadius: 25,
-                    backgroundColor: COLORS.primary,
-                    width: 120,
-                    height: 40,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}>
-                  <Text
-                    style={{
-                      fontSize: 20,
-                      fontWeight: 'bold',
-                      color: COLORS.white,
-                    }}>
-                    Prive club
-                  </Text>
-                </Neomorph>
-              </TouchableOpacity> */}
             </View>
+            <Text
+              style={{
+                fontSize: 15,
+                color: 'gray',
+                margin: 10,
+              }}>
+              All your generated art works will be saved on your device only by
+              default. Only public art works will be saved on our server.
+            </Text>
           </View>
         </View>
       </Modal>
@@ -448,6 +433,7 @@ export default function Dream() {
     const date = pickedImage.date;
     const artist = pickedImage.artist;
     const storageRef = storage().ref();
+    const seed = pickedImage.seed;
     const imageRef = storageRef.child('images/' + imageId + '.png');
     imageRef
       .putString(image, 'data_url')
@@ -462,6 +448,7 @@ export default function Dream() {
             creator: auth().currentUser.uid,
             owner: auth().currentUser.uid,
             likes: 1,
+            seed: seed,
           };
           // store image meta on firestore
           firestore()
