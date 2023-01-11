@@ -50,6 +50,7 @@ import artists from './artists.json';
 
 import RadioButtonRN from 'radio-buttons-react-native';
 import Payment from './Payment';
+import ImageMarker from 'react-native-image-marker';
 
 const loading_image = 'https://i.gifer.com/1amw.gif';
 const empty_image =
@@ -299,8 +300,22 @@ export default function Dream() {
   useEffect(() => {
     if (pickedImage) {
       if (saveButtonPressed) {
-        CameraRoll.save(pickedImage.image).then(() => {
-          Alert.alert('Photo Saved!');
+        // water mark the image with "PhantaDream"
+        const image = pickedImage.image;
+        ImageMarker.markText({
+          src: image,
+          text: 'Dreamed @ PhantaDream',
+          position: 'bottomRight',
+          scale: 1,
+          color: '#FFFFFF80',
+          fontName: 'HelveticaNeue',
+          fontSize: 15,
+          quality: 100,
+        }).then(markedImage => {
+          // save the image to camera roll
+          CameraRoll.save(markedImage).then(() => {
+            Alert.alert('Photo Saved!');
+          });
         });
       }
     }
