@@ -1,160 +1,71 @@
-import React from 'react';
+import * as React from 'react';
+import {useWindowDimensions} from 'react-native';
+import {TabView, TabBar, SceneMap} from 'react-native-tab-view';
+import {getDefaultHeaderHeight} from '@react-navigation/elements';
 import {
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  Text,
-  ScrollView,
-} from 'react-native';
-// import { useMoralis, useMoralisWeb3Api, useMoralisWeb3ApiCall } from "react-moralis";
+  useSafeAreaFrame,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
+
 import {COLORS} from '../GlobalValues/Colors';
-import {Avatar, ListItem} from '@rneui/themed';
 
-import InfoText from './InfoText';
+import Published from './Published';
+import Liked from './Liked';
+import Settings from './Settings';
 
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+const FirstRoute = () => <Published />;
 
-import auth from '@react-native-firebase/auth';
-import realtime from '@react-native-firebase/database';
-import storage from '@react-native-firebase/storage';
+const SecondRoute = () => <Liked />;
 
-import {
-  faBitcoinSign,
-  faBolt,
-  faChevronRight,
-  faDollar,
-  faGear,
-  faHeart,
-  faMailBulk,
-  faStar,
-  faThumbsUp,
-  faUserFriends,
-  faWarning,
-} from '@fortawesome/free-solid-svg-icons';
-import {useEffect} from 'react';
+const ThirdRoute = () => null;
 
-const styles = StyleSheet.create({
-  scroll: {
-    backgroundColor: COLORS.primary,
-  },
-  userRow: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    paddingBottom: 8,
-    paddingLeft: 30,
-    paddingRight: 15,
-    paddingTop: 60,
-  },
-  userImage: {
-    marginRight: 12,
-  },
-  listItemContainer: {
-    borderWidth: 0.5,
-    borderColor: COLORS.primary,
-    backgroundColor: COLORS.primary,
-  },
+const ForthRoute = () => null;
+
+const FifthRoute = () => <Settings />;
+
+const renderScene = SceneMap({
+  first: FirstRoute,
+  second: SecondRoute,
+  third: ThirdRoute,
+  fourth: ForthRoute,
+  fifth: FifthRoute,
 });
 
-const firstEmail = {
-  email: '',
-};
+export default function Profile() {
+  const layout = useWindowDimensions();
 
-const list = [
-  {
-    title: 'Friends',
-    icon: faUserFriends,
-  },
-  {
-    title: 'Following',
-    icon: faHeart,
-  },
-  {
-    title: 'Liked',
-    icon: faThumbsUp,
-  },
-  {
-    title: 'Billing',
-    icon: faDollar,
-  },
-  {
-    title: 'Revenue',
-    icon: faBitcoinSign,
-  },
-  {
-    title: 'Settings',
-    icon: faGear,
-  },
-  {
-    title: 'Messages',
-    icon: faMailBulk,
-  },
-];
+  const [index, setIndex] = React.useState(0);
+  const [routes] = React.useState([
+    {key: 'first', title: 'Published'},
+    {key: 'second', title: 'Liked'},
+    // {key: 'third', title: 'Minted'},
+    // {key: 'fourth', title: 'Private club'},
+    {key: 'fifth', title: 'Settings'},
+  ]);
 
-const Profile = ({navigation}) => {
-  // set user name
+  const frame = useSafeAreaFrame();
+  const insets = useSafeAreaInsets();
+  const headerHeight = getDefaultHeaderHeight(frame, false, insets.top);
 
-  const [name, setName] = React.useState('');
-  const [avatar, setAvatar] = React.useState('');
-
-  useEffect(() => {
-    realtime()
-      .ref(`/users/${auth().currentUser.uid}`)
-      .once('value')
-      .then(snapshot => {
-        setName(
-          snapshot.val().fullName.givenName +
-            ' ' +
-            snapshot.val().fullName.familyName,
-        );
-      });
-  }, []);
-
-  // select an avatar from photo and upload the picture to the database
-  const uploadAvatar = () => {};
+  const renderTabBar = props => (
+    <TabBar
+      {...props}
+      indicatorStyle={{backgroundColor: 'gray'}}
+      style={{backgroundColor: COLORS.primary}}
+      activeColor="black"
+      inactiveColor="gray"
+    />
+  );
 
   return (
-    <ScrollView
-      style={{
-        height: '100%',
-        width: '100%',
-        backgroundColor: COLORS.primary,
-      }}>
-      <View style={styles.userRow}>
-        <TouchableOpacity
-          onPress={() => {
-            // click the avatar to change the avatar
-            uploadAvatar();
-          }}>
-          <View style={styles.userImage}>
-            <Avatar rounded size="large" source={{uri: avatar}} />
-          </View>
-        </TouchableOpacity>
-        <View>
-          <Text style={{fontSize: 16}}>{name}</Text>
-          <Text
-            style={{
-              color: 'gray',
-              fontSize: 16,
-            }}>
-            {firstEmail.email}
-          </Text>
-        </View>
-      </View>
-      <InfoText text="Account" />
-
-      <View>
-        {list.map((item, i) => (
-          <ListItem key={i} bottomDivider style={styles.listItemContainer}>
-            <FontAwesomeIcon icon={item.icon} />
-            <ListItem.Content>
-              <ListItem.Title>{item.title}</ListItem.Title>
-            </ListItem.Content>
-            <FontAwesomeIcon icon={faChevronRight} />
-          </ListItem>
-        ))}
-      </View>
-    </ScrollView>
+    <TabView
+      navigationState={{index, routes}}
+      tabBarPosition="bottom"
+      renderTabBar={renderTabBar}
+      renderScene={renderScene}
+      onIndexChange={setIndex}
+      initialLayout={{width: layout.width}}
+      style={{backgroundColor: COLORS.primary}}
+    />
   );
-};
-
-export default Profile;
+}

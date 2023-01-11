@@ -22,11 +22,31 @@ import {
 
 import SignIn from './Components/Auth/SignIn';
 import {useEffect} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {LOAD_LIKED_IMAGES} from './redux/types';
+import realtime from '@react-native-firebase/database';
+import auth from '@react-native-firebase/auth';
 
 LogBox.ignoreAllLogs();
 
 // const Activecolor =
 function Home(): JSX.Element {
+  // Get user liked images
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    realtime()
+      .ref('users/' + auth().currentUser.uid + '/liked_images')
+      .once('value', snapshot => {
+        const likedImages = [];
+        snapshot.forEach(childSnapshot => {
+          likedImages.push(childSnapshot.val());
+        });
+        dispatch({type: LOAD_LIKED_IMAGES, payload: likedImages});
+      });
+  }, []);
+
   return (
     <Tab.Navigator
       shifting={false}
@@ -53,7 +73,7 @@ function Home(): JSX.Element {
         }}
         component={Explore}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Market"
         options={{
           tabBarLabel: 'Market',
@@ -64,7 +84,7 @@ function Home(): JSX.Element {
           },
         }}
         component={Market}
-      />
+      /> */}
       {/* <Tab.Screen
         name="PhantaSpace"
         options={{

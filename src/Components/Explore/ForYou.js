@@ -14,6 +14,12 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
 } from 'react-native-gesture-handler';
+import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
+const hapticOptions = {
+  enableVibrateFallback: true,
+  ignoreAndroidSystemSettings: false,
+};
+
 import like from './like';
 import {useDispatch, useSelector} from 'react-redux';
 import {LOAD_LIKED_IMAGES} from '../../redux/types';
@@ -93,20 +99,8 @@ export default function ForYou() {
   };
   // Get user liked images
 
-  const dispatch = useDispatch();
   const likedImages = useSelector(state => state.like.likedImages);
-
-  useEffect(() => {
-    realtime()
-      .ref('users/' + auth().currentUser.uid + '/liked_images')
-      .once('value', snapshot => {
-        const likedImages = [];
-        snapshot.forEach(childSnapshot => {
-          likedImages.push(childSnapshot.val());
-        });
-        dispatch({type: LOAD_LIKED_IMAGES, payload: likedImages});
-      });
-  }, []);
+  const dispatch = useDispatch();
 
   // load more when the user scrolls down to the bottom of the page
   return (
@@ -124,6 +118,10 @@ export default function ForYou() {
             <TouchableWithoutFeedback
               onPress={() => {
                 like(image, likedImages, dispatch);
+                ReactNativeHapticFeedback.trigger(
+                  'impactMedium',
+                  hapticOptions,
+                );
               }}>
               <Neomorph
                 key={image.id}

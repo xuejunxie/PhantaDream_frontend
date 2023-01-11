@@ -9,7 +9,6 @@ import {
   Platform,
   TouchableOpacity,
   Modal,
-  Button,
   Alert,
 } from 'react-native';
 import {TextInput} from 'react-native-paper';
@@ -17,23 +16,22 @@ import {TextInput} from 'react-native-paper';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import {Neomorph} from 'react-native-neomorph-shadows';
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
+const hapticOptions = {
+  enableVibrateFallback: true,
+  ignoreAndroidSystemSettings: false,
+};
 
 import {COLORS, SIZES} from '../GlobalValues/Colors';
 import axios from 'axios';
 import {Buffer} from 'buffer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
-const options = {
-  enableVibrateFallback: true,
-  ignoreAndroidSystemSettings: false,
-};
 
 import uuid from 'react-native-uuid';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {
   faBolt,
   faCopy,
-  faDatabase,
   faDownload,
   faShare,
   faTimes,
@@ -47,14 +45,11 @@ import realtime from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
-import {utils} from '@react-native-firebase/app';
 
 import artists from './artists.json';
 
 import RadioButtonRN from 'radio-buttons-react-native';
 import Payment from './Payment';
-
-import Profile from '../Profile/Profile';
 
 const loading_image = 'https://i.gifer.com/1amw.gif';
 const empty_image =
@@ -232,7 +227,7 @@ export default function Dream() {
         <TouchableWithoutFeedback
           onPressIn={() => {
             setPress(true);
-            ReactNativeHapticFeedback.trigger('impactMedium', options);
+            ReactNativeHapticFeedback.trigger('impactMedium', hapticOptions);
           }}
           onPressOut={() => setPress(false)}>
           <Neomorph
@@ -458,24 +453,30 @@ export default function Dream() {
       .putString(image, 'data_url')
       .then(() => {
         imageRef.getDownloadURL().then(url => {
+          const imageMeta = {
+            url: url,
+            id: imageId,
+            prompt: prompt,
+            date: date,
+            artist: artist,
+            creator: auth().currentUser.uid,
+            owner: auth().currentUser.uid,
+            likes: 1,
+          };
+          // store image meta on firestore
           firestore()
             .collection('images')
             .doc(imageId)
-            .set({
-              url: url,
-              id: imageId,
-              prompt: prompt,
-              date: date,
-              artist: artist,
-              creator: auth().currentUser.uid,
-              owner: auth().currentUser.uid,
-              public: shareToPbulic,
-              likes: 0,
-            })
+            .set(imageMeta)
             .then(() => {
               Alert.alert('Image Shared!');
               console.log('imageRef: ', imageRef);
             });
+          // store published image on user's published images
+          realtime()
+            .ref('users/' + auth().currentUser.uid + '/published')
+            .child(imageId)
+            .set(imageMeta);
         });
       })
       .catch(error => {
@@ -512,7 +513,7 @@ export default function Dream() {
         }}>
         <TouchableWithoutFeedback
           onPress={() => {
-            ReactNativeHapticFeedback.trigger('impactMedium', options);
+            ReactNativeHapticFeedback.trigger('impactMedium', hapticOptions);
 
             setImages(
               images.map(image => {
@@ -786,7 +787,10 @@ export default function Dream() {
               blurOnSubmit={true}
               onSubmitEditing={() => {
                 //haptic feedback
-                ReactNativeHapticFeedback.trigger('impactMedium', options);
+                ReactNativeHapticFeedback.trigger(
+                  'impactMedium',
+                  hapticOptions,
+                );
                 if (Charge > 0) {
                   setLoading(true);
                   if (images[0].id === 'empty') {

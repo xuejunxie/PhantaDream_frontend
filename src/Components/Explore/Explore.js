@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {View, useWindowDimensions, Image, ScrollView} from 'react-native';
+import {useWindowDimensions} from 'react-native';
 import {TabView, TabBar, SceneMap} from 'react-native-tab-view';
 import {getDefaultHeaderHeight} from '@react-navigation/elements';
 import {
@@ -7,47 +7,10 @@ import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 
-import {Neomorph} from 'react-native-neomorph-shadows';
-
 import {COLORS} from '../GlobalValues/Colors';
 import Hot from './Hot';
 import ForYou from './ForYou';
 import Liked from './Liked';
-
-const dummy = require('./dummy.json');
-const size = 280;
-const render_dummy = (start, end) =>
-  dummy.slice(start, end).map((item, index) => (
-    <View
-      key={index}
-      style={{
-        backgroundColor: 'rgba(0,0,0,0)',
-        marginTop: 30,
-        // make it center
-        alignItems: 'center',
-      }}>
-      <Neomorph
-        style={{
-          shadowRadius: 10,
-          borderRadius: 25,
-          backgroundColor: COLORS.primary,
-          width: size,
-          height: size,
-          marginTop: 20,
-        }}>
-        <Image
-          source={{
-            uri: item.uri,
-          }}
-          style={{
-            width: size,
-            height: size,
-
-            borderRadius: 25,
-          }}></Image>
-      </Neomorph>
-    </View>
-  ));
 
 const FirstRoute = () => <ForYou />;
 
@@ -55,10 +18,13 @@ const SecondRoute = () => <Hot />;
 
 const ThirdRoute = () => <Liked />;
 
+const ForthRoute = () => null;
+
 const renderScene = SceneMap({
   first: FirstRoute,
   second: SecondRoute,
   third: ThirdRoute,
+  fourth: ForthRoute,
 });
 
 export default function Explore() {
@@ -68,8 +34,8 @@ export default function Explore() {
   const [routes] = React.useState([
     {key: 'first', title: 'For you'},
     {key: 'second', title: 'Hot'},
-    {key: 'third', title: 'Liked'},
-    // {key: 'fourth', title: 'Private club'},
+    // {key: 'third', title: 'Liked'},
+    // {key: 'fourth', title: 'Published'},
   ]);
 
   const frame = useSafeAreaFrame();

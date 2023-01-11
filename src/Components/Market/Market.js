@@ -50,11 +50,7 @@ const render_dummy = (start, end) =>
     </View>
   ));
 
-const FirstRoute = () => <ScrollView>{render_dummy(12, 14)}</ScrollView>;
-
-const SecondRoute = () => <ScrollView>{render_dummy(14, 17)}</ScrollView>;
-
-const ThirdRoute = () => {
+const FirstRoute = () => {
   const [pressed, setPressed] = useState(false);
   const options = {
     enableVibrateFallback: true,
@@ -114,6 +110,10 @@ const ThirdRoute = () => {
   );
 };
 
+const SecondRoute = () => <ScrollView>{render_dummy(14, 17)}</ScrollView>;
+
+const ThirdRoute = () => <ScrollView>{render_dummy(12, 14)}</ScrollView>;
+
 const ForthRoute = () => <ScrollView>{render_dummy(18, 20)}</ScrollView>;
 
 const renderScene = SceneMap({
@@ -128,9 +128,9 @@ export default function Market() {
 
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
-    {key: 'first', title: 'Auction'},
-    {key: 'second', title: 'Owned'},
-    {key: 'third', title: 'Mint'},
+    {key: 'first', title: 'Mint'},
+    {key: 'second', title: 'Auction'},
+    {key: 'third', title: 'Owned'},
     {key: 'forth', title: 'Shop'},
   ]);
 

@@ -12,6 +12,12 @@ import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import like from './like';
 import {useDispatch, useSelector} from 'react-redux';
 
+import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
+const hapticOptions = {
+  enableVibrateFallback: true,
+  ignoreAndroidSystemSettings: false,
+};
+
 export default function Hot() {
   // load all images from firestore images
   // sort them by likes
@@ -63,6 +69,10 @@ export default function Hot() {
             <TouchableWithoutFeedback
               onPress={() => {
                 like(image, likedImages, dispatch);
+                ReactNativeHapticFeedback.trigger(
+                  'impactMedium',
+                  hapticOptions,
+                );
               }}>
               <Neomorph
                 style={{
