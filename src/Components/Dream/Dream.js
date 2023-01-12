@@ -162,7 +162,7 @@ export default function Dream() {
   const send = async () => {
     const imageId = uuid.v1();
     const userId = auth().currentUser.uid;
-    const seed = Math.floor(Math.random() * 1e10);
+    const seed = Math.floor(Math.random() * 1e8);
     axios
       .post(serverURL + 'txt2img', {
         prompt: prompt,
