@@ -19,6 +19,7 @@ import realtime from '@react-native-firebase/database';
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import {CameraRoll} from '@react-native-camera-roll/camera-roll';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 
 import {
   faBitcoinSign,
@@ -89,6 +90,7 @@ const Settings = () => {
   );
 
   useEffect(() => {
+    // get user name
     realtime()
       .ref(`/users/${auth().currentUser.uid}`)
       .once('value')
@@ -99,34 +101,50 @@ const Settings = () => {
             snapshot.val().fullName.familyName,
         );
       });
+
+    // get user avatar
+    storage()
+      .ref(`/users/${auth().currentUser.uid}/avatar`)
+      .getDownloadURL()
+      .then(url => {
+        setAvatar(url);
+      })
+      .catch(e => console.log(e));
   }, []);
 
   // select an avatar from photo and upload the picture to the database
   const uploadAvatar = () => {
     // select a photo from the photo library
-    CameraRoll.getPhotos({
-      first: 1,
-      assetType: 'Photos',
-    })
-      .then(r => {
-        // upload the photo to the database
-        storage()
-          .ref(`/users/${auth().currentUser.uid}/avatar`)
-          .putFile(r.edges[0].node.image.uri)
-          .then(() => {
-            // get the download url
-            storage()
-              .ref(`/users/${auth().currentUser.uid}/avatar`)
-              .getDownloadURL()
-              .then(url => {
-                // update the avatar
-                setAvatar(url);
-              });
-          });
-      })
-      .catch(err => {
-        //Error Loading Images
-      });
+    launchImageLibrary(
+      {
+        mediaType: 'photo',
+        includeBase64: false,
+        maxHeight: 200,
+        maxWidth: 200,
+      },
+      response => {
+        if (response.didCancel) {
+          console.log('User cancelled photo picker');
+        } else if (response.errorCode) {
+          console.log('ImagePicker Error: ', response.errorCode);
+        } else {
+          // upload the picture to the database
+          const reference = storage().ref(
+            `/users/${auth().currentUser.uid}/avatar`,
+          );
+          const task = reference.putFile(response.assets[0].uri);
+          task
+            .then(() => {
+              console.log('Image uploaded to the bucket!');
+            })
+            .catch(e => {
+              console.log(e);
+            });
+          // set the avatar to the new avatar
+          setAvatar(response.assets[0].uri);
+        }
+      },
+    );
   };
 
   return (
@@ -137,7 +155,7 @@ const Settings = () => {
         backgroundColor: COLORS.primary,
       }}>
       <View style={styles.userRow}>
-        {/* <TouchableOpacity
+        <TouchableOpacity
           onPress={() => {
             // click the avatar to change the avatar
             uploadAvatar();
@@ -145,7 +163,7 @@ const Settings = () => {
           <View style={styles.userImage}>
             <Avatar rounded size="large" source={{uri: avatar}} />
           </View>
-        </TouchableOpacity> */}
+        </TouchableOpacity>
         <View>
           <Text style={{fontSize: 16}}>{name}</Text>
           <Text

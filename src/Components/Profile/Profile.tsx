@@ -32,7 +32,7 @@ export default function Profile() {
   const [routes] = React.useState([
     {key: 'first', title: 'Published'},
     {key: 'second', title: 'Liked'},
-    // {key: 'third', title: 'Settings'},
+    {key: 'third', title: 'Settings'},
   ]);
 
   const frame = useSafeAreaFrame();
