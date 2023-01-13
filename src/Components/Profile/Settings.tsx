@@ -6,6 +6,8 @@ import {
   Text,
   ScrollView,
 } from 'react-native';
+import {createStackNavigator} from '@react-navigation/stack';
+
 // import { useMoralis, useMoralisWeb3Api, useMoralisWeb3ApiCall } from "react-moralis";
 import {COLORS} from '../common/globalValues';
 import {Avatar, ListItem} from '@rneui/themed';
@@ -18,23 +20,26 @@ import auth from '@react-native-firebase/auth';
 import realtime from '@react-native-firebase/database';
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
-import {CameraRoll} from '@react-native-camera-roll/camera-roll';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import {launchImageLibrary} from 'react-native-image-picker';
 
 import {
   faBitcoinSign,
   faBolt,
   faChevronRight,
   faDollar,
+  faExclamation,
   faGear,
   faHeart,
   faMailBulk,
+  faNewspaper,
   faStar,
   faThumbsUp,
   faUserFriends,
   faWarning,
 } from '@fortawesome/free-solid-svg-icons';
 import {useEffect} from 'react';
+import {StackActions} from '@react-navigation/native';
+import {faEnvelope, faMessage} from '@fortawesome/free-regular-svg-icons';
 
 const styles = StyleSheet.create({
   scroll: {
@@ -67,17 +72,14 @@ const list = [
     title: 'Billing',
     icon: faDollar,
   },
-  {
-    title: 'Revenue',
-    icon: faBitcoinSign,
-  },
-  {
-    title: 'Settings',
-    icon: faGear,
-  },
+
   {
     title: 'Messages',
-    icon: faMailBulk,
+    icon: faEnvelope,
+  },
+  {
+    title: 'Notifications',
+    icon: faExclamation,
   },
 ];
 
@@ -88,6 +90,7 @@ const Settings = () => {
   const [avatar, setAvatar] = React.useState(
     'https://i0.wp.com/bangla.indiarag.com/wp-content/uploads/2019/01/dummy-snapcode-avatar@2x.png?ssl=1',
   );
+  const [bills, setBills] = React.useState({});
 
   useEffect(() => {
     // get user name
@@ -110,6 +113,14 @@ const Settings = () => {
         setAvatar(url);
       })
       .catch(e => console.log(e));
+
+    // get user bills
+    realtime()
+      .ref(`/users/${auth().currentUser.uid}/bills`)
+      .once('value')
+      .then(snapshot => {
+        setBills(snapshot.val());
+      });
   }, []);
 
   // select an avatar from photo and upload the picture to the database
@@ -147,48 +158,119 @@ const Settings = () => {
     );
   };
 
-  return (
-    <ScrollView
-      style={{
-        height: '100%',
-        width: '100%',
-        backgroundColor: COLORS.primary,
-      }}>
-      <View style={styles.userRow}>
-        <TouchableOpacity
-          onPress={() => {
-            // click the avatar to change the avatar
-            uploadAvatar();
-          }}>
-          <View style={styles.userImage}>
-            <Avatar rounded size="large" source={{uri: avatar}} />
-          </View>
-        </TouchableOpacity>
-        <View>
-          <Text style={{fontSize: 16}}>{name}</Text>
-          <Text
-            style={{
-              color: 'gray',
-              fontSize: 16,
+  function SettingView({navigation}) {
+    return (
+      <ScrollView
+        style={{
+          height: '100%',
+          width: '100%',
+          backgroundColor: COLORS.primary,
+        }}>
+        <View style={styles.userRow}>
+          <TouchableOpacity
+            onPress={() => {
+              // click the avatar to change the avatar
+              uploadAvatar();
             }}>
-            {firstEmail.email}
-          </Text>
+            <View style={styles.userImage}>
+              <Avatar rounded size="large" source={{uri: avatar}} />
+            </View>
+          </TouchableOpacity>
+          <View>
+            <Text style={{fontSize: 16}}>{name}</Text>
+            <Text
+              style={{
+                color: 'gray',
+                fontSize: 16,
+              }}>
+              {firstEmail.email}
+            </Text>
+          </View>
         </View>
-      </View>
-      <InfoText text="Account" />
+        <InfoText text="Account" />
 
-      <View>
-        {list.map((item, i) => (
-          <ListItem key={i} bottomDivider style={styles.listItemContainer}>
-            <FontAwesomeIcon icon={item.icon} />
-            <ListItem.Content>
-              <ListItem.Title>{item.title}</ListItem.Title>
-            </ListItem.Content>
-            <FontAwesomeIcon icon={faChevronRight} />
-          </ListItem>
-        ))}
-      </View>
-    </ScrollView>
+        <View>
+          {list.map((item, i) => (
+            <ListItem
+              key={i}
+              bottomDivider
+              style={styles.listItemContainer}
+              onPress={() => navigation.navigate(item.title)}>
+              <FontAwesomeIcon icon={item.icon} />
+              <ListItem.Content>
+                <ListItem.Title>{item.title}</ListItem.Title>
+              </ListItem.Content>
+              <FontAwesomeIcon icon={faChevronRight} />
+            </ListItem>
+          ))}
+        </View>
+      </ScrollView>
+    );
+  }
+
+  const BillingView = () => {
+    return (
+      <ScrollView
+        style={{
+          height: '100%',
+          width: '100%',
+          backgroundColor: COLORS.primary,
+        }}>
+        {bills ? (
+          <View>
+            {Object.keys(bills).map((key, index) => (
+              <ListItem
+                key={index}
+                bottomDivider
+                style={styles.listItemContainer}>
+                <ListItem.Content
+                  style={{
+                    flexDirection: 'row',
+                  }}>
+                  <ListItem.Title
+                    style={{
+                      flex: 1,
+                    }}>
+                    {bills[key].date}
+                  </ListItem.Title>
+                  <ListItem.Subtitle
+                    style={{
+                      flex: 1,
+                    }}>
+                    <FontAwesomeIcon icon={faDollar} />
+                    {bills[key].amount}
+                    {' for '}
+                    {bills[key].chargeOrder}
+                    <FontAwesomeIcon icon={faBolt} color={'gray'} />
+                    +
+                    <FontAwesomeIcon icon={faHeart} color={COLORS.red} />
+                  </ListItem.Subtitle>
+                </ListItem.Content>
+              </ListItem>
+            ))}
+          </View>
+        ) : (
+          <View>
+            <Text>No bills</Text>
+          </View>
+        )}
+      </ScrollView>
+    );
+  };
+
+  const SettingStack = createStackNavigator();
+
+  return (
+    <SettingStack.Navigator
+      initialRouteName="Settings"
+      screenOptions={({route}) => {
+        return {
+          headerShown: route.name !== 'Settings',
+        };
+      }}>
+      <SettingStack.Screen name="Settings" component={SettingView} />
+      <SettingStack.Screen name="Billing" component={BillingView} />
+    </SettingStack.Navigator>
   );
 };
 
