@@ -63,16 +63,11 @@ const styles = StyleSheet.create({
   },
 });
 
-const firstEmail = {
-  email: '',
-};
-
 const list = [
   {
     title: 'Billing',
     icon: faDollar,
   },
-
   {
     title: 'Messages',
     icon: faEnvelope,
@@ -177,31 +172,27 @@ const Settings = () => {
             </View>
           </TouchableOpacity>
           <View>
-            <Text style={{fontSize: 16}}>{name}</Text>
-            <Text
-              style={{
-                color: 'gray',
-                fontSize: 16,
-              }}>
-              {firstEmail.email}
-            </Text>
+            <Text style={{fontSize: 25, color: 'gray'}}>{name}</Text>
           </View>
         </View>
         <InfoText text="Account" />
 
         <View>
           {list.map((item, i) => (
-            <ListItem
-              key={i}
-              bottomDivider
-              style={styles.listItemContainer}
-              onPress={() => navigation.navigate(item.title)}>
-              <FontAwesomeIcon icon={item.icon} />
-              <ListItem.Content>
-                <ListItem.Title>{item.title}</ListItem.Title>
-              </ListItem.Content>
-              <FontAwesomeIcon icon={faChevronRight} />
-            </ListItem>
+            <TouchableOpacity onPress={() => navigation.navigate(item.title)}>
+              <ListItem key={i} bottomDivider style={styles.listItemContainer}>
+                <FontAwesomeIcon icon={item.icon} color={'gray'} />
+                <ListItem.Content>
+                  <ListItem.Title
+                    style={{
+                      color: 'gray',
+                    }}>
+                    {item.title}
+                  </ListItem.Title>
+                </ListItem.Content>
+                <FontAwesomeIcon icon={faChevronRight} color={'gray'} />
+              </ListItem>
+            </TouchableOpacity>
           ))}
         </View>
       </ScrollView>
