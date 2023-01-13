@@ -28,6 +28,7 @@ import {
   faDollar,
   faExclamation,
   faHeart,
+  faPaintBrush,
   faUserFriends,
 } from '@fortawesome/free-solid-svg-icons';
 import {useEffect} from 'react';
@@ -61,18 +62,22 @@ const list = [
     title: 'Billing',
     icon: faDollar,
   },
-  {
-    title: 'Private club',
-    icon: faUserFriends,
-  },
-  {
-    title: 'Messages',
-    icon: faEnvelope,
-  },
-  {
-    title: 'Notifications',
-    icon: faExclamation,
-  },
+  //   {
+  //     title: 'Private club',
+  //     icon: faUserFriends,
+  //   },
+  //   {
+  //     title: 'Messages',
+  //     icon: faEnvelope,
+  //   },
+  //   {
+  //     title: 'Notifications',
+  //     icon: faExclamation,
+  //   },
+  //   {
+  //     title: 'Apply to be a regsitered artist',
+  //     icon: faPaintBrush,
+  //   },
 ];
 
 const Settings = () => {
