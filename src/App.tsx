@@ -39,7 +39,7 @@ function Home(): JSX.Element {
   useEffect(() => {
     realtime()
       .ref('users/' + auth().currentUser.uid + '/liked_images')
-      .once('value', snapshot => {
+      .on('value', snapshot => {
         var liked = snapshot.val();
         const likedImages = [];
         for (const key in liked) {

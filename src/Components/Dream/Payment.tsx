@@ -4,7 +4,7 @@ import {TouchableOpacity, View, Button} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import realtime from '@react-native-firebase/database';
 
-export default function Payment({price, chargeOrder, updateCharge}) {
+export default function Payment({price, chargeOrder, fillCharge}) {
   const Method: MethodData = {
     countryCode: 'US',
     currencyCode: 'USD',
@@ -29,7 +29,7 @@ export default function Payment({price, chargeOrder, updateCharge}) {
           payment.canMakePayments().then((can: any) => {
             if (can) {
               payment.initApplePay().then((res: any) => {
-                updateCharge(chargeOrder);
+                fillCharge(chargeOrder);
                 // save bill to user database
                 realtime().ref(`/users/${auth().currentUser.uid}/bills`).push({
                   amount: price,

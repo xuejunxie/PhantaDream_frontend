@@ -18,7 +18,7 @@ export default function Published() {
   const loadPublished = () => {
     realtime()
       .ref('users/' + auth().currentUser.uid + '/published')
-      .once('value', snapshot => {
+      .on('value', snapshot => {
         if (snapshot.val()) {
           var published = snapshot.val();
           const publishedImages = [];

@@ -139,12 +139,20 @@ export default function Dream() {
       setHeart(snapshot.val().heart);
     });
 
-  const updateCharge = change => {
+  const fillCharge = change => {
     realtime()
       .ref('/users/' + auth().currentUser.uid)
       .update({
         charge: Charge + change,
         heart: Heart + change,
+      });
+  };
+
+  const spendCharge = () => {
+    realtime()
+      .ref('/users/' + auth().currentUser.uid)
+      .update({
+        charge: Charge - 1,
       });
   };
 
@@ -219,7 +227,7 @@ export default function Dream() {
                   setLoading(false);
                   setPickedImage(image_entry);
                   setArtistsUsed([]);
-                  updateCharge(-1);
+                  spendCharge(-1);
                 });
             } else {
               setTimeout(getImage, 5000);
@@ -717,7 +725,7 @@ export default function Dream() {
             <Payment
               price={price}
               chargeOrder={chargeOrder}
-              updateCharge={updateCharge}
+              fillCharge={fillCharge}
             />
           </View>
         </View>
