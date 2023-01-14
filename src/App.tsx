@@ -51,7 +51,9 @@ function Home(): JSX.Element {
             .then(documentSnapshot => {
               liked[key] = documentSnapshot.data();
             });
-          likedImages.push(liked[key]);
+          if (liked[key].published) {
+            likedImages.push(liked[key]);
+          }
         }
         dispatch({type: LOAD_LIKED_IMAGES, payload: likedImages});
       });

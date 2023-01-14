@@ -227,7 +227,7 @@ export default function Dream() {
                   setLoading(false);
                   setPickedImage(image_entry);
                   setArtistsUsed([]);
-                  spendCharge(-1);
+                  spendCharge();
                 });
             } else {
               setTimeout(getImage, 5000);
@@ -272,7 +272,7 @@ export default function Dream() {
     return <FontAwesomeIcon icon={name} size={20} color={'gray'} />;
   };
 
-  const actions = () => {
+  const actionButtons = () => {
     return (
       <View
         style={{
@@ -480,6 +480,7 @@ export default function Dream() {
             owner: auth().currentUser.uid,
             likes: 1,
             seed: seed,
+            public: true,
           };
           // store image meta on firestore
           firestore()
@@ -581,7 +582,7 @@ export default function Dream() {
             {item.prompt}
           </Text>
         ) : null}
-        {item.selected ? actions() : null}
+        {item.selected ? actionButtons() : null}
       </View>
     );
   };

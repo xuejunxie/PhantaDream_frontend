@@ -33,14 +33,18 @@ export default function ForYou() {
     // load 10 random images from firestore images
     const unsubscriber = firestore()
       .collection('images')
+      // .where('public', '==', true)
       .orderBy('id', 'desc')
       .limit(loadSize + 2)
       .onSnapshot(querySnapshot => {
         const images = [];
-
-        querySnapshot.forEach(documentSnapshot => {
-          images.push(documentSnapshot.data());
-        });
+        if (querySnapshot) {
+          querySnapshot.forEach(documentSnapshot => {
+            if (documentSnapshot.data().public == true) {
+              images.push(documentSnapshot.data());
+            }
+          });
+        }
 
         setImages(images);
       });
@@ -50,14 +54,18 @@ export default function ForYou() {
   const loadMore = () => {
     const unsubscriber = firestore()
       .collection('images')
+      .where('public', '==', true)
       .orderBy('id', 'desc')
       .startAfter(images[images.length - 1].id)
       .limit(loadSize)
       .onSnapshot(querySnapshot => {
         // if the query is less then 10, then there are no more images to load
-        querySnapshot.forEach(documentSnapshot => {
-          setImages([...images, documentSnapshot.data()]);
-        });
+        if (querySnapshot) {
+          querySnapshot.forEach(documentSnapshot => {
+            setImages([...images, documentSnapshot.data()]);
+          });
+        }
+
         // Unsubscribe from events after load once
         unsubscriber();
       });

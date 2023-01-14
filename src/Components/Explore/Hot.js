@@ -25,18 +25,23 @@ export default function Hot() {
   const [images, setImages] = React.useState([]);
 
   useEffect(() => {
-    // load 10 random images from firestore images
+    // load 10 random images from firestore images with published = true
     const unsubscriber = firestore()
       .collection('images')
+      // published = true
+      // .where('public', '==', true)
+      // sort by likes
       .orderBy('likes', 'desc')
       .limit(10)
       .onSnapshot(querySnapshot => {
         const images = [];
-
-        querySnapshot.forEach(documentSnapshot => {
-          images.push(documentSnapshot.data());
-        });
-
+        if (querySnapshot) {
+          querySnapshot.forEach(documentSnapshot => {
+            if (documentSnapshot.data().public == true) {
+              images.push(documentSnapshot.data());
+            }
+          });
+        }
         setImages(images);
       });
   }, []);
