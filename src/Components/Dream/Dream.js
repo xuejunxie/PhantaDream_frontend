@@ -98,7 +98,11 @@ export default function Dream() {
   //
 
   const loadImages = async () => {
-    const keys = await AsyncStorage.getAllKeys();
+    const allKeys = await AsyncStorage.getAllKeys();
+    // remove keys with "auth_" prefix
+    const keys = allKeys.filter(key => {
+      return key.indexOf('auth_') === -1;
+    });
     if (keys.length === 0) {
       setImages([
         {

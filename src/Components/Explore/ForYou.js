@@ -61,6 +61,8 @@ export default function ForYou() {
       .onSnapshot(querySnapshot => {
         // if the query is less then 10, then there are no more images to load
         if (querySnapshot) {
+          console.log(querySnapshot.size);
+
           querySnapshot.forEach(documentSnapshot => {
             setImages([...images, documentSnapshot.data()]);
           });

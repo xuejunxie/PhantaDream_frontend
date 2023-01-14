@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {StackScreenProps} from '@react-navigation/stack';
 import {Neomorph} from 'react-native-neomorph-shadows';
@@ -22,6 +22,7 @@ import auth from '@react-native-firebase/auth';
 import {appleAuth} from '@invertase/react-native-apple-authentication';
 import firestore from '@react-native-firebase/firestore';
 import realtime from '@react-native-firebase/database';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const newUserCharge = 20;
 const newUserHeart = 20;
@@ -29,6 +30,47 @@ const newUserHeart = 20;
 export default function SignIn({navigation}) {
   const [pressed, setPressed] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
+
+  const storeTokens = async (identityToken, nonce) => {
+    try {
+      await AsyncStorage.setItem('auth_identityToken', identityToken);
+      await AsyncStorage.setItem('auth_nonce', nonce);
+    } catch (e) {
+      console.log('Error storing tokens:', e);
+    }
+  };
+
+  // sign in with stored tokens
+  const signInWithStoredTokens = async () => {
+    try {
+      const identityToken = await AsyncStorage.getItem('auth_identityToken');
+      const nonce = await AsyncStorage.getItem('auth_nonce');
+      console.log(identityToken, nonce);
+      if (identityToken && nonce) {
+        const appleCredential = auth.AppleAuthProvider.credential(
+          identityToken,
+          nonce,
+        );
+        // Sign in with stored tokens
+        auth()
+          .signInWithCredential(appleCredential)
+          .then(res => {
+            navigation.navigate('Home');
+          });
+      }
+    } catch (e) {
+      console.log('Error signing in with stored tokens:', e);
+    }
+  };
+  useEffect(() => {
+    // check if user is already signed in
+    const user = auth().currentUser;
+    if (user) {
+      navigation.navigate('Home');
+    } else {
+      signInWithStoredTokens();
+    }
+  }, []);
 
   async function signInButton() {
     // Start the sign-in request
@@ -44,6 +86,7 @@ export default function SignIn({navigation}) {
 
     // Create a Firebase credential from the response
     const {identityToken, nonce} = appleAuthRequestResponse;
+    storeTokens(identityToken, nonce);
     const appleCredential = auth.AppleAuthProvider.credential(
       identityToken,
       nonce,
