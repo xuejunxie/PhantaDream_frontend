@@ -133,7 +133,32 @@ export default function Dream() {
   useEffect(() => {
     // AsyncStorage.clear();
     loadImages();
+    loadBalance();
   }, []);
+
+  // save charge and hard to AsyncStorage
+
+  const storeBalance = async () => {
+    await AsyncStorage.setItem('auth_charge', Charge.toString());
+    await AsyncStorage.setItem('auth_heart', Heart.toString());
+  };
+  useEffect(() => {
+    storeBalance();
+  }, [Charge, Heart]);
+
+  // load charge and heart from AsyncStorage
+  const loadBalance = async () => {
+    AsyncStorage.getItem('auth_charge').then(value => {
+      if (value) {
+        setCharge(parseInt(value));
+      }
+    });
+    AsyncStorage.getItem('auth_heart').then(value => {
+      if (value) {
+        setHeart(parseInt(value));
+      }
+    });
+  };
 
   // sync user charge
   realtime()
