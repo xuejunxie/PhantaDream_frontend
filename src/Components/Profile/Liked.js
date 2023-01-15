@@ -14,7 +14,6 @@ import {useDispatch, useSelector} from 'react-redux';
 export default function Liked() {
   // Get user liked images
   const likedImages = useSelector(state => state.like.likedImages);
-  const dispatch = useDispatch();
 
   return (
     <View>

@@ -1,7 +1,7 @@
 // get 10 results from the database and load more when the user scrolls down
 
 import {View, Text, Image} from 'react-native';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import firestore from '@react-native-firebase/firestore';
 import realtime from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
@@ -28,7 +28,9 @@ import getLike from '../common/getLike';
 const loadSize = 1;
 
 export default function ForYou() {
-  const [images, setImages] = React.useState([]);
+  const [images, setImages] = useState([]);
+  const [likes, setLikes] = useState({});
+
   useEffect(() => {
     // load 10 random images from firestore images
     const unsubscriber = firestore()
@@ -50,6 +52,23 @@ export default function ForYou() {
       });
   }, []);
 
+  useEffect(() => {
+    // get liked images
+    images.map(image => {
+      firestore()
+        .collection('images')
+        .doc(image.id)
+        .onSnapshot(documentSnapshot => {
+          const newLikes = {};
+          if (documentSnapshot.data()) {
+            const newLikes = likes;
+            newLikes[image.id] = documentSnapshot.data().likes;
+            setLikes(newLikes);
+          }
+        });
+    });
+  }, [images]);
+
   // load more images when the user scrolls down
   const loadMore = () => {
     const unsubscriber = firestore()
@@ -61,19 +80,16 @@ export default function ForYou() {
       .onSnapshot(querySnapshot => {
         // if the query is less then 10, then there are no more images to load
         if (querySnapshot) {
-          console.log(querySnapshot.size);
-
           querySnapshot.forEach(documentSnapshot => {
             setImages([...images, documentSnapshot.data()]);
           });
         }
 
         // Unsubscribe from events after load once
-        unsubscriber();
       });
   };
 
-  const [hearts, setHearts] = React.useState(0);
+  const [hearts, setHearts] = useState(0);
   realtime()
     .ref('users/' + auth().currentUser.uid + '/heart')
     .on('value', snapshot => {
@@ -167,24 +183,22 @@ export default function ForYou() {
             </View>
           </Neomorph>
         </TouchableWithoutFeedback>
-        {liked ? (
-          <View
+        <View
+          style={{
+            width: SIZES.canvas,
+          }}>
+          <Text
             style={{
-              width: SIZES.canvas,
+              color: COLORS.red,
+              fontSize: 15,
+              marginTop: 10,
             }}>
-            <Text
-              style={{
-                color: COLORS.red,
-                fontSize: 15,
-                marginTop: 10,
-              }}>
-              Likes: {image.likes}
-            </Text>
-            <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
-              Prompt: {image.prompt}
-            </Text>
-          </View>
-        ) : null}
+            Likes: {likes[image.id]}
+          </Text>
+          <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
+            Prompt: {image.prompt}
+          </Text>
+        </View>
       </View>
     );
   };

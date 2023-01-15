@@ -51,7 +51,7 @@ function Home(): JSX.Element {
             .then(documentSnapshot => {
               liked[key] = documentSnapshot.data();
             });
-          if (liked[key].published) {
+          if (liked[key].public) {
             likedImages.push(liked[key]);
           }
         }

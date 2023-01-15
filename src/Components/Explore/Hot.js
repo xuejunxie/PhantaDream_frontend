@@ -28,7 +28,6 @@ export default function Hot() {
     // load 10 random images from firestore images with published = true
     const unsubscriber = firestore()
       .collection('images')
-      // published = true
       // .where('public', '==', true)
       // sort by likes
       .orderBy('likes', 'desc')

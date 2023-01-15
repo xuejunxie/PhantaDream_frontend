@@ -507,7 +507,7 @@ export default function Dream() {
             artist: artist,
             creator: auth().currentUser.uid,
             owner: auth().currentUser.uid,
-            likes: 1,
+            likes: 0,
             seed: seed,
             public: true,
           };
@@ -518,7 +518,6 @@ export default function Dream() {
             .set(imageMeta)
             .then(() => {
               Alert.alert('Image Shared!');
-              console.log('imageRef: ', imageRef);
             });
           // store published image on user's published images
           realtime()

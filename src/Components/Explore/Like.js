@@ -1,4 +1,4 @@
-import {View, Text} from 'react-native';
+import {View, Text, Alert} from 'react-native';
 import React from 'react';
 import auth from '@react-native-firebase/auth';
 import realtime from '@react-native-firebase/database';
@@ -10,6 +10,16 @@ export default function like(image, isLiked, dispatch) {
   // check if the image is liked by user
   // if it is liked, unlike it
   // if it is not liked, like it
+  // get user like count
+  realtime()
+    .ref('users/' + auth().currentUser.uid + '/heart')
+    .once('value')
+    .then(snapshot => {
+      if (snapshot.val() <= 0) {
+        Alert('You have no more hearts');
+        return;
+      }
+    });
 
   if (isLiked) {
     // unlike the image
@@ -48,6 +58,7 @@ export default function like(image, isLiked, dispatch) {
   } else {
     // like the image
     // increase the image's likes by 1
+    image.likes = image.likes + 1;
     dispatch({type: ADD_LIKED_IMAGES, payload: image});
     firestore()
       .collection('images')

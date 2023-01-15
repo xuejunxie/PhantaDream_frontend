@@ -45,7 +45,6 @@ export default function SignIn({navigation}) {
     try {
       const identityToken = await AsyncStorage.getItem('auth_identityToken');
       const nonce = await AsyncStorage.getItem('auth_nonce');
-      console.log(identityToken, nonce);
       if (identityToken && nonce) {
         const appleCredential = auth.AppleAuthProvider.credential(
           identityToken,

@@ -18,29 +18,38 @@ const hapticOptions = {
 export default function Published() {
   // Get user published images
   const [publishedImages, setPublishedImages] = useState([]);
+  const [likes, setLikes] = useState({});
   const [selectedImage, setSelectedImage] = useState(null);
 
   const loadPublished = () => {
+    // get published images
     realtime()
       .ref('users/' + auth().currentUser.uid + '/published')
       .on('value', snapshot => {
         if (snapshot.val()) {
           var published = snapshot.val();
-          const publishedImages = [];
+          var images = [];
           for (const key in published) {
-            // get latest like count from database
-            firestore()
-              .collection('images')
-              .doc(published[key].id)
-              .get()
-              .then(documentSnapshot => {
-                published[key] = documentSnapshot.data();
-              });
-            publishedImages.push(published[key]);
+            images.push(published[key]);
           }
-          setPublishedImages(publishedImages);
+          setPublishedImages(images);
         }
       });
+
+    // get likes
+    publishedImages.map(image => {
+      firestore()
+        .collection('images')
+        .doc(image.id)
+        .onSnapshot(documentSnapshot => {
+          const newLikes = {};
+          if (documentSnapshot.data()) {
+            const newLikes = likes;
+            newLikes[image.id] = documentSnapshot.data().likes;
+            setLikes(newLikes);
+          }
+        });
+    });
   };
   useEffect(() => {
     loadPublished();
@@ -126,81 +135,83 @@ export default function Published() {
     }
   }, [UnpublishButtonPressed]);
 
+  const imageView = image => {
+    return (
+      <View
+        key={image.id}
+        style={{
+          backgroundColor: 'rgba(0,0,0,0)',
+          marginTop: 30,
+          // make it center
+          alignItems: 'center',
+        }}>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            ReactNativeHapticFeedback.trigger('impactMedium', hapticOptions);
+
+            setPublishedImages(
+              publishedImages.map(Pimage => {
+                if (Pimage.id === image.id) {
+                  Pimage.selected = !Pimage.selected;
+                  if (Pimage.selected) {
+                    setSelectedImage(Pimage);
+                  } else {
+                    setSelectedImage(null);
+                  }
+                } else {
+                  Pimage.selected = false;
+                }
+                return Pimage;
+              }),
+            );
+          }}>
+          <Neomorph
+            style={{
+              shadowRadius: 10,
+              borderRadius: 25,
+              backgroundColor: COLORS.primary,
+              width: SIZES.canvas,
+              height: SIZES.canvas,
+              marginTop: 20,
+            }}>
+            <Image
+              source={{
+                uri: image.url,
+              }}
+              style={{
+                width: SIZES.canvas,
+                height: SIZES.canvas,
+
+                borderRadius: 25,
+              }}></Image>
+          </Neomorph>
+        </TouchableWithoutFeedback>
+        <View
+          style={{
+            width: SIZES.canvas,
+          }}>
+          <Text
+            style={{
+              color: COLORS.red,
+              fontSize: 15,
+              marginTop: 10,
+            }}>
+            Likes: {likes[image.id] ? likes[image.id] : 0}
+          </Text>
+
+          <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
+            Prompt: {image.prompt}
+          </Text>
+        </View>
+        {image.selected && actionButtons()}
+      </View>
+    );
+  };
+
   return (
     <View>
       <ScrollView onScrollBeginDrag={loadPublished}>
-        {publishedImages.map(image => (
-          <View
-            key={image.id}
-            style={{
-              backgroundColor: 'rgba(0,0,0,0)',
-              marginTop: 30,
-              // make it center
-              alignItems: 'center',
-            }}>
-            <TouchableWithoutFeedback
-              onPress={() => {
-                ReactNativeHapticFeedback.trigger(
-                  'impactMedium',
-                  hapticOptions,
-                );
-
-                setPublishedImages(
-                  publishedImages.map(Pimage => {
-                    if (Pimage.id === image.id) {
-                      Pimage.selected = !Pimage.selected;
-                      if (Pimage.selected) {
-                        setSelectedImage(Pimage);
-                      } else {
-                        setSelectedImage(null);
-                      }
-                    } else {
-                      Pimage.selected = false;
-                    }
-                    return Pimage;
-                  }),
-                );
-              }}>
-              <Neomorph
-                style={{
-                  shadowRadius: 10,
-                  borderRadius: 25,
-                  backgroundColor: COLORS.primary,
-                  width: SIZES.canvas,
-                  height: SIZES.canvas,
-                  marginTop: 20,
-                }}>
-                <Image
-                  source={{
-                    uri: image.url,
-                  }}
-                  style={{
-                    width: SIZES.canvas,
-                    height: SIZES.canvas,
-
-                    borderRadius: 25,
-                  }}></Image>
-              </Neomorph>
-            </TouchableWithoutFeedback>
-            <View
-              style={{
-                width: SIZES.canvas,
-              }}>
-              <Text
-                style={{
-                  color: COLORS.red,
-                  fontSize: 15,
-                  marginTop: 10,
-                }}>
-                Likes: {image.likes}
-              </Text>
-              <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
-                Prompt: {image.prompt}
-              </Text>
-            </View>
-            {image.selected && actionButtons()}
-          </View>
-        ))}
+        {publishedImages.map(image => imageView(image))}
       </ScrollView>
     </View>
   );
