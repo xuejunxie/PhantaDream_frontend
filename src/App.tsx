@@ -46,11 +46,12 @@ function Home(): JSX.Element {
           firestore()
             .collection('images')
             .doc(liked[key].id)
-            .onSnapshot(documentSnapshot => {
+            .get()
+            .then(documentSnapshot => {
               liked[key] = documentSnapshot.data();
-              // if (liked[key].public) {
-              dispatch({type: UPDATE_LIKED_IMAGES, payload: liked[key]});
-              // }
+              if (liked[key].public) {
+                dispatch({type: UPDATE_LIKED_IMAGES, payload: liked[key]});
+              }
             });
         }
       });

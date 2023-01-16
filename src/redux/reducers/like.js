@@ -36,13 +36,11 @@ export default function (state = initialState, action) {
           likedImage => likedImage.id === action.payload.id,
         ).length === 0
       ) {
-        console.log('add liked image');
         return {
           ...state,
           likedImages: [...state.likedImages, action.payload],
         };
       } else {
-        console.log('update liked image');
         return {
           ...state,
           likedImages: state.likedImages.map(likedImage => {
