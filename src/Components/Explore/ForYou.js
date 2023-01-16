@@ -27,13 +27,22 @@ import getLike from '../common/getLike';
 
 const loadSize = 1;
 
+function useForceUpdate() {
+  const [value, setValue] = useState(0); // integer state
+  return () => setValue(value => value + 1); // update state to force render
+  // A function that increment 👆🏻 the previous state like here
+  // is better than directly setting `setValue(value + 1)`
+}
+
 export default function ForYou() {
   const [images, setImages] = useState([]);
   const [likes, setLikes] = useState({});
+  const forceUpdate = useForceUpdate();
 
-  useEffect(() => {
+  const loadForYou = () => {
     // load 10 random images from firestore images
-    const unsubscriber = firestore()
+    console.log('load for you');
+    firestore()
       .collection('images')
       // .where('public', '==', true)
       .orderBy('id', 'desc')
@@ -50,10 +59,11 @@ export default function ForYou() {
 
         setImages(images);
       });
-  }, []);
+  };
 
-  useEffect(() => {
-    // get liked images
+  const loadLike = images => {
+    // get likes
+    console.log('load like');
     images.map(image => {
       firestore()
         .collection('images')
@@ -67,6 +77,14 @@ export default function ForYou() {
           }
         });
     });
+  };
+
+  useEffect(() => {
+    loadForYou();
+  }, []);
+
+  useEffect(() => {
+    loadLike(images);
   }, [images]);
 
   // load more images when the user scrolls down

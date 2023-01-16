@@ -15,14 +15,24 @@ const hapticOptions = {
   enableVibrateFallback: true,
   ignoreAndroidSystemSettings: false,
 };
+
+function useForceUpdate() {
+  const [value, setValue] = useState(0); // integer state
+  return () => setValue(value => value + 1); // update state to force render
+  // A function that increment 👆🏻 the previous state like here
+  // is better than directly setting `setValue(value + 1)`
+}
+
 export default function Published() {
   // Get user published images
   const [publishedImages, setPublishedImages] = useState([]);
   const [likes, setLikes] = useState({});
   const [selectedImage, setSelectedImage] = useState(null);
+  const forceUpdate = useForceUpdate();
 
   const loadPublished = () => {
     // get published images
+    console.log('load published');
     realtime()
       .ref('users/' + auth().currentUser.uid + '/published')
       .on('value', snapshot => {
@@ -35,9 +45,12 @@ export default function Published() {
           setPublishedImages(images);
         }
       });
+  };
 
+  const loadLike = images => {
     // get likes
-    publishedImages.map(image => {
+    console.log('load like');
+    images.map(image => {
       firestore()
         .collection('images')
         .doc(image.id)
@@ -47,13 +60,19 @@ export default function Published() {
             const newLikes = likes;
             newLikes[image.id] = documentSnapshot.data().likes;
             setLikes(newLikes);
+            forceUpdate();
           }
         });
     });
   };
+
   useEffect(() => {
     loadPublished();
   }, []);
+
+  useEffect(() => {
+    loadLike(publishedImages);
+  }, [publishedImages]);
 
   // unpublish selected image
   const unpublish = () => {
@@ -210,9 +229,7 @@ export default function Published() {
 
   return (
     <View>
-      <ScrollView onScrollBeginDrag={loadPublished}>
-        {publishedImages.map(image => imageView(image))}
-      </ScrollView>
+      <ScrollView>{publishedImages.map(image => imageView(image))}</ScrollView>
     </View>
   );
 }
