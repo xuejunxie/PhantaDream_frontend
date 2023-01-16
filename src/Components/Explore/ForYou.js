@@ -52,9 +52,34 @@ export default function ForYou() {
       });
   };
 
+  const [likes, setLikes] = useState({});
+
+  const loadLike = images => {
+    // get likes
+    console.log('load like');
+    images.map(image => {
+      firestore()
+        .collection('images')
+        .doc(image.id)
+        .onSnapshot(documentSnapshot => {
+          const newLikes = {};
+          if (documentSnapshot.data()) {
+            const newLikes = likes;
+            newLikes[image.id] = documentSnapshot.data().likes;
+            setLikes(newLikes);
+            // forceUpdate();
+          }
+        });
+    });
+  };
+
   useEffect(() => {
     loadForYou();
   }, []);
+
+  useEffect(() => {
+    loadLike(images);
+  }, [images]);
 
   // load more images when the user scrolls down
   const loadMore = () => {
@@ -178,7 +203,7 @@ export default function ForYou() {
               fontSize: 15,
               marginTop: 10,
             }}>
-            Likes: {image.likes}
+            Likes: {likes[image.id] ? likes[image.id] : image.likes}
           </Text>
           <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
             Prompt: {image.prompt}

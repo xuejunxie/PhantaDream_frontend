@@ -58,7 +58,7 @@ export default function like(image, isLiked, dispatch) {
   } else {
     // like the image
     // increase the image's likes by 1
-    image.likes = image.likes + 1;
+    // image.likes = image.likes + 1;
     dispatch({type: ADD_LIKED_IMAGES, payload: image});
     firestore()
       .collection('images')
