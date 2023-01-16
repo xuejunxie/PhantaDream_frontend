@@ -23,7 +23,7 @@ import {
 import SignIn from './Components/Auth/SignIn';
 import {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {LOAD_LIKED_IMAGES} from './redux/types';
+import {LOAD_LIKED_IMAGES, UPDATE_LIKED_IMAGES} from './redux/types';
 import realtime from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
@@ -41,21 +41,18 @@ function Home(): JSX.Element {
       .ref('users/' + auth().currentUser.uid + '/liked_images')
       .on('value', snapshot => {
         var liked = snapshot.val();
-        const likedImages = [];
         for (const key in liked) {
           // get latest like count from database
           firestore()
             .collection('images')
             .doc(liked[key].id)
-            .get()
-            .then(documentSnapshot => {
+            .onSnapshot(documentSnapshot => {
               liked[key] = documentSnapshot.data();
+              // if (liked[key].public) {
+              dispatch({type: UPDATE_LIKED_IMAGES, payload: liked[key]});
+              // }
             });
-          if (liked[key].public) {
-            likedImages.push(liked[key]);
-          }
         }
-        dispatch({type: LOAD_LIKED_IMAGES, payload: likedImages});
       });
   }, []);
 
