@@ -43,6 +43,9 @@ export default function Hot() {
         }
         setImages(images);
       });
+
+    // Unsubscribe from events when no longer in use
+    return () => unsubscriber();
   }, []);
 
   // Sync user hearts number

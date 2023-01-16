@@ -84,7 +84,7 @@ export default function ForYou() {
   }, []);
 
   useEffect(() => {
-    loadLike(images);
+    // loadLike(images);
   }, [images]);
 
   // load more images when the user scrolls down
@@ -211,7 +211,7 @@ export default function ForYou() {
               fontSize: 15,
               marginTop: 10,
             }}>
-            Likes: {likes[image.id]}
+            Likes: {likes[image.id] ? likes[image.id] : image.likes}
           </Text>
           <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
             Prompt: {image.prompt}
