@@ -1,5 +1,5 @@
 import {View, Image, ScrollView, Text, Alert} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import firestore from '@react-native-firebase/firestore';
 import realtime from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
@@ -124,7 +124,11 @@ export default function Liked() {
         }}>
         <TouchableWithoutFeedback
           onPress={() => {
-            setSelectedImage(image);
+            if (isSelected) {
+              setSelectedImage(null);
+            } else {
+              setSelectedImage(image);
+            }
 
             ReactNativeHapticFeedback.trigger('impactMedium', hapticOptions);
           }}>
@@ -186,10 +190,28 @@ export default function Liked() {
       </View>
     );
   };
+  const scrollViewRef = useRef();
+  let scrollViewHeight = 0;
 
   return (
     <View>
-      <ScrollView>{likedImages.map(image => imageView(image))}</ScrollView>
+      <ScrollView
+        ref={scrollViewRef}
+        onContentSizeChange={(contentWidth, contentHeight) => {
+          if (selectedImage === null) {
+            // if user unselected the image, don't scroll
+            if (contentHeight > scrollViewHeight) {
+              scrollViewRef.current.scrollToEnd({animated: true});
+            }
+          } else {
+            if (selectedImage.id === likedImages[likedImages.length - 1].id) {
+              scrollViewRef.current.scrollToEnd({animated: true});
+            }
+          }
+          scrollViewHeight = contentHeight;
+        }}>
+        {likedImages.map(image => imageView(image))}
+      </ScrollView>
     </View>
   );
 }
