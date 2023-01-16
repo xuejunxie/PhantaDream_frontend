@@ -240,7 +240,7 @@ export default function Dream() {
                   // const image_file = URL.createObjectURL(response.data);
                   setPrompt('');
                   // save the image locally with AsyncStorage
-                  const image_meta = {
+                  const generatedImageMeta = {
                     id: imageId,
                     imageURL: imageURL,
                     prompt: prompt,
@@ -250,10 +250,9 @@ export default function Dream() {
                   };
                   // save the image information to user database
                   realtime()
-                    .ref('/users/' + auth().currentUser.uid)
-                    .child('generated')
+                    .ref('/users/' + auth().currentUser.uid + '/generated')
                     .child(imageId)
-                    .set(image_meta);
+                    .set(generatedImageMeta);
 
                   const image_entry = {
                     id: imageId,

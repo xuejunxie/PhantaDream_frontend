@@ -31,7 +31,13 @@ export default function like(image, isLiked, dispatch) {
       .remove();
 
     // remove the user from the image's like collection
-    firestore().collection(image.id).doc(auth().currentUser.uid).delete();
+    // firestore().collection(image.id).doc(auth().currentUser.uid).delete();
+    firestore()
+      .collection('images')
+      .doc(image.id)
+      .collection('likes')
+      .doc(auth().currentUser.uid)
+      .delete();
 
     // decrease the image's likes by 1
     firestore()
@@ -67,10 +73,21 @@ export default function like(image, isLiked, dispatch) {
         likes: firestore.FieldValue.increment(1),
       });
 
-    // store the user information in the image's like collection
-    firestore().collection(image.id).doc(auth().currentUser.uid).set({
-      time: Date(),
-    });
+    // // store the user information in the image's like collection
+    // firestore().collection(image.id).doc(auth().currentUser.uid).set({
+    //   time: Date(),
+    // });
+
+    // save the like to image's like collection
+    firestore()
+      .collection('images')
+      .doc(image.id)
+      .collection('likes')
+      .doc(auth().currentUser.uid)
+      .set({
+        time: Date(),
+        id: auth().currentUser.uid,
+      });
 
     // save the image to the user's liked images
     realtime()
