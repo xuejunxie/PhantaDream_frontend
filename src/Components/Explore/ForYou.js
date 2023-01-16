@@ -27,17 +27,8 @@ import getLike from '../common/getLike';
 
 const loadSize = 1;
 
-function useForceUpdate() {
-  const [value, setValue] = useState(0); // integer state
-  return () => setValue(value => value + 1); // update state to force render
-  // A function that increment 👆🏻 the previous state like here
-  // is better than directly setting `setValue(value + 1)`
-}
-
 export default function ForYou() {
   const [images, setImages] = useState([]);
-  const [likes, setLikes] = useState({});
-  const forceUpdate = useForceUpdate();
 
   const loadForYou = () => {
     // load 10 random images from firestore images
@@ -61,35 +52,13 @@ export default function ForYou() {
       });
   };
 
-  const loadLike = images => {
-    // get likes
-    console.log('load like');
-    images.map(image => {
-      firestore()
-        .collection('images')
-        .doc(image.id)
-        .onSnapshot(documentSnapshot => {
-          const newLikes = {};
-          if (documentSnapshot.data()) {
-            const newLikes = likes;
-            newLikes[image.id] = documentSnapshot.data().likes;
-            setLikes(newLikes);
-          }
-        });
-    });
-  };
-
   useEffect(() => {
     loadForYou();
   }, []);
 
-  useEffect(() => {
-    // loadLike(images);
-  }, [images]);
-
   // load more images when the user scrolls down
   const loadMore = () => {
-    const unsubscriber = firestore()
+    firestore()
       .collection('images')
       .where('public', '==', true)
       .orderBy('id', 'desc')
@@ -102,8 +71,6 @@ export default function ForYou() {
             setImages([...images, documentSnapshot.data()]);
           });
         }
-
-        // Unsubscribe from events after load once
       });
   };
 
@@ -211,7 +178,7 @@ export default function ForYou() {
               fontSize: 15,
               marginTop: 10,
             }}>
-            Likes: {likes[image.id] ? likes[image.id] : image.likes}
+            Likes: {image.likes}
           </Text>
           <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
             Prompt: {image.prompt}

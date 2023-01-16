@@ -26,7 +26,7 @@ export default function Hot() {
 
   useEffect(() => {
     // load 10 random images from firestore images with published = true
-    const unsubscriber = firestore()
+    firestore()
       .collection('images')
       // .where('public', '==', true)
       // sort by likes
@@ -43,9 +43,6 @@ export default function Hot() {
         }
         setImages(images);
       });
-
-    // Unsubscribe from events when no longer in use
-    return () => unsubscriber();
   }, []);
 
   // Sync user hearts number

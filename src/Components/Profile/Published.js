@@ -71,6 +71,7 @@ export default function Published() {
   }, []);
 
   useEffect(() => {
+    console.log('published images changed');
     loadLike(publishedImages);
   }, [publishedImages]);
 
