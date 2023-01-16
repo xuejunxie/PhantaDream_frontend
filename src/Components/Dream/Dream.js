@@ -51,6 +51,7 @@ import artists from './artists.json';
 import RadioButtonRN from 'radio-buttons-react-native';
 import Payment from './Payment';
 import ImageMarker from 'react-native-image-marker';
+import {useSelector} from 'react-redux';
 
 const loading_image = 'https://i.gifer.com/1amw.gif';
 const loading_images = [
@@ -69,7 +70,11 @@ const tabBarHeight = 29;
 var scrollViewHeight = 0;
 
 export default function Dream() {
-  const [prompt, setPrompt] = React.useState('');
+  // const [prompt, setPrompt] = React.useState('');
+
+  const prompt = useSelector(state => state.dream.prompt);
+  const setPrompt = prompt => dispatch({type: 'SET_PROMPT', payload: prompt});
+
   const [loading, setLoading] = useState(false);
   const [Charge, setCharge] = useState(0);
   const [Heart, setHeart] = useState(false);

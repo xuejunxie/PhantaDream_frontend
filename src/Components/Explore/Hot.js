@@ -9,7 +9,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faHeart} from '@fortawesome/free-solid-svg-icons';
 import {faHeart as faHeartO} from '@fortawesome/free-regular-svg-icons';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
-import like from './like';
+import like from '../common/like';
 import {useDispatch, useSelector} from 'react-redux';
 
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';

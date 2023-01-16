@@ -93,7 +93,19 @@ export default Billing = () => {
         </View>
       ) : (
         <View>
-          <Text>No bills</Text>
+          <ListItem bottomDivider style={styles.listItemContainer}>
+            <ListItem.Content
+              style={{
+                flexDirection: 'row',
+              }}>
+              <ListItem.Title
+                style={{
+                  flex: 1,
+                }}>
+                <Text> No bills yet </Text>
+              </ListItem.Title>
+            </ListItem.Content>
+          </ListItem>
         </View>
       )}
     </ScrollView>

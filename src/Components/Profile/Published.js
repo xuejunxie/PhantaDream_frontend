@@ -1,5 +1,5 @@
 import {View, Image, ScrollView, Text} from 'react-native';
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import firestore from '@react-native-firebase/firestore';
 import realtime from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
@@ -7,7 +7,7 @@ import {Neomorph} from 'react-native-neomorph-shadows';
 import {COLORS, SIZES} from '../common/globalValues';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faHeart, faTrashCan} from '@fortawesome/free-solid-svg-icons';
-import {faHeart as faHeartO} from '@fortawesome/free-regular-svg-icons';
+import {faCopy, faHeart as faHeartO} from '@fortawesome/free-regular-svg-icons';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import {useDispatch, useSelector} from 'react-redux';
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
@@ -15,6 +15,8 @@ const hapticOptions = {
   enableVibrateFallback: true,
   ignoreAndroidSystemSettings: false,
 };
+import like from '../common/like';
+import {SET_PROMPT} from '../../redux/types';
 
 function useForceUpdate() {
   const [value, setValue] = useState(0); // integer state
@@ -23,12 +25,15 @@ function useForceUpdate() {
   // is better than directly setting `setValue(value + 1)`
 }
 
+var scrollViewHeight = 0;
+
 export default function Published() {
   // Get user published images
   const [publishedImages, setPublishedImages] = useState([]);
   const [likes, setLikes] = useState({});
   const [selectedImage, setSelectedImage] = useState(null);
   const forceUpdate = useForceUpdate();
+  const scrollViewRef = useRef();
 
   const loadPublished = () => {
     // get published images
@@ -130,6 +135,8 @@ export default function Published() {
     );
   };
   const [UnpublishButtonPressed, setUnpublishButtonPressed] = useState(false);
+  const [LikeButtonPressed, setLikeButtonPressed] = useState(false);
+  const [CopyButtonPressed, setCopyButtonPressed] = useState(false);
   const actionButtons = () => {
     return (
       <View
@@ -137,6 +144,22 @@ export default function Published() {
           flexDirection: 'row',
           justifyContent: 'space-evenly',
         }}>
+        {operations(
+          LikeButtonPressed,
+          setLikeButtonPressed,
+          renderIcon(
+            faHeart,
+            selectedImage &&
+              likedImages.find(likedImage => likedImage.id === selectedImage.id)
+              ? COLORS.red
+              : 'gray',
+          ),
+        )}
+        {operations(
+          CopyButtonPressed,
+          setCopyButtonPressed,
+          renderIcon(faCopy, 'gray'),
+        )}
         {operations(
           UnpublishButtonPressed,
           setUnpublishButtonPressed,
@@ -155,7 +178,34 @@ export default function Published() {
     }
   }, [UnpublishButtonPressed]);
 
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (selectedImage) {
+      if (LikeButtonPressed) {
+        const liked = likedImages.find(
+          likedImage => likedImage.id === selectedImage.id,
+        );
+        like(selectedImage, liked, dispatch);
+        setLikeButtonPressed(false);
+      }
+    }
+  }, [LikeButtonPressed]);
+
+  useEffect(() => {
+    if (selectedImage) {
+      if (CopyButtonPressed) {
+        dispatch({type: SET_PROMPT, payload: selectedImage.prompt});
+        setCopyButtonPressed(false);
+      }
+    }
+  }, [CopyButtonPressed]);
+
+  const likedImages = useSelector(state => state.like.likedImages);
+
   const imageView = image => {
+    const liked = likedImages.find(likedImage => likedImage.id === image.id);
+
     return (
       <View
         key={image.id}
@@ -230,7 +280,28 @@ export default function Published() {
 
   return (
     <View>
-      <ScrollView>{publishedImages.map(image => imageView(image))}</ScrollView>
+      <ScrollView
+        ref={scrollViewRef}
+        onContentSizeChange={(contentWidth, contentHeight) => {
+          if (selectedImage === null) {
+            // if user unselected the image, don't scroll
+            if (contentHeight > scrollViewHeight) {
+              scrollViewRef.current.scrollToEnd({animated: true});
+            }
+          } else {
+            if (
+              selectedImage.id ===
+              publishedImages[publishedImages.length - 1].id
+            ) {
+              scrollViewRef.current.scrollToEnd({animated: true});
+            }
+          }
+          scrollViewHeight = contentHeight;
+        }}>
+        {publishedImages
+          .sort((a, b) => new Date(a.date) - new Date(b.date))
+          .map(image => imageView(image))}
+      </ScrollView>
     </View>
   );
 }

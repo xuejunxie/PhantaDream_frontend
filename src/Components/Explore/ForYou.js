@@ -20,7 +20,7 @@ const hapticOptions = {
   ignoreAndroidSystemSettings: false,
 };
 
-import like from './like';
+import like from '../common/like';
 import {useDispatch, useSelector} from 'react-redux';
 import {LOAD_LIKED_IMAGES} from '../../redux/types';
 import getLike from '../common/getLike';
