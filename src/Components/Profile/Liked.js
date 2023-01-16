@@ -1,5 +1,5 @@
-import {View, Image, ScrollView, Text} from 'react-native';
-import React, {useEffect} from 'react';
+import {View, Image, ScrollView, Text, Alert} from 'react-native';
+import React, {useEffect, useState} from 'react';
 import firestore from '@react-native-firebase/firestore';
 import realtime from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
@@ -7,11 +7,12 @@ import {Neomorph} from 'react-native-neomorph-shadows';
 import {COLORS, SIZES} from '../common/globalValues';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faHeart} from '@fortawesome/free-solid-svg-icons';
-import {faHeart as faHeartO} from '@fortawesome/free-regular-svg-icons';
+import {faCopy, faHeart as faHeartO} from '@fortawesome/free-regular-svg-icons';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import {useDispatch, useSelector} from 'react-redux';
 import like from '../common/like';
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
+import {SET_PROMPT} from '../../redux/types';
 const hapticOptions = {
   enableVibrateFallback: true,
   ignoreAndroidSystemSettings: false,
@@ -21,9 +22,97 @@ export default function Liked() {
   // Get user liked images
   const likedImages = useSelector(state => state.like.likedImages);
   const dispatch = useDispatch();
+  const [selectedImage, setSelectedImage] = React.useState(null);
+
+  const [LikeButtonPressed, setLikeButtonPressed] = useState(false);
+  const [CopyButtonPressed, setCopyButtonPressed] = useState(false);
+
+  useEffect(() => {
+    if (selectedImage) {
+      if (LikeButtonPressed) {
+        const liked = likedImages.find(
+          likedImage => likedImage.id === selectedImage.id,
+        );
+        like(selectedImage, liked, dispatch);
+        setLikeButtonPressed(false);
+      }
+    }
+  }, [LikeButtonPressed]);
+
+  useEffect(() => {
+    if (selectedImage) {
+      if (CopyButtonPressed) {
+        dispatch({type: SET_PROMPT, payload: selectedImage.prompt});
+        setCopyButtonPressed(false);
+        Alert.alert('Copied prompt to the Dream input!');
+      }
+    }
+  }, [CopyButtonPressed]);
+
+  const operations = (press, setPress, icon) => {
+    return (
+      <View
+        style={{
+          margin: 10,
+        }}>
+        <TouchableWithoutFeedback
+          onPressIn={() => {
+            setPress(true);
+            ReactNativeHapticFeedback.trigger('impactMedium', hapticOptions);
+          }}
+          onPressOut={() => setPress(false)}>
+          <Neomorph
+            inner={press}
+            style={{
+              shadowRadius: 10,
+              borderRadius: 25,
+              backgroundColor: COLORS.primary,
+              width: 60,
+              height: 40,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            {icon}
+          </Neomorph>
+        </TouchableWithoutFeedback>
+      </View>
+    );
+  };
+
+  const renderIcon = (name, color) => {
+    return <FontAwesomeIcon icon={name} size={20} color={color} />;
+  };
+
+  const actionButtons = () => {
+    return (
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-evenly',
+        }}>
+        {operations(
+          LikeButtonPressed,
+          setLikeButtonPressed,
+          renderIcon(
+            faHeart,
+            selectedImage &&
+              likedImages.find(likedImage => likedImage.id === selectedImage.id)
+              ? COLORS.red
+              : 'gray',
+          ),
+        )}
+        {operations(
+          CopyButtonPressed,
+          setCopyButtonPressed,
+          renderIcon(faCopy, 'gray'),
+        )}
+      </View>
+    );
+  };
 
   const imageView = image => {
     const liked = likedImages.find(likedImage => likedImage.id === image.id);
+    const isSelected = selectedImage && selectedImage.id === image.id;
     return (
       <View
         key={image.id}
@@ -35,7 +124,8 @@ export default function Liked() {
         }}>
         <TouchableWithoutFeedback
           onPress={() => {
-            like(image, liked, dispatch);
+            setSelectedImage(image);
+
             ReactNativeHapticFeedback.trigger('impactMedium', hapticOptions);
           }}>
           <Neomorph
@@ -92,6 +182,7 @@ export default function Liked() {
             Prompt: {image.prompt}
           </Text>
         </View>
+        {isSelected && actionButtons()}
       </View>
     );
   };

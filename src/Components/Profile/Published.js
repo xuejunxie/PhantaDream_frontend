@@ -1,4 +1,4 @@
-import {View, Image, ScrollView, Text} from 'react-native';
+import {View, Image, ScrollView, Text, Alert} from 'react-native';
 import React, {useState, useEffect, useRef} from 'react';
 import firestore from '@react-native-firebase/firestore';
 import realtime from '@react-native-firebase/database';
@@ -197,6 +197,7 @@ export default function Published() {
       if (CopyButtonPressed) {
         dispatch({type: SET_PROMPT, payload: selectedImage.prompt});
         setCopyButtonPressed(false);
+        Alert.alert('Copied prompt to the Dream input!');
       }
     }
   }, [CopyButtonPressed]);
