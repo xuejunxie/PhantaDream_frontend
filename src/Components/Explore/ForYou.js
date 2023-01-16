@@ -85,7 +85,7 @@ export default function ForYou() {
   const loadMore = () => {
     firestore()
       .collection('images')
-      .where('public', '==', true)
+      // .where('public', '==', true)
       .orderBy('id', 'desc')
       .startAfter(images[images.length - 1].id)
       .limit(loadSize)
@@ -217,7 +217,11 @@ export default function ForYou() {
   return (
     <View>
       <ScrollView onScrollBeginDrag={loadMore}>
-        {images.map(image => imageView(image))}
+        {images.map(image => {
+          if (image.public == true) {
+            return imageView(image);
+          }
+        })}
       </ScrollView>
       <HeartIcon />
     </View>

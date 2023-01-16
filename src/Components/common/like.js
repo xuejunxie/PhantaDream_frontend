@@ -16,105 +16,107 @@ export default function like(image, isLiked, dispatch) {
     .once('value')
     .then(snapshot => {
       if (snapshot.val() <= 0) {
-        Alert('You have no more hearts');
+        Alert.alert('You have no more hearts');
         return;
+      } else {
+        if (isLiked) {
+          // unlike the image
+          // remove the image from the user's liked images
+
+          dispatch({type: REMOVE_LIKED_IMAGES, payload: image});
+          realtime()
+            .ref(
+              'users/' + auth().currentUser.uid + '/liked_images/' + image.id,
+            )
+            .remove();
+
+          // remove the user from the image's like collection
+          // firestore().collection(image.id).doc(auth().currentUser.uid).delete();
+          firestore()
+            .collection('images')
+            .doc(image.id)
+            .collection('likeUsers')
+            .doc(auth().currentUser.uid)
+            .delete();
+
+          // decrease the image's likes by 1
+          firestore()
+            .collection('images')
+            .doc(image.id)
+            .update({
+              likes: firestore.FieldValue.increment(-1),
+            });
+
+          // increase user hearts by 1
+          realtime()
+            .ref('users/' + auth().currentUser.uid + '/heart')
+            .once('value')
+            .then(snapshot => {
+              realtime()
+                .ref('users/' + auth().currentUser.uid + '/heart')
+                .set(snapshot.val() + 1);
+            });
+
+          // update likedImages state
+          // setLikedImages(
+          //   likedImages.filter(likedImage => likedImage.id !== image.id),
+          // );
+        } else {
+          // like the image
+          // increase the image's likes by 1
+          // image.likes = image.likes + 1;
+          dispatch({type: ADD_LIKED_IMAGES, payload: image});
+          firestore()
+            .collection('images')
+            .doc(image.id)
+            .update({
+              likes: firestore.FieldValue.increment(1),
+            });
+
+          // // store the user information in the image's like collection
+          // firestore().collection(image.id).doc(auth().currentUser.uid).set({
+          //   time: Date(),
+          // });
+
+          // save the like to image's like collection
+          firestore()
+            .collection('images')
+            .doc(image.id)
+            .collection('likeUsers')
+            .doc(auth().currentUser.uid)
+            .set({
+              time: Date(),
+              id: auth().currentUser.uid,
+            });
+
+          // save the image to the user's liked images
+          realtime()
+            .ref('users/' + auth().currentUser.uid + '/liked_images')
+            .child(image.id)
+            .set({
+              ...image,
+              likedTime: Date(),
+            });
+
+          // reduce user hearts by 1
+          realtime()
+            .ref('users/' + auth().currentUser.uid + '/heart')
+            .once('value')
+            .then(snapshot => {
+              realtime()
+                .ref('users/' + auth().currentUser.uid + '/heart')
+                .set(snapshot.val() - 1);
+            });
+
+          // update likedImages state
+          // setLikedImages([
+          //   ...likedImages,
+          //   {
+          //     liked: true,
+          //     id: image.id,
+          //   },
+          // ]);
+        }
       }
     });
-
-  if (isLiked) {
-    // unlike the image
-    // remove the image from the user's liked images
-
-    dispatch({type: REMOVE_LIKED_IMAGES, payload: image});
-    realtime()
-      .ref('users/' + auth().currentUser.uid + '/liked_images/' + image.id)
-      .remove();
-
-    // remove the user from the image's like collection
-    // firestore().collection(image.id).doc(auth().currentUser.uid).delete();
-    firestore()
-      .collection('images')
-      .doc(image.id)
-      .collection('likes')
-      .doc(auth().currentUser.uid)
-      .delete();
-
-    // decrease the image's likes by 1
-    firestore()
-      .collection('images')
-      .doc(image.id)
-      .update({
-        likes: firestore.FieldValue.increment(-1),
-      });
-
-    // increase user hearts by 1
-    realtime()
-      .ref('users/' + auth().currentUser.uid + '/heart')
-      .once('value')
-      .then(snapshot => {
-        realtime()
-          .ref('users/' + auth().currentUser.uid + '/heart')
-          .set(snapshot.val() + 1);
-      });
-
-    // update likedImages state
-    // setLikedImages(
-    //   likedImages.filter(likedImage => likedImage.id !== image.id),
-    // );
-  } else {
-    // like the image
-    // increase the image's likes by 1
-    // image.likes = image.likes + 1;
-    dispatch({type: ADD_LIKED_IMAGES, payload: image});
-    firestore()
-      .collection('images')
-      .doc(image.id)
-      .update({
-        likes: firestore.FieldValue.increment(1),
-      });
-
-    // // store the user information in the image's like collection
-    // firestore().collection(image.id).doc(auth().currentUser.uid).set({
-    //   time: Date(),
-    // });
-
-    // save the like to image's like collection
-    firestore()
-      .collection('images')
-      .doc(image.id)
-      .collection('likes')
-      .doc(auth().currentUser.uid)
-      .set({
-        time: Date(),
-        id: auth().currentUser.uid,
-      });
-
-    // save the image to the user's liked images
-    realtime()
-      .ref('users/' + auth().currentUser.uid + '/liked_images')
-      .child(image.id)
-      .set({
-        ...image,
-        likedTime: Date(),
-      });
-
-    // reduce user hearts by 1
-    realtime()
-      .ref('users/' + auth().currentUser.uid + '/heart')
-      .once('value')
-      .then(snapshot => {
-        realtime()
-          .ref('users/' + auth().currentUser.uid + '/heart')
-          .set(snapshot.val() - 1);
-      });
-
-    // update likedImages state
-    // setLikedImages([
-    //   ...likedImages,
-    //   {
-    //     liked: true,
-    //     id: image.id,
-    //   },
-    // ]);
-  }
 }
