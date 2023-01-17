@@ -38,13 +38,13 @@ export default function ForYou() {
       // .where('public', '==', true)
       .orderBy('id', 'desc')
       .limit(loadSize + 2)
-      .onSnapshot(querySnapshot => {
+      .get()
+      .then(querySnapshot => {
         const images = [];
         if (querySnapshot) {
           querySnapshot.forEach(documentSnapshot => {
-            if (documentSnapshot.data().public == true) {
-              images.push(documentSnapshot.data());
-            }
+            images.push(documentSnapshot.data());
+            console.log(documentSnapshot.data());
           });
         }
 
@@ -62,12 +62,15 @@ export default function ForYou() {
         .collection('images')
         .doc(image.id)
         .onSnapshot(documentSnapshot => {
-          const newLikes = {};
+          // const newLikes = {};
           if (documentSnapshot.data()) {
-            const newLikes = likes;
-            newLikes[image.id] = documentSnapshot.data().likes;
-            setLikes(newLikes);
-            // forceUpdate();
+            // const newLikes = likes;
+            // newLikes[image.id] = documentSnapshot.data().likes;
+            // setLikes(newLikes);
+            setLikes({
+              ...likes,
+              [image.id]: documentSnapshot.data().likes,
+            });
           }
         });
     });
@@ -79,6 +82,7 @@ export default function ForYou() {
 
   useEffect(() => {
     loadLike(images);
+    console.log('image changed');
   }, [images]);
 
   // load more images when the user scrolls down
@@ -87,9 +91,10 @@ export default function ForYou() {
       .collection('images')
       // .where('public', '==', true)
       .orderBy('id', 'desc')
-      .startAfter(images[images.length - 1].id)
+      .startAfter(images[images.length - loadSize].id)
       .limit(loadSize)
-      .onSnapshot(querySnapshot => {
+      .get()
+      .then(querySnapshot => {
         // if the query is less then 10, then there are no more images to load
         if (querySnapshot) {
           querySnapshot.forEach(documentSnapshot => {
@@ -218,9 +223,9 @@ export default function ForYou() {
     <View>
       <ScrollView onScrollBeginDrag={loadMore}>
         {images.map(image => {
-          if (image.public == true) {
-            return imageView(image);
-          }
+          // if (image.public == true) {
+          return imageView(image);
+          // }
         })}
       </ScrollView>
       <HeartIcon />

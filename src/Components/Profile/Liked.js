@@ -44,7 +44,7 @@ export default function Liked() {
       if (CopyButtonPressed) {
         dispatch({type: SET_PROMPT, payload: selectedImage.prompt});
         setCopyButtonPressed(false);
-        Alert.alert('Copied prompt to the Dream input!');
+        Alert.alert('Prompt copied to the Dream input!');
       }
     }
   }, [CopyButtonPressed]);
