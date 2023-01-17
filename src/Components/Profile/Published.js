@@ -93,10 +93,8 @@ export default function Published() {
         });
       });
 
-    // set published to false
-    firestore().collection('images').doc(selectedImage.id).update({
-      public: false,
-    });
+    // delete from images
+    firestore().collection('images').doc(selectedImage.id).delete();
 
     setSelectedImage(null);
   };

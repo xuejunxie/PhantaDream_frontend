@@ -35,16 +35,14 @@ export default function ForYou() {
     console.log('load for you');
     firestore()
       .collection('images')
-      // .where('public', '==', true)
       .orderBy('id', 'desc')
-      .limit(loadSize + 2)
+      .limit(3)
       .get()
       .then(querySnapshot => {
         const images = [];
         if (querySnapshot) {
           querySnapshot.forEach(documentSnapshot => {
             images.push(documentSnapshot.data());
-            console.log(documentSnapshot.data());
           });
         }
 
@@ -56,7 +54,6 @@ export default function ForYou() {
 
   const loadLike = images => {
     // get likes
-    console.log('load like');
     images.map(image => {
       firestore()
         .collection('images')
@@ -82,20 +79,17 @@ export default function ForYou() {
 
   useEffect(() => {
     loadLike(images);
-    console.log('image changed');
   }, [images]);
 
   // load more images when the user scrolls down
   const loadMore = () => {
     firestore()
       .collection('images')
-      // .where('public', '==', true)
       .orderBy('id', 'desc')
-      .startAfter(images[images.length - loadSize].id)
+      .startAfter(images[images.length - 1].id)
       .limit(loadSize)
       .get()
       .then(querySnapshot => {
-        // if the query is less then 10, then there are no more images to load
         if (querySnapshot) {
           querySnapshot.forEach(documentSnapshot => {
             setImages([...images, documentSnapshot.data()]);
@@ -223,9 +217,7 @@ export default function ForYou() {
     <View>
       <ScrollView onScrollBeginDrag={loadMore}>
         {images.map(image => {
-          // if (image.public == true) {
           return imageView(image);
-          // }
         })}
       </ScrollView>
       <HeartIcon />
