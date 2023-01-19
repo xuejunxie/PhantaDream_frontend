@@ -379,20 +379,27 @@ export default function Dream() {
       if (saveButtonPressed) {
         // water mark the image with "PhantaDream"
         const image = pickedImage.image;
-        ImageMarker.markText({
-          src: image,
-          text: 'Dreamed @ PhantaDream',
-          position: 'bottomRight',
-          scale: 1,
-          color: '#FFFFFF80',
-          fontName: 'HelveticaNeue',
-          fontSize: 15,
-          quality: 100,
-        }).then(markedImage => {
-          // save the image to camera roll
-          CameraRoll.save(markedImage).then(() => {
-            Alert.alert('Photo Saved!');
-          });
+        // attach a black bar to the bottom of the image
+
+        // ImageMarker.markText({
+        //   src: image,
+        //   text: 'Dreamed @ PhantaDream',
+        //   position: 'bottomRight',
+        //   scale: 1,
+        //   color: '#FFFFFF80',
+        //   fontName: 'HelveticaNeue',
+        //   fontSize: 15,
+        //   quality: 100,
+        // }).then(markedImage => {
+        //   // save the image to camera roll
+        //   CameraRoll.save(markedImage).then(() => {
+        //     Alert.alert('Photo Saved!');
+        //   });
+        // });
+
+        // save the image to camera roll
+        CameraRoll.save(image).then(() => {
+          Alert.alert('Photo Saved!');
         });
       }
     }
