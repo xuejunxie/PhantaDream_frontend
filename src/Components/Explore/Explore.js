@@ -18,6 +18,7 @@ const SecondRoute = () => <Hot />;
 const renderScene = SceneMap({
   first: FirstRoute,
   second: SecondRoute,
+  third: SecondRoute,
 });
 
 export default function Explore() {
@@ -27,8 +28,7 @@ export default function Explore() {
   const [routes] = React.useState([
     {key: 'first', title: 'For you'},
     {key: 'second', title: 'Hot'},
-    // {key: 'third', title: 'Liked'},
-    // {key: 'fourth', title: 'Published'},
+    // {key: 'third', title: 'Private club'},
   ]);
 
   const frame = useSafeAreaFrame();

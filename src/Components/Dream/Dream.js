@@ -70,7 +70,6 @@ const tabBarHeight = 29;
 var scrollViewHeight = 0;
 
 export default function Dream() {
-  // const [prompt, setPrompt] = React.useState('');
   const dispatch = useDispatch();
   const prompt = useSelector(state => state.dream.prompt);
   const setPrompt = prompt => dispatch({type: 'SET_PROMPT', payload: prompt});
@@ -104,6 +103,7 @@ export default function Dream() {
 
   const loadImages = async () => {
     const allKeys = await AsyncStorage.getAllKeys();
+
     // remove keys with "auth_" prefix
     const keys = allKeys.filter(key => {
       return key.indexOf('auth_') === -1;
@@ -134,7 +134,6 @@ export default function Dream() {
       setImages(sourtedResult);
     }
   };
-
   useEffect(() => {
     // AsyncStorage.clear();
     loadImages();
@@ -213,6 +212,7 @@ export default function Dream() {
     const imageId = uuid.v1();
     const userId = auth().currentUser.uid;
     const seed = Math.floor(Math.random() * 1e8);
+    // const now = performance.now();
     axios
       .post(serverURL + 'txt2img', {
         prompt: prompt,
@@ -227,62 +227,75 @@ export default function Dream() {
         const imageURL = serverURL + userId + '/' + imageId;
 
         const getImage = async () => {
-          await axios.get(statusURL).then(function (response) {
-            if (response.data.state === 'SUCCESS') {
-              axios
-                .get(imageURL, {responseType: 'arraybuffer'})
-                .then(function (response) {
-                  const image_data = Buffer.from(
-                    response.data,
-                    'binary',
-                  ).toString('base64');
-                  const image_file = `data:image/png;base64,${image_data}`;
-                  // const image_file = URL.createObjectURL(response.data);
-                  setPrompt('');
-                  // save the image locally with AsyncStorage
-                  const generatedImageMeta = {
-                    id: imageId,
-                    imageURL: imageURL,
-                    prompt: prompt,
-                    date: new Date(),
-                    artist: artistsUsed,
-                    seed: seed,
-                  };
-                  // save the image information to user database
-                  realtime()
-                    .ref('/users/' + auth().currentUser.uid + '/generated')
-                    .child(imageId)
-                    .set(generatedImageMeta);
+          await axios
+            .get(statusURL)
+            .then(function (response) {
+              if (response.data.state === 'SUCCESS') {
+                console.log(performance.now() - now);
+                axios
+                  .get(imageURL, {responseType: 'arraybuffer'})
+                  .then(function (response) {
+                    const image_data = Buffer.from(
+                      response.data,
+                      'binary',
+                    ).toString('base64');
+                    const image_file = `data:image/png;base64,${image_data}`;
+                    // const image_file = URL.createObjectURL(response.data);
+                    setPrompt('');
+                    // save the image locally with AsyncStorage
+                    const generatedImageMeta = {
+                      id: imageId,
+                      imageURL: imageURL,
+                      prompt: prompt,
+                      date: new Date(),
+                      artist: artistsUsed,
+                      seed: seed,
+                    };
+                    // save the image information to user database
+                    realtime()
+                      .ref('/users/' + auth().currentUser.uid + '/generated')
+                      .child(imageId)
+                      .set(generatedImageMeta);
 
-                  const image_entry = {
-                    id: imageId,
-                    image: image_file,
-                    imageURL: imageURL,
-                    prompt: prompt,
-                    date: new Date(),
-                    artist: artistsUsed,
-                    seed: seed,
-                  };
-                  AsyncStorage.setItem(imageId, JSON.stringify(image_entry));
-                  // replace the last image with the new image
-                  image_entry.loading = false;
-                  image_entry.selected = true;
-                  if (images[0].id === 'empty') {
-                    setImages([image_entry]);
-                  } else {
-                    setImages([...images, image_entry]);
-                  }
-                  setLoading(false);
-                  setPickedImage(image_entry);
-                  setArtistsUsed([]);
-                  spendCharge();
-                });
-            } else {
-              setTimeout(getImage, 5000);
-            }
-          });
+                    const image_entry = {
+                      id: imageId,
+                      image: image_file,
+                      imageURL: imageURL,
+                      prompt: prompt,
+                      date: new Date(),
+                      artist: artistsUsed,
+                      seed: seed,
+                    };
+                    AsyncStorage.setItem(imageId, JSON.stringify(image_entry));
+                    // replace the last image with the new image
+                    image_entry.loading = false;
+                    image_entry.selected = true;
+                    if (images[0].id === 'empty') {
+                      setImages([image_entry]);
+                    } else {
+                      setImages([...images, image_entry]);
+                    }
+                    setLoading(false);
+                    setPickedImage(image_entry);
+                    setArtistsUsed([]);
+                    spendCharge();
+                  });
+              } else {
+                setTimeout(getImage, 5000);
+              }
+            })
+            .catch(function (error) {
+              console.log(error);
+              send();
+              return;
+            });
         };
         getImage();
+      })
+      .catch(function (error) {
+        console.log(error);
+        send();
+        return;
       });
   };
   // buttom press components
@@ -538,6 +551,7 @@ export default function Dream() {
             .then(() => {
               Alert.alert('Image Shared!');
             });
+
           // store published image on user's published images
           realtime()
             .ref('users/' + auth().currentUser.uid + '/published')
