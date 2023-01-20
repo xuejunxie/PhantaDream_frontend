@@ -50,7 +50,7 @@ function Home(): JSX.Element {
             .get()
             .then(documentSnapshot => {
               liked[key] = documentSnapshot.data();
-              if (liked[key].public) {
+              if (liked[key]?.public) {
                 dispatch({type: UPDATE_LIKED_IMAGES, payload: liked[key]});
               }
             });
@@ -84,7 +84,7 @@ function Home(): JSX.Element {
         }}
         component={Explore}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Market"
         options={{
           tabBarLabel: 'Market',
@@ -95,7 +95,7 @@ function Home(): JSX.Element {
           },
         }}
         component={Market}
-      />
+      /> */}
       {/* <Tab.Screen
         name="PhantaSpace"
         options={{

@@ -30,6 +30,7 @@ import {
   faExclamation,
   faHeart,
   faPaintBrush,
+  faSignOut,
   faUserFriends,
 } from '@fortawesome/free-solid-svg-icons';
 import {useEffect} from 'react';
@@ -195,19 +196,18 @@ const Settings = () => {
             key={'logout'}
             onPress={() => {
               RootNavigation.navigate('Auth');
-
               auth()
                 .signOut()
                 .then(() => console.log('User signed out!'));
             }}>
             <ListItem bottomDivider style={styles.listItemContainer}>
-              <FontAwesomeIcon icon={faDoorOpen} color={'gray'} />
+              <FontAwesomeIcon icon={faSignOut} color={'gray'} />
               <ListItem.Content>
                 <ListItem.Title
                   style={{
                     color: 'gray',
                   }}>
-                  {'Logout'}
+                  {'Sign out'}
                 </ListItem.Title>
               </ListItem.Content>
               <FontAwesomeIcon icon={faChevronRight} color={'gray'} />
@@ -217,14 +217,6 @@ const Settings = () => {
       </ScrollView>
     );
   }
-
-  const logout = () => {
-    auth()
-      .signOut()
-      .then(() => console.log('User signed out!'));
-
-    RootNavigation.navigate('Auth');
-  };
 
   const SettingStack = createStackNavigator();
 

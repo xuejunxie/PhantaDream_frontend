@@ -75,8 +75,12 @@ export default function like(image, isLiked, dispatch) {
 
           // // store the user information in the image's like collection
           // firestore().collection(image.id).doc(auth().currentUser.uid).set({
-          //   time: Date(),
+          //   time: new Date().getTime(),
           // });
+          // change the image's date format
+          firestore().collection('images').doc(image.id).update({
+            date: new Date().getTime(),
+          });
 
           // save the like to image's like collection
           firestore()
@@ -85,7 +89,7 @@ export default function like(image, isLiked, dispatch) {
             .collection('likeUsers')
             .doc(auth().currentUser.uid)
             .set({
-              time: Date(),
+              time: new Date().getTime(),
               id: auth().currentUser.uid,
             });
 
@@ -95,7 +99,7 @@ export default function like(image, isLiked, dispatch) {
             .child(image.id)
             .set({
               ...image,
-              likedTime: Date(),
+              likedTime: new Date().getTime(),
             });
 
           // reduce user hearts by 1

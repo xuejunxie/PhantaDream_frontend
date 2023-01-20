@@ -35,7 +35,7 @@ export default function ForYou() {
     console.log('load for you');
     firestore()
       .collection('images')
-      .orderBy('id', 'desc')
+      .orderBy('date', 'desc')
       .limit(3)
       .get()
       .then(querySnapshot => {
@@ -85,8 +85,8 @@ export default function ForYou() {
   const loadMore = () => {
     firestore()
       .collection('images')
-      .orderBy('id', 'desc')
-      .startAfter(images[images.length - 1].id)
+      .orderBy('date', 'desc')
+      .startAfter(images[images.length - 1].date)
       .limit(loadSize)
       .get()
       .then(querySnapshot => {
