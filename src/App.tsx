@@ -27,6 +27,7 @@ import {LOAD_LIKED_IMAGES, UPDATE_LIKED_IMAGES} from './redux/types';
 import realtime from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import {navigationRef} from './Components/common/RootNavigation';
 
 LogBox.ignoreAllLogs();
 
@@ -129,7 +130,7 @@ function App(): JSX.Element {
   }, []);
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Stack.Navigator
         initialRouteName={auth().currentUser ? 'Home' : 'Auth'}
         screenOptions={{

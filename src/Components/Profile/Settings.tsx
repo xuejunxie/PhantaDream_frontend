@@ -26,6 +26,7 @@ import {
   faBolt,
   faChevronRight,
   faDollar,
+  faDoorOpen,
   faExclamation,
   faHeart,
   faPaintBrush,
@@ -34,6 +35,7 @@ import {
 import {useEffect} from 'react';
 import {faEnvelope} from '@fortawesome/free-regular-svg-icons';
 import Billing from './Settings/Billing';
+import * as RootNavigation from '../common/RootNavigation';
 
 const styles = StyleSheet.create({
   scroll: {
@@ -189,10 +191,40 @@ const Settings = () => {
               </ListItem>
             </TouchableOpacity>
           ))}
+          <TouchableOpacity
+            key={'logout'}
+            onPress={() => {
+              RootNavigation.navigate('Auth');
+
+              auth()
+                .signOut()
+                .then(() => console.log('User signed out!'));
+            }}>
+            <ListItem bottomDivider style={styles.listItemContainer}>
+              <FontAwesomeIcon icon={faDoorOpen} color={'gray'} />
+              <ListItem.Content>
+                <ListItem.Title
+                  style={{
+                    color: 'gray',
+                  }}>
+                  {'Logout'}
+                </ListItem.Title>
+              </ListItem.Content>
+              <FontAwesomeIcon icon={faChevronRight} color={'gray'} />
+            </ListItem>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     );
   }
+
+  const logout = () => {
+    auth()
+      .signOut()
+      .then(() => console.log('User signed out!'));
+
+    RootNavigation.navigate('Auth');
+  };
 
   const SettingStack = createStackNavigator();
 
