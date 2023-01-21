@@ -698,7 +698,7 @@ export default function Dream() {
     return (
       <TouchableOpacity
         onPress={() => {
-          setChargeModalVisible(true);
+          setChargeModalVisible(!chargeModalVisible);
         }}>
         <View
           style={{
