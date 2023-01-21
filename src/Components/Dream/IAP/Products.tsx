@@ -8,7 +8,7 @@ import {
   useIAP,
 } from 'react-native-iap';
 import {useDispatch, useSelector} from 'react-redux';
-import {FILL_CHARGE} from '../../../redux/types';
+import {BUY_CHARGE_LOADING, FILL_CHARGE} from '../../../redux/types';
 
 import {Box, Button, Heading, Row, State} from '../components';
 import {
@@ -20,6 +20,8 @@ import {
 } from '../utils';
 
 export const Products = () => {
+  const dispatch = useDispatch();
+
   const [success, setSuccess] = useState(false);
   const {
     connected,
@@ -40,6 +42,7 @@ export const Products = () => {
   };
 
   const handleBuyProduct = async (sku: Sku) => {
+    dispatch({type: BUY_CHARGE_LOADING, payload: true});
     try {
       await requestPurchase({sku});
     } catch (error) {
@@ -50,8 +53,6 @@ export const Products = () => {
       }
     }
   };
-
-  const dispatch = useDispatch();
 
   const chargeOrder = useSelector((state: State) => state.dream.chargeOrder);
 

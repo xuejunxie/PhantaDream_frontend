@@ -9,3 +9,4 @@ export const SET_PROMPT = 'SET_PROMPT';
 export const SET_PRODUCT_ID = 'SET_PRODUCT_ID';
 export const FILL_CHARGE = 'FILL_CHARGE';
 export const SET_CHARGE_ORDER = 'SET_CHARGE_ORDER';
+export const BUY_CHARGE_LOADING = 'BUY_CHARGE_LOADING';

@@ -3,6 +3,7 @@ import {
   SET_PRODUCT_ID,
   FILL_CHARGE,
   SET_CHARGE_ORDER,
+  BUY_CHARGE_LOADING,
 } from '../types';
 
 const initialState = {
@@ -10,6 +11,7 @@ const initialState = {
   productID: '',
   chargeOrder: 0,
   fillCharge: 0,
+  buyChargeLoading: false,
 };
 
 export default function (state = initialState, action) {
@@ -33,6 +35,11 @@ export default function (state = initialState, action) {
       return {
         ...state,
         fillCharge: state.chargeOrder,
+      };
+    case BUY_CHARGE_LOADING:
+      return {
+        ...state,
+        buyChargeLoading: action.payload,
       };
 
     default:

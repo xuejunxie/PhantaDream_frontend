@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
+  ActivityIndicator,
   Modal,
   Alert,
 } from 'react-native';
@@ -53,7 +54,12 @@ import Payment from './Payment';
 import ImageMarker from 'react-native-image-marker';
 import {useDispatch, useSelector} from 'react-redux';
 import {IAP} from './PaymentIAP';
-import {FILL_CHARGE, SET_CHARGE_ORDER, SET_PRODUCT_ID} from '../../redux/types';
+import {
+  BUY_CHARGE_LOADING,
+  FILL_CHARGE,
+  SET_CHARGE_ORDER,
+  SET_PRODUCT_ID,
+} from '../../redux/types';
 
 const loading_image = 'https://i.gifer.com/1amw.gif';
 const loading_images = [
@@ -189,8 +195,29 @@ export default function Dream() {
     if (fillChargeAmount) {
       fillCharge(fillChargeAmount);
       dispatch({type: FILL_CHARGE, payload: 0});
+      dispatch({type: BUY_CHARGE_LOADING, payload: false});
     }
   }, [fillChargeAmount]);
+
+  const buyChargeLoading = useSelector(state => state.dream.buyChargeLoading);
+
+  const buyChargeLoadingModal = () => {
+    return (
+      buyChargeLoading && (
+        <Modal transparent={true}>
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: 'rgba(0,0,0,0.5)',
+            }}>
+            <ActivityIndicator size="large" color="#fff" />
+          </View>
+        </Modal>
+      )
+    );
+  };
 
   const spendCharge = () => {
     realtime()
@@ -888,6 +915,7 @@ export default function Dream() {
           })}
           {ChargeLeft()}
           {ChargeModal()}
+          {buyChargeLoadingModal()}
         </ScrollView>
 
         <View>
