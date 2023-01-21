@@ -53,7 +53,7 @@ import Payment from './Payment';
 import ImageMarker from 'react-native-image-marker';
 import {useDispatch, useSelector} from 'react-redux';
 import {IAP} from './PaymentIAP';
-import {SET_CHARGE_ORDER, SET_PRODUCT_ID} from '../../redux/types';
+import {FILL_CHARGE, SET_CHARGE_ORDER, SET_PRODUCT_ID} from '../../redux/types';
 
 const loading_image = 'https://i.gifer.com/1amw.gif';
 const loading_images = [
@@ -182,6 +182,15 @@ export default function Dream() {
         heart: Heart + change,
       });
   };
+
+  const fillChargeAmount = useSelector(state => state.dream.fillCharge);
+
+  useEffect(() => {
+    if (fillChargeAmount) {
+      fillCharge(fillChargeAmount);
+      dispatch({type: FILL_CHARGE, payload: 0});
+    }
+  }, [fillChargeAmount]);
 
   const spendCharge = () => {
     realtime()
@@ -723,22 +732,20 @@ export default function Dream() {
       label: '$19.99 for 800 ',
       productID: 'charge2',
       subscription: false,
-      price: 1.99,
-      charge: 80,
+      price: 19.99,
+      charge: 800,
     },
     {
       label: '$399.99 for 20000 ',
       productID: 'charge3',
       subscription: false,
-      price: 39.99,
-      charge: 200,
+      price: 399.99,
+      charge: 20000,
     },
   ];
 
   // show modal to purchase charge when user press the Charge icon
   const [chargeModalVisible, setChargeModalVisible] = useState(false);
-  const [price, setPrice] = useState(0);
-  const [chargeOrder, setChargeOrder] = useState(0);
 
   const ChargeModal = () => {
     return (

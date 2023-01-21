@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {ScrollView, StyleSheet, View} from 'react-native';
 import {
   isIosStorekit2,
   PurchaseError,
@@ -8,6 +8,7 @@ import {
   useIAP,
 } from 'react-native-iap';
 import {useDispatch, useSelector} from 'react-redux';
+import {FILL_CHARGE} from '../../../redux/types';
 
 import {Box, Button, Heading, Row, State} from '../components';
 import {
@@ -52,6 +53,8 @@ export const Products = () => {
 
   const dispatch = useDispatch();
 
+  const chargeOrder = useSelector((state: State) => state.dream.chargeOrder);
+
   useEffect(() => {
     const checkCurrentPurchase = async () => {
       try {
@@ -65,6 +68,7 @@ export const Products = () => {
           });
 
           setSuccess(true);
+          dispatch({type: FILL_CHARGE, payload: chargeOrder});
         }
       } catch (error) {
         if (error instanceof PurchaseError) {
