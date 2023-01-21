@@ -6,3 +6,6 @@ export const UPDATE_LIKED_IMAGES = 'UPDATE_LIKED_IMAGES';
 export const ADD_WATERMARK = 'ADD_WATERMARK';
 
 export const SET_PROMPT = 'SET_PROMPT';
+export const SET_PRODUCT_ID = 'SET_PRODUCT_ID';
+export const FILL_CHARGE = 'FILL_CHARGE';
+export const SET_CHARGE_ORDER = 'SET_CHARGE_ORDER';

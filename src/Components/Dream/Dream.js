@@ -52,6 +52,8 @@ import RadioButtonRN from 'radio-buttons-react-native';
 import Payment from './Payment';
 import ImageMarker from 'react-native-image-marker';
 import {useDispatch, useSelector} from 'react-redux';
+import {IAP} from './PaymentIAP';
+import {SET_CHARGE_ORDER, SET_PRODUCT_ID} from '../../redux/types';
 
 const loading_image = 'https://i.gifer.com/1amw.gif';
 const loading_images = [
@@ -712,18 +714,21 @@ export default function Dream() {
   const chargePurchaseSelection = [
     {
       label: '$0.99 for 30 ',
+      productID: 'charge1',
       subscription: false,
       price: 0.99,
       charge: 30,
     },
     {
-      label: '$19.9 for 800 ',
+      label: '$19.99 for 800 ',
+      productID: 'charge2',
       subscription: false,
       price: 1.99,
       charge: 80,
     },
     {
       label: '$399.99 for 20000 ',
+      productID: 'charge3',
       subscription: false,
       price: 39.99,
       charge: 200,
@@ -770,8 +775,10 @@ export default function Dream() {
           <RadioButtonRN
             data={chargePurchaseSelection}
             selectedBtn={e => {
-              setPrice(e.price);
-              setChargeOrder(e.charge);
+              dispatch({type: SET_PRODUCT_ID, payload: e.productID});
+              dispatch({type: SET_CHARGE_ORDER, payload: e.charge});
+              // setPrice(e.price);
+              // setChargeOrder(e.charge);
             }}
             box={false}
             circleSize={10}
@@ -791,11 +798,12 @@ export default function Dream() {
               alignItems: 'center',
               marginTop: 20,
             }}>
-            <Payment
+            {/* <Payment
               price={price}
               chargeOrder={chargeOrder}
               fillCharge={fillCharge}
-            />
+            /> */}
+            <IAP />
           </View>
         </View>
       )
