@@ -184,17 +184,18 @@ export default function Dream() {
     realtime()
       .ref('/users/' + auth().currentUser.uid)
       .update({
-        charge: Charge + change,
-        heart: Heart + change,
+        charge: realtime.ServerValue.increment(change),
+        heart: realtime.ServerValue.increment(change),
       });
+    dispatch({type: FILL_CHARGE, payload: 0});
   };
 
   const fillChargeAmount = useSelector(state => state.dream.fillCharge);
 
   useEffect(() => {
+    console.log(fillChargeAmount);
     if (fillChargeAmount) {
       fillCharge(fillChargeAmount);
-      dispatch({type: FILL_CHARGE, payload: 0});
       dispatch({type: BUY_CHARGE_LOADING, payload: false});
     }
   }, [fillChargeAmount]);

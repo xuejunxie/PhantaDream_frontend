@@ -34,7 +34,7 @@ export default function (state = initialState, action) {
     case FILL_CHARGE:
       return {
         ...state,
-        fillCharge: state.chargeOrder,
+        fillCharge: action.payload,
       };
     case BUY_CHARGE_LOADING:
       return {

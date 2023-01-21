@@ -48,8 +48,10 @@ export const Products = () => {
     } catch (error) {
       if (error instanceof PurchaseError) {
         errorLog({message: `[${error.code}]: ${error.message}`, error});
+        dispatch({type: BUY_CHARGE_LOADING, payload: false});
       } else {
         errorLog({message: 'handleBuyProduct', error});
+        dispatch({type: BUY_CHARGE_LOADING, payload: false});
       }
     }
   };
@@ -73,8 +75,12 @@ export const Products = () => {
         }
       } catch (error) {
         if (error instanceof PurchaseError) {
+          dispatch({type: BUY_CHARGE_LOADING, payload: false});
+
           errorLog({message: `[${error.code}]: ${error.message}`, error});
         } else {
+          dispatch({type: BUY_CHARGE_LOADING, payload: false});
+
           errorLog({message: 'handleBuyProduct', error});
         }
       }
