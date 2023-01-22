@@ -36,20 +36,26 @@ export default function Published() {
   const scrollViewRef = useRef();
 
   const loadPublished = () => {
-    // get published images
-    console.log('load published');
-    realtime()
-      .ref('users/' + auth().currentUser.uid + '/published')
-      .on('value', snapshot => {
-        if (snapshot.val()) {
-          var published = snapshot.val();
-          var images = [];
-          for (const key in published) {
-            images.push(published[key]);
+    return new Promise((resolve, reject) => {
+      // get published images
+      console.log('load published');
+      realtime()
+        .ref('users/' + auth().currentUser.uid + '/published')
+        .on('value', snapshot => {
+          if (snapshot.val()) {
+            var published = snapshot.val();
+            var images = [];
+            for (const key in published) {
+              images.push(published[key]);
+            }
+            setPublishedImages(images);
+            resolve(images);
+          } else {
+            setPublishedImages([]);
+            resolve([]);
           }
-          setPublishedImages(images);
-        }
-      });
+        });
+    });
   };
 
   const loadLike = images => {
