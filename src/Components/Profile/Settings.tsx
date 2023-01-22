@@ -27,6 +27,7 @@ import {
   faChevronRight,
   faDollar,
   faDoorOpen,
+  faEdit,
   faExclamation,
   faHeart,
   faPaintBrush,
@@ -37,6 +38,7 @@ import {useEffect} from 'react';
 import {faEnvelope} from '@fortawesome/free-regular-svg-icons';
 import Billing from './Settings/Billing';
 import * as RootNavigation from '../common/RootNavigation';
+import {TextInput} from 'react-native-gesture-handler';
 
 const styles = StyleSheet.create({
   scroll: {
@@ -51,7 +53,7 @@ const styles = StyleSheet.create({
     paddingTop: 60,
   },
   userImage: {
-    marginRight: 12,
+    marginRight: 30,
   },
   listItemContainer: {
     borderWidth: 0.5,
@@ -97,11 +99,15 @@ const Settings = () => {
       .ref(`/users/${auth().currentUser.uid}`)
       .once('value')
       .then(snapshot => {
-        setName(
-          snapshot.val().fullName.givenName +
-            ' ' +
-            snapshot.val().fullName.familyName,
-        );
+        if (snapshot.val().artName) {
+          setName(snapshot.val().artName);
+        } else {
+          setName(
+            snapshot.val().fullName.givenName +
+              ' ' +
+              snapshot.val().fullName.familyName,
+          );
+        }
       });
 
     // get user avatar
@@ -149,9 +155,26 @@ const Settings = () => {
     );
   };
 
+  useEffect(() => {
+    console.log('rerendered');
+  }, []);
+
+  const [editName, setEditName] = React.useState(false);
+
+  const updateName = newName => {
+    // update the name in the database
+    realtime()
+      .ref(`/users/${auth().currentUser.uid}/artName`)
+      .set(newName)
+      .catch(e => console.log(e));
+    // update the name in the app
+    setName(newName);
+    setEditName(false);
+  };
+
   function SettingView({navigation}) {
     return (
-      <ScrollView
+      <View
         style={{
           height: '100%',
           width: '100%',
@@ -168,10 +191,38 @@ const Settings = () => {
             </View>
           </TouchableOpacity>
           <View>
-            <Text style={{fontSize: 25, color: 'gray'}}>{name}</Text>
+            {editName ? (
+              <TextInput
+                placeholder="Tap to enter"
+                placeholderTextColor={'gray'}
+                style={{
+                  fontSize: 25,
+                  color: 'gray',
+                }}
+                onSubmitEditing={e => {
+                  updateName(e.nativeEvent.text);
+                }}
+              />
+            ) : (
+              <Text style={{fontSize: 25, color: 'gray'}}>
+                {name}
+                <TouchableOpacity
+                  onPress={() => {
+                    setEditName(true);
+                  }}>
+                  <FontAwesomeIcon
+                    style={{
+                      marginLeft: 20,
+                    }}
+                    icon={faEdit}
+                    size={25}
+                    color={'gray'}
+                  />
+                </TouchableOpacity>
+              </Text>
+            )}
           </View>
         </View>
-        <InfoText text="Account" />
 
         <View>
           {list.map((item, i) => (
@@ -214,7 +265,7 @@ const Settings = () => {
             </ListItem>
           </TouchableOpacity>
         </View>
-      </ScrollView>
+      </View>
     );
   }
 
