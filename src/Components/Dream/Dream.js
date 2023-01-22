@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
   Modal,
   Alert,
+  RefreshControl,
 } from 'react-native';
 import {TextInput} from 'react-native-paper';
 
@@ -187,6 +188,12 @@ export default function Dream() {
         charge: realtime.ServerValue.increment(change),
         heart: realtime.ServerValue.increment(change),
       });
+    realtime().ref(`/users/${auth().currentUser.uid}/bills`).push({
+      amount: price,
+      chargeOrder: fillChargeAmount,
+      date: new Date().toLocaleString(),
+    });
+
     dispatch({type: FILL_CHARGE, payload: 0});
   };
 
@@ -251,7 +258,6 @@ export default function Dream() {
     const imageId = uuid.v1();
     const userId = auth().currentUser.uid;
     const seed = Math.floor(Math.random() * 1e8);
-    // const now = performance.now();
     axios
       .post(serverURL + 'txt2img', {
         prompt: prompt,
@@ -270,7 +276,6 @@ export default function Dream() {
             .get(statusURL)
             .then(function (response) {
               if (response.data.state === 'SUCCESS') {
-                console.log(performance.now() - now);
                 axios
                   .get(imageURL, {responseType: 'arraybuffer'})
                   .then(function (response) {
@@ -748,6 +753,8 @@ export default function Dream() {
     }
   }, [Charge]);
 
+  const [price, setPrice] = useState(0.99);
+
   const chargePurchaseSelection = [
     {
       label: '$0.99 for 30 ',
@@ -812,7 +819,7 @@ export default function Dream() {
             selectedBtn={e => {
               dispatch({type: SET_PRODUCT_ID, payload: e.productID});
               dispatch({type: SET_CHARGE_ORDER, payload: e.charge});
-              // setPrice(e.price);
+              setPrice(e.price);
               // setChargeOrder(e.charge);
             }}
             box={false}

@@ -1,6 +1,6 @@
 // get 10 results from the database and load more when the user scrolls down
 
-import {View, Text, Image} from 'react-native';
+import {View, Text, Image, RefreshControl} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import firestore from '@react-native-firebase/firestore';
 import realtime from '@react-native-firebase/database';
@@ -31,23 +31,28 @@ export default function ForYou() {
   const [images, setImages] = useState([]);
 
   const loadForYou = () => {
-    // load 10 random images from firestore images
-    console.log('load for you');
-    firestore()
-      .collection('images')
-      .orderBy('date', 'desc')
-      .limit(3)
-      .get()
-      .then(querySnapshot => {
-        const images = [];
-        if (querySnapshot) {
-          querySnapshot.forEach(documentSnapshot => {
-            images.push(documentSnapshot.data());
-          });
-        }
-
-        setImages(images);
-      });
+    return new Promise((resolve, reject) => {
+      console.log('load for you');
+      firestore()
+        .collection('images')
+        .orderBy('date', 'desc')
+        .limit(3)
+        .get()
+        .then(querySnapshot => {
+          const images = [];
+          if (querySnapshot) {
+            querySnapshot.forEach(documentSnapshot => {
+              images.push(documentSnapshot.data());
+            });
+          }
+          setImages(images);
+          resolve(images);
+        })
+        .catch(error => {
+          console.log(error);
+          reject(error);
+        });
+    });
   };
 
   const [likes, setLikes] = useState({});
@@ -212,10 +217,21 @@ export default function ForYou() {
     );
   };
 
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    loadForYou().then(() => setRefreshing(false));
+  }, []);
+
   // load more when the user scrolls down to the bottom of the page
   return (
     <View>
-      <ScrollView onScrollBeginDrag={loadMore}>
+      <ScrollView
+        onScrollBeginDrag={loadMore}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
         {images.map(image => {
           return imageView(image);
         })}
