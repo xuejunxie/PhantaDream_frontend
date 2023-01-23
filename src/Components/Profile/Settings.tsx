@@ -35,7 +35,7 @@ import {
   faUserFriends,
 } from '@fortawesome/free-solid-svg-icons';
 import {useEffect} from 'react';
-import {faEnvelope} from '@fortawesome/free-regular-svg-icons';
+import {faEnvelope, faStar} from '@fortawesome/free-regular-svg-icons';
 import Billing from './Settings/Billing';
 import * as RootNavigation from '../common/RootNavigation';
 import {TextInput} from 'react-native-gesture-handler';
@@ -67,18 +67,22 @@ const list = [
     title: 'Billing',
     icon: faDollar,
   },
-  //   {
-  //     title: 'Private club',
-  //     icon: faUserFriends,
-  //   },
-  //   {
-  //     title: 'Messages',
-  //     icon: faEnvelope,
-  //   },
-  //   {
-  //     title: 'Notifications',
-  //     icon: faExclamation,
-  //   },
+  {
+    title: 'Private club friends',
+    icon: faUserFriends,
+  },
+  {
+    title: 'Followeing',
+    icon: faStar,
+  },
+  {
+    title: 'Messages',
+    icon: faEnvelope,
+  },
+  // {
+  //   title: 'Notifications',
+  //   icon: faExclamation,
+  // },
   //   {
   //     title: 'Apply to be a regsitered artist',
   //     icon: faPaintBrush,
@@ -89,6 +93,7 @@ const Settings = () => {
   // set user name
 
   const [name, setName] = React.useState('');
+  const [handleName, setHandleName] = React.useState('');
   const [avatar, setAvatar] = React.useState(
     'https://i0.wp.com/bangla.indiarag.com/wp-content/uploads/2019/01/dummy-snapcode-avatar@2x.png?ssl=1',
   );
@@ -119,6 +124,28 @@ const Settings = () => {
       })
       .catch(e => console.log(e));
   }, []);
+
+  useEffect(() => {
+    if (name) {
+      // get user handle name, if it exists. If not, set it to the user's name with a random number
+      realtime()
+        .ref(`/users/${auth().currentUser.uid}/handleName`)
+        .once('value')
+        .then(snapshot => {
+          if (snapshot.val()) {
+            setHandleName(snapshot.val());
+          } else {
+            let random = Math.floor(Math.random() * 100000);
+            let handleName = name.replace(/\s/g, '') + random;
+            realtime()
+              .ref(`/users/${auth().currentUser.uid}/handleName`)
+              .set(handleName)
+              .catch(e => console.log(e));
+            setHandleName(handleName);
+          }
+        });
+    }
+  }, [name]);
 
   // select an avatar from photo and upload the picture to the database
   const uploadAvatar = () => {
@@ -155,10 +182,6 @@ const Settings = () => {
     );
   };
 
-  useEffect(() => {
-    console.log('rerendered');
-  }, []);
-
   const [editName, setEditName] = React.useState(false);
 
   const updateName = newName => {
@@ -170,6 +193,19 @@ const Settings = () => {
     // update the name in the app
     setName(newName);
     setEditName(false);
+  };
+
+  const [editHandleName, setEditHandleName] = React.useState(false);
+
+  const updateHandleName = newHandleName => {
+    // update the handle name in the database
+    realtime()
+      .ref(`/users/${auth().currentUser.uid}/handleName`)
+      .set(newHandleName)
+      .catch(e => console.log(e));
+    // update the handle name in the app
+    setHandleName(newHandleName);
+    setEditHandleName(false);
   };
 
   function SettingView({navigation}) {
@@ -190,13 +226,16 @@ const Settings = () => {
               <Avatar rounded size="large" source={{uri: avatar}} />
             </View>
           </TouchableOpacity>
-          <View>
+          <View
+            style={{
+              flexDirection: 'column',
+            }}>
             {editName ? (
               <TextInput
                 placeholder="Tap to enter"
                 placeholderTextColor={'gray'}
                 style={{
-                  fontSize: 25,
+                  fontSize: 20,
                   color: 'gray',
                 }}
                 onSubmitEditing={e => {
@@ -204,7 +243,7 @@ const Settings = () => {
                 }}
               />
             ) : (
-              <Text style={{fontSize: 25, color: 'gray'}}>
+              <Text style={{fontSize: 20, color: 'gray'}}>
                 {name}
                 <TouchableOpacity
                   onPress={() => {
@@ -215,7 +254,35 @@ const Settings = () => {
                       marginLeft: 20,
                     }}
                     icon={faEdit}
-                    size={25}
+                    size={16}
+                    color={'gray'}
+                  />
+                </TouchableOpacity>
+              </Text>
+            )}
+
+            {editHandleName ? (
+              <TextInput
+                placeholder="Tap to enter"
+                placeholderTextColor={'gray'}
+                style={{fontSize: 15, color: 'gray', marginTop: 20}}
+                onSubmitEditing={e => {
+                  updateHandleName(e.nativeEvent.text.replace(/\s/g, ''));
+                }}
+              />
+            ) : (
+              <Text style={{fontSize: 15, color: 'gray', marginTop: 20}}>
+                {'@' + handleName}
+                <TouchableOpacity
+                  onPress={() => {
+                    setEditHandleName(true);
+                  }}>
+                  <FontAwesomeIcon
+                    style={{
+                      marginLeft: 20,
+                    }}
+                    icon={faEdit}
+                    size={16}
                     color={'gray'}
                   />
                 </TouchableOpacity>

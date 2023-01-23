@@ -674,11 +674,7 @@ export default function Dream() {
             }}>
             <Image
               source={{
-                uri: item.loading
-                  ? loading_images[
-                      Math.floor(Math.random() * loading_images.length)
-                    ]
-                  : item.image,
+                uri: item.loading ? loading_image : item.image,
               }}
               style={{
                 width: SIZES.canvas,
