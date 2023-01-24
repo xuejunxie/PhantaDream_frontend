@@ -280,24 +280,60 @@ const Settings = () => {
             style={{
               flexDirection: 'column',
             }}>
-            {editName ? (
+            <View
+              style={{
+                flexDirection: 'row',
+              }}>
               <TextInput
-                placeholder="Tap to enter"
-                placeholderTextColor={'gray'}
-                style={{
-                  fontSize: 20,
-                  color: 'gray',
-                }}
+                editable={editName}
+                autoFocus={true}
                 onSubmitEditing={e => {
                   updateName(e.nativeEvent.text);
                 }}
-              />
-            ) : (
-              <Text style={{fontSize: 20, color: 'gray'}}>
+                style={{fontSize: 20, color: 'gray'}}>
                 {name}
+              </TextInput>
+              <TouchableOpacity
+                style={{
+                  justifyContent: 'center',
+                }}
+                onPress={() => {
+                  setEditName(true);
+                }}>
+                <FontAwesomeIcon
+                  style={{
+                    marginLeft: 20,
+                  }}
+                  icon={faEdit}
+                  size={16}
+                  color={'gray'}
+                />
+              </TouchableOpacity>
+            </View>
+
+            <View
+              style={{
+                flexDirection: 'row',
+                marginTop: 10,
+              }}>
+              <Text style={{fontSize: 15, color: 'gray'}}>@</Text>
+              <TextInput
+                editable={editHandleName}
+                autoFocus={true}
+                onSubmitEditing={e => {
+                  updateHandleName(e.nativeEvent.text);
+                  Alert.alert(
+                    'Note that: you can change your handle name once a month.',
+                  );
+                }}
+                style={{fontSize: 15, color: 'gray'}}>
+                {handleNameObject.name}
+              </TextInput>
+              {new Date().getTime() - handleNameObject.time >
+                1000 * 60 * 60 * 24 * 30 && (
                 <TouchableOpacity
                   onPress={() => {
-                    setEditName(true);
+                    setEditHandleName(true);
                   }}>
                   <FontAwesomeIcon
                     style={{
@@ -308,42 +344,8 @@ const Settings = () => {
                     color={'gray'}
                   />
                 </TouchableOpacity>
-              </Text>
-            )}
-
-            {editHandleName ? (
-              <TextInput
-                placeholder="Tap to enter"
-                placeholderTextColor={'gray'}
-                style={{fontSize: 15, color: 'gray', marginTop: 20}}
-                onSubmitEditing={e => {
-                  updateHandleName(e.nativeEvent.text.replace(/\s/g, ''));
-                }}
-              />
-            ) : (
-              <Text style={{fontSize: 15, color: 'gray', marginTop: 20}}>
-                {'@' + handleNameObject.name}
-                {new Date().getTime() - handleNameObject.time <
-                  1000 * 60 * 60 * 24 * 30 && (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setEditHandleName(true);
-                      Alert.alert(
-                        'Note that: you can change your handle name once a month.',
-                      );
-                    }}>
-                    <FontAwesomeIcon
-                      style={{
-                        marginLeft: 20,
-                      }}
-                      icon={faEdit}
-                      size={16}
-                      color={'gray'}
-                    />
-                  </TouchableOpacity>
-                )}
-              </Text>
-            )}
+              )}
+            </View>
           </View>
         </View>
 
