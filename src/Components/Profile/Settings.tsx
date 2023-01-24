@@ -321,7 +321,7 @@ const Settings = () => {
                 editable={editHandleName}
                 autoFocus={true}
                 onSubmitEditing={e => {
-                  updateHandleName(e.nativeEvent.text);
+                  updateHandleName(e.nativeEvent.text.replace(/\s/g, ''));
                   Alert.alert(
                     'Note that: you can change your handle name once a month.',
                   );
@@ -329,7 +329,7 @@ const Settings = () => {
                 style={{fontSize: 15, color: 'gray'}}>
                 {handleNameObject.name}
               </TextInput>
-              {new Date().getTime() - handleNameObject.time >
+              {new Date().getTime() - handleNameObject.time <
                 1000 * 60 * 60 * 24 * 30 && (
                 <TouchableOpacity
                   onPress={() => {
