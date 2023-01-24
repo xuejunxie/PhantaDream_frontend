@@ -1,10 +1,11 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import {
   StyleSheet,
   TouchableOpacity,
   View,
   Text,
   ScrollView,
+  Alert,
 } from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 
@@ -93,7 +94,7 @@ const Settings = () => {
   // set user name
 
   const [name, setName] = React.useState('');
-  const [handleName, setHandleName] = React.useState('');
+  const [handleNameObject, setHandleNameObject] = React.useState({});
   const [avatar, setAvatar] = React.useState(
     'https://i0.wp.com/bangla.indiarag.com/wp-content/uploads/2019/01/dummy-snapcode-avatar@2x.png?ssl=1',
   );
@@ -133,15 +134,28 @@ const Settings = () => {
         .once('value')
         .then(snapshot => {
           if (snapshot.val()) {
-            setHandleName(snapshot.val());
+            setHandleNameObject(snapshot.val());
           } else {
             let random = Math.floor(Math.random() * 100000);
-            let handleName = name.replace(/\s/g, '') + random;
+            let newHandleName = name.replace(/\s/g, '') + random;
+            let handleNameObject = {
+              name: newHandleName,
+              time: new Date().getTime(),
+            };
             realtime()
-              .ref(`/users/${auth().currentUser.uid}/handleName`)
-              .set(handleName)
+              .ref(`/users/${auth().currentUser.uid}/handleNamObjecte`)
+              .set(handleNameObject)
               .catch(e => console.log(e));
-            setHandleName(handleName);
+            setHandleNameObject(handleNameObject);
+
+            // update the handle name in handle database
+            firestore()
+              .collection('handles')
+              .doc(newHandleName)
+              .set({
+                id: auth().currentUser.uid,
+              })
+              .catch(e => console.log(e));
           }
         });
     }
@@ -198,14 +212,50 @@ const Settings = () => {
   const [editHandleName, setEditHandleName] = React.useState(false);
 
   const updateHandleName = newHandleName => {
-    // update the handle name in the database
-    realtime()
-      .ref(`/users/${auth().currentUser.uid}/handleName`)
-      .set(newHandleName)
-      .catch(e => console.log(e));
-    // update the handle name in the app
-    setHandleName(newHandleName);
-    setEditHandleName(false);
+    // check if the handle name is already taken
+    firestore()
+      .collection('handles')
+      .doc(newHandleName)
+      .get()
+      .then(doc => {
+        if (doc.exists) {
+          Alert.alert(
+            'Handle name already taken',
+            'Please choose a different handle name',
+          );
+
+          return;
+        } else {
+          // delete the old handle name from handle database
+          firestore()
+            .collection('handles')
+            .doc(handleNameObject.name)
+            .delete()
+            .catch(e => console.log(e));
+
+          // update the handle name in handle database
+          firestore()
+            .collection('handles')
+            .doc(newHandleName)
+            .set({
+              id: auth().currentUser.uid,
+            })
+            .catch(e => console.log(e));
+
+          // update the handle name in user database
+          const newHandleNameObject = {
+            name: newHandleName,
+            time: new Date().getTime(),
+          };
+          realtime()
+            .ref(`/users/${auth().currentUser.uid}/handleName`)
+            .set(newHandleNameObject)
+            .catch(e => console.log(e));
+          // update the handle name in the app
+          setHandleNameObject(newHandleNameObject);
+          setEditHandleName(false);
+        }
+      });
   };
 
   function SettingView({navigation}) {
@@ -272,20 +322,26 @@ const Settings = () => {
               />
             ) : (
               <Text style={{fontSize: 15, color: 'gray', marginTop: 20}}>
-                {'@' + handleName}
-                <TouchableOpacity
-                  onPress={() => {
-                    setEditHandleName(true);
-                  }}>
-                  <FontAwesomeIcon
-                    style={{
-                      marginLeft: 20,
-                    }}
-                    icon={faEdit}
-                    size={16}
-                    color={'gray'}
-                  />
-                </TouchableOpacity>
+                {'@' + handleNameObject.name}
+                {new Date().getTime() - handleNameObject.time <
+                  1000 * 60 * 60 * 24 * 30 && (
+                  <TouchableOpacity
+                    onPress={() => {
+                      setEditHandleName(true);
+                      Alert.alert(
+                        'Note that: you can change your handle name once a month.',
+                      );
+                    }}>
+                    <FontAwesomeIcon
+                      style={{
+                        marginLeft: 20,
+                      }}
+                      icon={faEdit}
+                      size={16}
+                      color={'gray'}
+                    />
+                  </TouchableOpacity>
+                )}
               </Text>
             )}
           </View>
