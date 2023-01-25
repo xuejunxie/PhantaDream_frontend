@@ -77,10 +77,6 @@ export default function like(image, isLiked, dispatch) {
           // firestore().collection(image.id).doc(auth().currentUser.uid).set({
           //   time: new Date().getTime(),
           // });
-          // change the image's date format
-          firestore().collection('images').doc(image.id).update({
-            date: new Date().getTime(),
-          });
 
           // save the like to image's like collection
           firestore()

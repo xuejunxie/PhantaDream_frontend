@@ -68,18 +68,18 @@ const list = [
     title: 'Billing',
     icon: faDollar,
   },
-  {
-    title: 'Private club friends',
-    icon: faUserFriends,
-  },
-  {
-    title: 'Followeing',
-    icon: faStar,
-  },
-  {
-    title: 'Messages',
-    icon: faEnvelope,
-  },
+  // {
+  //   title: 'Private club friends',
+  //   icon: faUserFriends,
+  // },
+  // {
+  //   title: 'Followeing',
+  //   icon: faStar,
+  // },
+  // {
+  //   title: 'Messages',
+  //   icon: faEnvelope,
+  // },
   // {
   //   title: 'Notifications',
   //   icon: faExclamation,
@@ -90,14 +90,15 @@ const list = [
   //   },
 ];
 
+const defaultAvatar =
+  'https://i0.wp.com/bangla.indiarag.com/wp-content/uploads/2019/01/dummy-snapcode-avatar@2x.png?ssl=1';
+
 const Settings = () => {
   // set user name
 
   const [name, setName] = React.useState('');
   const [handleNameObject, setHandleNameObject] = React.useState({});
-  const [avatar, setAvatar] = React.useState(
-    'https://i0.wp.com/bangla.indiarag.com/wp-content/uploads/2019/01/dummy-snapcode-avatar@2x.png?ssl=1',
-  );
+  const [avatar, setAvatar] = React.useState(defaultAvatar);
 
   useEffect(() => {
     // get user name
@@ -323,14 +324,14 @@ const Settings = () => {
                 onSubmitEditing={e => {
                   updateHandleName(e.nativeEvent.text.replace(/\s/g, ''));
                   Alert.alert(
-                    'Note that: you can change your handle name once a month.',
+                    'Note that: you can change your handle name once a day.',
                   );
                 }}
                 style={{fontSize: 15, color: 'gray'}}>
                 {handleNameObject.name}
               </TextInput>
-              {new Date().getTime() - handleNameObject.time <
-                1000 * 60 * 60 * 24 * 30 && (
+              {new Date().getTime() - handleNameObject.time >
+                1000 * 60 * 60 * 24 && (
                 <TouchableOpacity
                   onPress={() => {
                     setEditHandleName(true);
