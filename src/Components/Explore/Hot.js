@@ -1,6 +1,7 @@
 import {View, Image, ScrollView, Text} from 'react-native';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import firestore from '@react-native-firebase/firestore';
+import storage from '@react-native-firebase/storage';
 import realtime from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import {Neomorph} from 'react-native-neomorph-shadows';
@@ -13,6 +14,7 @@ import like from '../common/like';
 import {useDispatch, useSelector} from 'react-redux';
 
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
+import ImageView from './ImageView';
 const hapticOptions = {
   enableVibrateFallback: true,
   ignoreAndroidSystemSettings: false,
@@ -37,7 +39,9 @@ export default function Hot() {
         if (querySnapshot) {
           querySnapshot.forEach(documentSnapshot => {
             if (documentSnapshot.data().public == true) {
-              images.push(documentSnapshot.data());
+              const image = documentSnapshot.data();
+              images.push(image);
+              getAvatarUrlArtName(image);
             }
           });
         }
@@ -61,84 +65,71 @@ export default function Hot() {
     return likedImages.find(likedImage => likedImage.id === image.id);
   };
 
-  const imageView = image => {
-    let liked = isLiked(image);
+  const [likes, setLikes] = useState({});
 
-    return (
-      <View
-        key={image.id}
-        style={{
-          backgroundColor: 'rgba(0,0,0,0)',
-          marginTop: 30,
-          // make it center
-          alignItems: 'center',
-        }}>
-        <TouchableWithoutFeedback
-          onPress={() => {
-            like(image, liked, dispatch);
-            ReactNativeHapticFeedback.trigger('impactMedium', hapticOptions);
-          }}>
-          <Neomorph
-            style={{
-              shadowRadius: 10,
-              borderRadius: 25,
-              backgroundColor: COLORS.primary,
-              width: SIZES.canvas,
-              height: SIZES.canvas,
-              marginTop: 20,
-            }}>
-            <Image
-              source={{
-                uri: image.url,
-              }}
-              style={{
-                width: SIZES.canvas,
-                height: SIZES.canvas,
+  const loadLike = images => {
+    // get likes
+    images.map(image => {
+      firestore()
+        .collection('images')
+        .doc(image.id)
+        .onSnapshot(documentSnapshot => {
+          // const newLikes = {};
+          if (documentSnapshot.data()) {
+            // const newLikes = likes;
+            // newLikes[image.id] = documentSnapshot.data().likes;
+            // setLikes(newLikes);
+            setLikes({
+              ...likes,
+              [image.id]: documentSnapshot.data().likes,
+            });
+          }
+        });
+    });
+  };
 
-                borderRadius: 25,
-              }}></Image>
-            <View
-              style={{
-                position: 'absolute',
-                bottom: 0,
-                right: 0,
-                width: 50,
-                height: 50,
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexDirection: 'column',
-              }}>
-              {liked ? (
-                <FontAwesomeIcon icon={faHeart} size={25} color={COLORS.red} />
-              ) : (
-                <FontAwesomeIcon icon={faHeartO} size={25} color={'gray'} />
-              )}
-            </View>
-          </Neomorph>
-        </TouchableWithoutFeedback>
-        <View
-          style={{
-            width: SIZES.canvas,
-          }}>
-          <Text
-            style={{
-              color: COLORS.red,
-              fontSize: 15,
-              marginTop: 10,
-            }}>
-            Likes: {image.likes}
-          </Text>
-          <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
-            Prompt: {image.prompt}
-          </Text>
-        </View>
-      </View>
-    );
+  useEffect(() => {
+    loadLike(images);
+  }, [images]);
+
+  const [avatars, setAvatars] = useState({});
+  const [artNames, setArtNames] = useState({});
+
+  const getAvatarUrlArtName = async image => {
+    storage()
+      .ref(`users/${image.owner}/avatar`)
+      .getDownloadURL()
+      .then(url => {
+        setAvatars({
+          ...avatars,
+          [image.owner]: url,
+        });
+      })
+      .catch(error => {
+        console.log(error);
+        setAvatars({
+          ...avatars,
+          [image.owner]: defaultAvatar,
+        });
+      });
+
+    realtime()
+      .ref('users/' + image.owner + '/artName')
+      .on('value', snapshot => {
+        setArtNames({
+          ...artNames,
+          [image.owner]: snapshot.val(),
+        });
+      });
   };
 
   return (
     <View>
-      <ScrollView>{images.map(image => imageView(image))}</ScrollView>
+      <ScrollView>
+        {images.map(image =>
+          ImageView(image, likes, isLiked(image), avatars, artNames, dispatch),
+        )}
+      </ScrollView>
       {/* show a heart overlay on the bottom right of Hots */}
       <View
         style={{

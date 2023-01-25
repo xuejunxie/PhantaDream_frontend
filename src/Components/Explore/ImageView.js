@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {View, Text, Image} from 'react-native';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import {Neomorph} from 'react-native-neomorph-shadows';
@@ -12,11 +12,8 @@ import {faHeart} from '@fortawesome/free-solid-svg-icons';
 import {faHeart as faHeartO} from '@fortawesome/free-regular-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import like from '../common/like';
-import {useDispatch} from 'react-redux';
 
 const ImageView = (image, likes, liked, avatars, artNames, dispatch) => {
-  // get owner avatar url
-
   return (
     <View
       key={image.id}

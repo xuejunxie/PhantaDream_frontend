@@ -75,7 +75,7 @@ export default function ForYou() {
           const images = [];
           if (querySnapshot) {
             querySnapshot.forEach(documentSnapshot => {
-              image = documentSnapshot.data();
+              const image = documentSnapshot.data();
               images.push(image);
               // load owner Avatar URL
               getAvatarUrlArtName(image);
