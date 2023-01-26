@@ -23,11 +23,17 @@ import {
 import SignIn from './Components/Auth/SignIn';
 import {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {LOAD_LIKED_IMAGES, UPDATE_LIKED_IMAGES} from './redux/types';
+import {
+  LOAD_LIKED_IMAGES,
+  UPDATE_LIKED_IMAGES,
+  UPDATE_USER,
+} from './redux/types';
 import realtime from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {navigationRef} from './Components/common/RootNavigation';
+import UserPage from './Components/Explore/UserPage';
+import editData from './editData';
 
 LogBox.ignoreAllLogs();
 
@@ -38,6 +44,17 @@ function Home(): JSX.Element {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    editData();
+  }, []);
+
+  useEffect(() => {
+    realtime()
+      .ref('users/' + auth().currentUser.uid)
+      .on('value', snapshot => {
+        var user = snapshot.val();
+        dispatch({type: UPDATE_USER, payload: user});
+      });
+
     realtime()
       .ref('users/' + auth().currentUser.uid + '/liked_images')
       .on('value', snapshot => {
@@ -138,6 +155,7 @@ function App(): JSX.Element {
         }}>
         <Stack.Screen name="Auth" component={SignIn} />
         <Stack.Screen name="Home" component={Home} />
+        <Stack.Screen name="UserPage" component={UserPage} />
       </Stack.Navigator>
     </NavigationContainer>
   );

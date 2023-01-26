@@ -40,6 +40,7 @@ import {faEnvelope, faStar} from '@fortawesome/free-regular-svg-icons';
 import Billing from './Settings/Billing';
 import * as RootNavigation from '../common/RootNavigation';
 import {TextInput} from 'react-native-gesture-handler';
+import {useSelector} from 'react-redux';
 
 const styles = StyleSheet.create({
   scroll: {
@@ -96,71 +97,15 @@ const defaultAvatar =
 const Settings = () => {
   // set user name
 
-  const [name, setName] = React.useState('');
-  const [handleNameObject, setHandleNameObject] = React.useState({});
-  const [avatar, setAvatar] = React.useState(defaultAvatar);
+  // const [name, setName] = React.useState('');
+  // const [avatar, setAvatar] = React.useState(defaultAvatar);
 
-  useEffect(() => {
-    // get user name
-    realtime()
-      .ref(`/users/${auth().currentUser.uid}`)
-      .once('value')
-      .then(snapshot => {
-        if (snapshot.val().artName) {
-          setName(snapshot.val().artName);
-        } else {
-          setName(
-            snapshot.val().fullName.givenName +
-              ' ' +
-              snapshot.val().fullName.familyName,
-          );
-        }
-      });
-
-    // get user avatar
-    storage()
-      .ref(`/users/${auth().currentUser.uid}/avatar`)
-      .getDownloadURL()
-      .then(url => {
-        setAvatar(url);
-      })
-      .catch(e => console.log(e));
-  }, []);
-
-  useEffect(() => {
-    if (name) {
-      // get user handle name, if it exists. If not, set it to the user's name with a random number
-      realtime()
-        .ref(`/users/${auth().currentUser.uid}/handleName`)
-        .once('value')
-        .then(snapshot => {
-          if (snapshot.val()) {
-            setHandleNameObject(snapshot.val());
-          } else {
-            let random = Math.floor(Math.random() * 100000);
-            let newHandleName = name.replace(/\s/g, '') + random;
-            let handleNameObject = {
-              name: newHandleName,
-              time: new Date().getTime(),
-            };
-            realtime()
-              .ref(`/users/${auth().currentUser.uid}/handleNamObjecte`)
-              .set(handleNameObject)
-              .catch(e => console.log(e));
-            setHandleNameObject(handleNameObject);
-
-            // update the handle name in handle database
-            firestore()
-              .collection('handles')
-              .doc(newHandleName)
-              .set({
-                id: auth().currentUser.uid,
-              })
-              .catch(e => console.log(e));
-          }
-        });
-    }
-  }, [name]);
+  const avatar = useSelector(state => state.user.data.avatar);
+  const artName = useSelector(state => state.user.data.artName);
+  const familyName = useSelector(state => state.user.data.fullName.familyName);
+  const givenName = useSelector(state => state.user.data.fullName.givenName);
+  const name = artName ? artName : givenName + ' ' + familyName;
+  const handleNameObject = useSelector(state => state.user.data.handleName);
 
   // select an avatar from photo and upload the picture to the database
   const uploadAvatar = () => {
@@ -192,6 +137,11 @@ const Settings = () => {
             });
           // set the avatar to the new avatar
           setAvatar(response.assets[0].uri);
+          // save uri to user database
+          realtime()
+            .ref(`/users/${auth().currentUser.uid}/avatar`)
+            .set(response.assets[0].uri)
+            .catch(e => console.log(e));
         }
       },
     );
@@ -206,7 +156,6 @@ const Settings = () => {
       .set(newName)
       .catch(e => console.log(e));
     // update the name in the app
-    setName(newName);
     setEditName(false);
   };
 
@@ -253,7 +202,6 @@ const Settings = () => {
             .set(newHandleNameObject)
             .catch(e => console.log(e));
           // update the handle name in the app
-          setHandleNameObject(newHandleNameObject);
           setEditHandleName(false);
         }
       });

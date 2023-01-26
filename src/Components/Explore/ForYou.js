@@ -24,6 +24,7 @@ const hapticOptions = {
 import like from '../common/like';
 import {useDispatch, useSelector} from 'react-redux';
 import ImageView from './ImageView';
+import UserPage from './UserPage';
 
 const loadSize = 1;
 
@@ -32,35 +33,12 @@ const defaultAvatar =
 
 export default function ForYou() {
   const [images, setImages] = useState([]);
-  const [avatars, setAvatars] = useState({});
-  const [artNames, setArtNames] = useState({});
 
-  const getAvatarUrlArtName = async image => {
-    storage()
-      .ref(`users/${image.owner}/avatar`)
-      .getDownloadURL()
-      .then(url => {
-        setAvatars({
-          ...avatars,
-          [image.owner]: url,
-        });
-      })
-      .catch(error => {
-        console.log(error);
-        setAvatars({
-          ...avatars,
-          [image.owner]: defaultAvatar,
-        });
-      });
-
-    realtime()
-      .ref('users/' + image.owner + '/artName')
-      .on('value', snapshot => {
-        setArtNames({
-          ...artNames,
-          [image.owner]: snapshot.val(),
-        });
-      });
+  const addInforToImage = async (image, field, value) => {
+    const imageRef = firestore().collection('images').doc(image.id);
+    await imageRef.update({
+      [field]: value,
+    });
   };
 
   const loadForYou = () => {
@@ -78,7 +56,7 @@ export default function ForYou() {
               const image = documentSnapshot.data();
               images.push(image);
               // load owner Avatar URL
-              getAvatarUrlArtName(image);
+              // getAvatarUrlArtName(image);
             });
           }
           setImages(images);
@@ -136,18 +114,12 @@ export default function ForYou() {
             image = documentSnapshot.data();
             setImages([...images, image]);
             // load owner Avatar URL
-            getAvatarUrlArtName(image);
           });
         }
       });
   };
 
-  const [hearts, setHearts] = useState(0);
-  realtime()
-    .ref('users/' + auth().currentUser.uid + '/heart')
-    .on('value', snapshot => {
-      setHearts(snapshot.val());
-    });
+  const hearts = useSelector(state => state.user.data.heart);
 
   const HeartIcon = () => {
     return (
@@ -191,6 +163,7 @@ export default function ForYou() {
   }, []);
 
   // load more when the user scrolls down to the bottom of the page
+
   return (
     <View>
       <ScrollView
@@ -199,14 +172,7 @@ export default function ForYou() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }>
         {images.map(image => {
-          return ImageView(
-            image,
-            likes,
-            isLiked(image),
-            avatars,
-            artNames,
-            dispatch,
-          );
+          return ImageView(image, likes, isLiked(image), dispatch);
         })}
       </ScrollView>
       <HeartIcon />

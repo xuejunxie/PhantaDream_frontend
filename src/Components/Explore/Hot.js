@@ -41,7 +41,6 @@ export default function Hot() {
             if (documentSnapshot.data().public == true) {
               const image = documentSnapshot.data();
               images.push(image);
-              getAvatarUrlArtName(image);
             }
           });
         }
@@ -49,13 +48,7 @@ export default function Hot() {
       });
   }, []);
 
-  // Sync user hearts number
-  const [hearts, setHearts] = React.useState(0);
-  realtime()
-    .ref('users/' + auth().currentUser.uid + '/heart')
-    .on('value', snapshot => {
-      setHearts(snapshot.val());
-    });
+  const hearts = useSelector(state => state.user.data.heart);
 
   // Get user liked images
   const likedImages = useSelector(state => state.like.likedImages);
@@ -92,43 +85,10 @@ export default function Hot() {
     loadLike(images);
   }, [images]);
 
-  const [avatars, setAvatars] = useState({});
-  const [artNames, setArtNames] = useState({});
-
-  const getAvatarUrlArtName = async image => {
-    storage()
-      .ref(`users/${image.owner}/avatar`)
-      .getDownloadURL()
-      .then(url => {
-        setAvatars({
-          ...avatars,
-          [image.owner]: url,
-        });
-      })
-      .catch(error => {
-        console.log(error);
-        setAvatars({
-          ...avatars,
-          [image.owner]: defaultAvatar,
-        });
-      });
-
-    realtime()
-      .ref('users/' + image.owner + '/artName')
-      .on('value', snapshot => {
-        setArtNames({
-          ...artNames,
-          [image.owner]: snapshot.val(),
-        });
-      });
-  };
-
   return (
     <View>
       <ScrollView>
-        {images.map(image =>
-          ImageView(image, likes, isLiked(image), avatars, artNames, dispatch),
-        )}
+        {images.map(image => ImageView(image, likes, isLiked(image), dispatch))}
       </ScrollView>
       {/* show a heart overlay on the bottom right of Hots */}
       <View

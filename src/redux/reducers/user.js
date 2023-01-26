@@ -1,15 +1,15 @@
-import {ADD_WATERMARK} from '../types';
+import {UPDATE_USER} from '../types';
 
 const initialState = {
-  waterMakr: true,
+  data: {},
 };
 
 export default function (state = initialState, action) {
   switch (action.type) {
-    case ADD_WATERMARK:
+    case UPDATE_USER:
       return {
         ...state,
-        waterMakr: action.payload,
+        data: action.payload,
       };
 
     default:

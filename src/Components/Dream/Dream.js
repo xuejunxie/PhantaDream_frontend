@@ -84,8 +84,10 @@ export default function Dream() {
   const setPrompt = prompt => dispatch({type: 'SET_PROMPT', payload: prompt});
 
   const [loading, setLoading] = useState(false);
-  const [Charge, setCharge] = useState(0);
-  const [Heart, setHeart] = useState(false);
+  // const [charge, setCharge] = useState(0);
+  // const [heart, setHeart] = useState(false);
+  const Charge = useSelector(state => state.user.data.charge);
+  const Heart = useSelector(state => state.user.data.heart);
 
   const [CopyButtonPressed, setCopyButtonPressed] = useState(false);
   const [saveButtonPressed, setSaveButtonPressed] = useState(false);
@@ -146,40 +148,40 @@ export default function Dream() {
   useEffect(() => {
     // AsyncStorage.clear();
     loadImages();
-    loadBalance();
+    // loadBalance();
   }, []);
 
   // save charge and hard to AsyncStorage
 
-  const storeBalance = async () => {
-    await AsyncStorage.setItem('auth_charge', Charge.toString());
-    await AsyncStorage.setItem('auth_heart', Heart.toString());
-  };
-  useEffect(() => {
-    storeBalance();
-  }, [Charge, Heart]);
+  // const storeBalance = async () => {
+  //   await AsyncStorage.setItem('auth_charge', Charge.toString());
+  //   await AsyncStorage.setItem('auth_heart', Heart.toString());
+  // };
+  // useEffect(() => {
+  //   storeBalance();
+  // }, [Charge, Heart]);
 
-  // load charge and heart from AsyncStorage
-  const loadBalance = async () => {
-    AsyncStorage.getItem('auth_charge').then(value => {
-      if (value) {
-        setCharge(parseInt(value));
-      }
-    });
-    AsyncStorage.getItem('auth_heart').then(value => {
-      if (value) {
-        setHeart(parseInt(value));
-      }
-    });
-  };
+  // // load charge and heart from AsyncStorage
+  // const loadBalance = async () => {
+  //   AsyncStorage.getItem('auth_charge').then(value => {
+  //     if (value) {
+  //       setCharge(parseInt(value));
+  //     }
+  //   });
+  //   AsyncStorage.getItem('auth_heart').then(value => {
+  //     if (value) {
+  //       setHeart(parseInt(value));
+  //     }
+  //   });
+  // };
 
-  // sync user charge
-  realtime()
-    .ref('/users/' + auth().currentUser.uid)
-    .on('value', snapshot => {
-      setCharge(snapshot.val().charge);
-      setHeart(snapshot.val().heart);
-    });
+  // // sync user charge
+  // realtime()
+  //   .ref('/users/' + auth().currentUser.uid)
+  //   .on('value', snapshot => {
+  //     setCharge(snapshot.val().charge);
+  //     setHeart(snapshot.val().heart);
+  //   });
 
   const fillCharge = change => {
     realtime()
@@ -578,6 +580,7 @@ export default function Dream() {
     const storageRef = storage().ref();
     const seed = pickedImage.seed;
     const imageRef = storageRef.child('images/' + imageId + '.png');
+
     imageRef
       .putString(image, 'data_url')
       .then(() => {
@@ -589,7 +592,7 @@ export default function Dream() {
             date: date,
             artist: artist,
             creator: auth().currentUser.uid,
-            owner: auth().currentUser.uid,
+            owner: {id: auth().currentUser.uid},
             likes: 0,
             seed: seed,
             public: true,

@@ -1,10 +1,10 @@
 import {combineReducers} from 'redux';
 import like from './like';
-import settings from './settings';
+import user from './user';
 import dream from './dream';
 
 export default combineReducers({
   like,
-  settings,
+  user,
   dream,
 });

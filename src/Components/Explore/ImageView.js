@@ -12,8 +12,12 @@ import {faHeart} from '@fortawesome/free-solid-svg-icons';
 import {faHeart as faHeartO} from '@fortawesome/free-regular-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import like from '../common/like';
+import * as RootNavigation from '../common/RootNavigation';
 
-const ImageView = (image, likes, liked, avatars, artNames, dispatch) => {
+const defaultAvatar =
+  'https://i0.wp.com/bangla.indiarag.com/wp-content/uploads/2019/01/dummy-snapcode-avatar@2x.png';
+
+const ImageView = (image, likes, liked, dispatch) => {
   return (
     <View
       key={image.id}
@@ -70,47 +74,57 @@ const ImageView = (image, likes, liked, avatars, artNames, dispatch) => {
           width: SIZES.canvas,
         }}>
         <View style={{flexDirection: 'row'}}>
-          <View
-            style={{
-              color: COLORS.red,
-              fontSize: 15,
-              marginTop: 10,
-              flex: 1,
-              alignSelf: 'flex-start',
-              flexDirection: 'row',
+          <TouchableWithoutFeedback
+            onPress={() => {
+              RootNavigation.navigate('UserPage', {
+                id: image.owner.id,
+              });
             }}>
-            <Image
-              source={{
-                uri: avatars[image.owner],
-              }}
-              style={{
-                width: 30,
-                height: 30,
-                borderRadius: 15,
-              }}
-            />
-            <Text
-              style={{
-                color: 'gray',
-                fontSize: 15,
-                marginLeft: 10,
-                textAlign: 'center',
-                alignSelf: 'center',
-              }}>
-              {artNames[image.owner]}
-            </Text>
-            <Text
+            <View
               style={{
                 color: COLORS.red,
                 fontSize: 15,
                 marginTop: 10,
                 flex: 1,
-                textAlign: 'right',
-                alignSelf: 'center',
+                alignSelf: 'flex-start',
+                flexDirection: 'row',
               }}>
-              Likes: {likes[image.id] ? likes[image.id] : image.likes}
-            </Text>
-          </View>
+              <Image
+                source={{
+                  uri: image?.owner?.avatar
+                    ? image.owner.avatar
+                    : defaultAvatar,
+                }}
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: 15,
+                }}
+              />
+              <Text
+                style={{
+                  color: 'gray',
+                  fontSize: 15,
+                  marginLeft: 10,
+                  textAlign: 'center',
+                  alignSelf: 'center',
+                }}>
+                {image.owner.artName}
+              </Text>
+            </View>
+          </TouchableWithoutFeedback>
+
+          <Text
+            style={{
+              color: COLORS.red,
+              fontSize: 15,
+              marginTop: 10,
+              flex: 1,
+              textAlign: 'right',
+              alignSelf: 'center',
+            }}>
+            Likes: {likes[image.id] ? likes[image.id] : image.likes}
+          </Text>
         </View>
         <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
           Prompt: {image.prompt}
