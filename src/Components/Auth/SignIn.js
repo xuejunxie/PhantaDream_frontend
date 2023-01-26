@@ -98,13 +98,34 @@ export default function SignIn({navigation}) {
         const user = res.user;
         if (res.additionalUserInfo.isNewUser) {
           // create a new user data entry in the database
+          var userName = appleAuthRequestResponse.fullName;
+          if (userName == null) {
+            userName = {
+              familyName: 'Joe',
+              givenName: 'Average',
+            };
+          }
+          // check the user name is Chinese
+          const inChinese = /[\u4e00-\u9fa5]/.test(userName.givenName);
+
           realtime()
             .ref('/users/' + user.uid)
             .set({
               email: appleAuthRequestResponse.email,
-              fullName: appleAuthRequestResponse.fullName,
+              fullName: userName,
               charge: newUserCharge,
               heart: newUserHeart,
+              artName: inChinese
+                ? userName.familyName + ' ' + userName.givenName
+                : userName.givenName + ' ' + userName.familyName,
+              handleName: {
+                name: inChinese
+                  ? userName.familyName + userName.givenName
+                  : userName.givenName +
+                    userName.familyName +
+                    Math.floor(Math.random() * 10000),
+                time: 0,
+              },
             });
         }
         navigation.navigate('Home');

@@ -34,13 +34,6 @@ const defaultAvatar =
 export default function ForYou() {
   const [images, setImages] = useState([]);
 
-  const addInforToImage = async (image, field, value) => {
-    const imageRef = firestore().collection('images').doc(image.id);
-    await imageRef.update({
-      [field]: value,
-    });
-  };
-
   const loadForYou = () => {
     return new Promise((resolve, reject) => {
       console.log('load for you');
@@ -148,11 +141,13 @@ export default function ForYou() {
   };
   // Get user liked images
 
-  const likedImages = useSelector(state => state.like.likedImages);
+  // const likedImages = useSelector(state => state.like.likedImages);
+
+  const likedImages = useSelector(state => state.user.data.liked_images);
   const dispatch = useDispatch();
 
   const isLiked = image => {
-    return likedImages.find(likedImage => likedImage.id === image.id);
+    return likedImages[image.id] ? true : false;
   };
 
   const [refreshing, setRefreshing] = useState(false);

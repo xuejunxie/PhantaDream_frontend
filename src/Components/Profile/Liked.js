@@ -20,7 +20,8 @@ const hapticOptions = {
 
 export default function Liked() {
   // Get user liked images
-  const likedImages = useSelector(state => state.like.likedImages);
+  const likedImages = useSelector(state => state.user.data.liked_images);
+
   const dispatch = useDispatch();
   const [selectedImage, setSelectedImage] = React.useState(null);
 
@@ -30,9 +31,7 @@ export default function Liked() {
   useEffect(() => {
     if (selectedImage) {
       if (LikeButtonPressed) {
-        const liked = likedImages.find(
-          likedImage => likedImage.id === selectedImage.id,
-        );
+        const liked = likedImages[selectedImage.id] ? false : true;
         like(selectedImage, liked, dispatch);
         setLikeButtonPressed(false);
       }
@@ -95,8 +94,7 @@ export default function Liked() {
           setLikeButtonPressed,
           renderIcon(
             faHeart,
-            selectedImage &&
-              likedImages.find(likedImage => likedImage.id === selectedImage.id)
+            selectedImage && likedImages[selectedImage.id]
               ? COLORS.red
               : 'gray',
           ),
@@ -111,7 +109,7 @@ export default function Liked() {
   };
 
   const imageView = image => {
-    const liked = likedImages.find(likedImage => likedImage.id === image.id);
+    const liked = likedImages[image.id] ? true : false;
     const isSelected = selectedImage && selectedImage.id === image.id;
     return (
       <View
@@ -193,6 +191,8 @@ export default function Liked() {
   const scrollViewRef = useRef();
   let scrollViewHeight = 0;
 
+  const likedImagesArray = Object.values(likedImages);
+
   return (
     <View>
       <ScrollView
@@ -204,13 +204,16 @@ export default function Liked() {
               scrollViewRef.current.scrollToEnd({animated: true});
             }
           } else {
-            if (selectedImage.id === likedImages[likedImages.length - 1].id) {
+            if (
+              selectedImage.id ===
+              likedImagesArray[likedImagesArray.length - 1].id
+            ) {
               scrollViewRef.current.scrollToEnd({animated: true});
             }
           }
           scrollViewHeight = contentHeight;
         }}>
-        {likedImages.map(image => imageView(image))}
+        {likedImagesArray.map(image => imageView(image))}
       </ScrollView>
     </View>
   );

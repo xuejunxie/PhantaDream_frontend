@@ -51,11 +51,12 @@ export default function Hot() {
   const hearts = useSelector(state => state.user.data.heart);
 
   // Get user liked images
-  const likedImages = useSelector(state => state.like.likedImages);
+  const likedImages = useSelector(state => state.user.data.liked_images);
+
   const dispatch = useDispatch();
 
   const isLiked = image => {
-    return likedImages.find(likedImage => likedImage.id === image.id);
+    return likedImages[image.id] ? true : false;
   };
 
   const [likes, setLikes] = useState({});

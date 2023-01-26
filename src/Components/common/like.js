@@ -3,7 +3,6 @@ import React from 'react';
 import auth from '@react-native-firebase/auth';
 import realtime from '@react-native-firebase/database';
 import firestore from '@react-native-firebase/firestore';
-import {REMOVE_LIKED_IMAGES, ADD_LIKED_IMAGES} from '../../redux/types';
 import {useSelector} from 'react-redux';
 
 export default function like(image, isLiked, dispatch) {
@@ -23,7 +22,6 @@ export default function like(image, isLiked, dispatch) {
           // unlike the image
           // remove the image from the user's liked images
 
-          dispatch({type: REMOVE_LIKED_IMAGES, payload: image});
           realtime()
             .ref(
               'users/' + auth().currentUser.uid + '/liked_images/' + image.id,
@@ -65,7 +63,6 @@ export default function like(image, isLiked, dispatch) {
           // like the image
           // increase the image's likes by 1
           // image.likes = image.likes + 1;
-          dispatch({type: ADD_LIKED_IMAGES, payload: image});
           firestore()
             .collection('images')
             .doc(image.id)

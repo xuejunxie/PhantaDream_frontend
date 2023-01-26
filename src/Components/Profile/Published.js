@@ -153,8 +153,7 @@ export default function Published() {
           setLikeButtonPressed,
           renderIcon(
             faHeart,
-            selectedImage &&
-              likedImages.find(likedImage => likedImage.id === selectedImage.id)
+            selectedImage && likedImages[selectedImage.id]
               ? COLORS.red
               : 'gray',
           ),
@@ -187,9 +186,7 @@ export default function Published() {
   useEffect(() => {
     if (selectedImage) {
       if (LikeButtonPressed) {
-        const liked = likedImages.find(
-          likedImage => likedImage.id === selectedImage.id,
-        );
+        const liked = likedImages[selectedImage.id] ? true : false;
         like(selectedImage, liked, dispatch);
         setLikeButtonPressed(false);
       }
@@ -206,11 +203,9 @@ export default function Published() {
     }
   }, [CopyButtonPressed]);
 
-  const likedImages = useSelector(state => state.like.likedImages);
+  const likedImages = useSelector(state => state.user.data.liked_images);
 
   const imageView = image => {
-    const liked = likedImages.find(likedImage => likedImage.id === image.id);
-
     return (
       <View
         key={image.id}

@@ -54,25 +54,6 @@ function Home(): JSX.Element {
         var user = snapshot.val();
         dispatch({type: UPDATE_USER, payload: user});
       });
-
-    realtime()
-      .ref('users/' + auth().currentUser.uid + '/liked_images')
-      .on('value', snapshot => {
-        var liked = snapshot.val();
-        for (const key in liked) {
-          // get latest like count from database
-          firestore()
-            .collection('images')
-            .doc(liked[key].id)
-            .get()
-            .then(documentSnapshot => {
-              liked[key] = documentSnapshot.data();
-              if (liked[key]?.public) {
-                dispatch({type: UPDATE_LIKED_IMAGES, payload: liked[key]});
-              }
-            });
-        }
-      });
   }, []);
 
   return (
