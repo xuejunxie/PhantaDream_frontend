@@ -154,6 +154,28 @@ const Settings = () => {
       .ref(`/users/${auth().currentUser.uid}/artName`)
       .set(newName)
       .catch(e => console.log(e));
+
+    // update artName in the published images
+    realtime()
+      .ref(`/users/${auth().currentUser.uid}/published`)
+      .once('value')
+      .then(snapshot => {
+        snapshot.forEach(child => {
+          firestore()
+            .collection('images')
+            .doc(child.key)
+            .update({
+              owner: {
+                artName: newName,
+                avatar: avatar,
+                id: auth().currentUser.uid,
+              },
+            })
+            .catch(e => console.log(e));
+        });
+      })
+      .catch(e => console.log(e));
+
     // update the name in the app
     setEditName(false);
   };
