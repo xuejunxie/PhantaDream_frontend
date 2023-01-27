@@ -31,8 +31,10 @@ import {
   faEdit,
   faExclamation,
   faHeart,
+  faHome,
   faPaintBrush,
   faSignOut,
+  faSignOutAlt,
   faUserFriends,
 } from '@fortawesome/free-solid-svg-icons';
 import {useEffect} from 'react';
@@ -65,33 +67,6 @@ const styles = StyleSheet.create({
   },
 });
 
-const list = [
-  {
-    title: 'Billing',
-    icon: faDollar,
-  },
-  // {
-  //   title: 'Private club friends',
-  //   icon: faUserFriends,
-  // },
-  {
-    title: 'Following',
-    icon: faStar,
-  },
-  // {
-  //   title: 'Messages',
-  //   icon: faEnvelope,
-  // },
-  // {
-  //   title: 'Notifications',
-  //   icon: faExclamation,
-  // },
-  //   {
-  //     title: 'Apply to be a regsitered artist',
-  //     icon: faPaintBrush,
-  //   },
-];
-
 const defaultAvatar =
   'https://i0.wp.com/bangla.indiarag.com/wp-content/uploads/2019/01/dummy-snapcode-avatar@2x.png?ssl=1';
 
@@ -115,8 +90,8 @@ const Settings = () => {
       {
         mediaType: 'photo',
         includeBase64: false,
-        maxHeight: 200,
-        maxWidth: 200,
+        maxHeight: 400,
+        maxWidth: 400,
       },
       response => {
         if (response.didCancel) {
@@ -230,6 +205,34 @@ const Settings = () => {
   };
 
   function SettingView({navigation}) {
+    const simpleNavigate = title => {
+      return () => navigation.navigate(title);
+    };
+
+    const list = [
+      {
+        title: 'Profile page',
+        icon: faHome,
+        onPress: ProfileFunction,
+      },
+
+      {
+        title: 'Following',
+        icon: faStar,
+        onPress: simpleNavigate('Following'),
+      },
+      {
+        title: 'Billing',
+        icon: faDollar,
+        onPress: simpleNavigate('Billing'),
+      },
+      {
+        title: 'Sign out',
+        icon: faSignOut,
+        onPress: SignOutFunction,
+      },
+    ];
+
     return (
       <View
         style={{
@@ -321,47 +324,42 @@ const Settings = () => {
         </View>
 
         <View>
-          {list.map((item, i) => (
-            <TouchableOpacity
-              key={i}
-              onPress={() => navigation.navigate(item.title)}>
-              <ListItem bottomDivider style={styles.listItemContainer}>
-                <FontAwesomeIcon icon={item.icon} color={'gray'} />
-                <ListItem.Content>
-                  <ListItem.Title
-                    style={{
-                      color: 'gray',
-                    }}>
-                    {item.title}
-                  </ListItem.Title>
-                </ListItem.Content>
-                <FontAwesomeIcon icon={faChevronRight} color={'gray'} />
-              </ListItem>
-            </TouchableOpacity>
-          ))}
-          <TouchableOpacity
-            key={'logout'}
-            onPress={() => {
-              RootNavigation.navigate('Auth');
-              auth()
-                .signOut()
-                .then(() => console.log('User signed out!'));
-            }}>
-            <ListItem bottomDivider style={styles.listItemContainer}>
-              <FontAwesomeIcon icon={faSignOut} color={'gray'} />
-              <ListItem.Content>
-                <ListItem.Title
-                  style={{
-                    color: 'gray',
-                  }}>
-                  {'Sign out'}
-                </ListItem.Title>
-              </ListItem.Content>
-              <FontAwesomeIcon icon={faChevronRight} color={'gray'} />
-            </ListItem>
-          </TouchableOpacity>
+          {list.map((item, i) => {
+            return listItem(i, item.onPress, item.title, item.icon);
+          })}
         </View>
       </View>
+    );
+  }
+
+  const ProfileFunction = () => {
+    RootNavigation.navigate('UserPage', {id: auth().currentUser.uid});
+  };
+
+  const SignOutFunction = () => {
+    auth()
+      .signOut()
+      .then(() => {
+        RootNavigation.navigate('Auth');
+      });
+  };
+
+  function listItem(key, onPress, title, icon) {
+    return (
+      <TouchableOpacity key={key} onPress={onPress}>
+        <ListItem bottomDivider style={styles.listItemContainer}>
+          <FontAwesomeIcon icon={icon} color={'gray'} />
+          <ListItem.Content>
+            <ListItem.Title
+              style={{
+                color: 'gray',
+              }}>
+              {title}
+            </ListItem.Title>
+          </ListItem.Content>
+          <FontAwesomeIcon icon={faChevronRight} color={'gray'} />
+        </ListItem>
+      </TouchableOpacity>
     );
   }
 

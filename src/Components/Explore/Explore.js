@@ -10,15 +10,18 @@ import {
 import {COLORS} from '../common/globalValues';
 import Hot from './Hot';
 import ForYou from './ForYou';
+import Following from './Following';
 
 const FirstRoute = () => <ForYou />;
 
 const SecondRoute = () => <Hot />;
 
+const ThirdRoute = () => <Following />;
+
 const renderScene = SceneMap({
   first: FirstRoute,
   second: SecondRoute,
-  third: SecondRoute,
+  third: ThirdRoute,
 });
 
 export default function Explore() {
@@ -28,7 +31,7 @@ export default function Explore() {
   const [routes] = React.useState([
     {key: 'first', title: 'For you'},
     {key: 'second', title: 'Hot'},
-    // {key: 'third', title: 'Private club'},
+    // {key: 'third', title: 'Following'},
   ]);
 
   const frame = useSafeAreaFrame();
