@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import realtime from '@react-native-firebase/database';
 import {View, Text, TouchableOpacity} from 'react-native';
 import {COLORS, defaultAvatar} from '../common/globalValues';
 import {Avatar, ListItem} from '@rneui/themed';
@@ -12,10 +11,15 @@ import {faChevronLeft, faChevronRight} from '@fortawesome/free-solid-svg-icons';
 import ImageView from './ImageView';
 import {useDispatch, useSelector} from 'react-redux';
 import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
+import realtime from '@react-native-firebase/database';
+
 import {Neomorph} from 'react-native-neomorph-shadows';
 
 export default UserPage = ({route, navigation}) => {
-  const [user, setUser] = useState({});
+  const hostId = route.params.id;
+
+  const [host, setHost] = useState({});
   const dispatch = useDispatch();
   const [likes, setLikes] = useState({});
   const likedImages = useSelector(state => state.user.data.liked_images);
@@ -25,10 +29,10 @@ export default UserPage = ({route, navigation}) => {
 
   useEffect(() => {
     realtime()
-      .ref(`/users/${route.params.id}`)
+      .ref(`/users/${hostId}`)
       .once('value')
       .then(snapshot => {
-        setUser(snapshot.val());
+        setHost(snapshot.val());
         // console.log(snapshot.val());
       });
   }, []);
@@ -36,9 +40,29 @@ export default UserPage = ({route, navigation}) => {
   // show user artName, avatar picture, published images
   // show follow button
   // show ask to join private club button
+
+  const followings = useSelector(state => state.user.data.followings);
+
   const handleFollow = () => {
-    console.log('follow');
+    if (followings && followings[hostId]) {
+      // unfollow
+      realtime()
+        .ref(`/users/${hostId}/followers/${auth().currentUser.uid}`)
+        .remove();
+      realtime()
+        .ref(`/users/${auth().currentUser.uid}/followings/${hostId}`)
+        .remove();
+    } else {
+      // follow
+      realtime()
+        .ref(`/users/${hostId}/followers/${auth().currentUser.uid}`)
+        .set(true);
+      realtime()
+        .ref(`/users/${auth().currentUser.uid}/followings/${hostId}`)
+        .set(true);
+    }
   };
+
   const handleAskToJoin = () => {
     console.log('ask to join');
   };
@@ -61,9 +85,55 @@ export default UserPage = ({route, navigation}) => {
     });
   };
 
+  const followButton = () => {
+    return (
+      <Neomorph
+        style={{
+          shadowRadius: 10,
+          borderRadius: 25,
+          backgroundColor: COLORS.primary,
+          width: 100,
+          height: 40,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <Text
+          style={{
+            color: 'gray',
+            fontSize: 15,
+          }}>
+          Follow
+        </Text>
+      </Neomorph>
+    );
+  };
+
+  const followingButton = () => {
+    return (
+      <Neomorph
+        style={{
+          shadowRadius: 10,
+          borderRadius: 25,
+          backgroundColor: COLORS.primary,
+          width: 100,
+          height: 40,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <Text
+          style={{
+            color: COLORS.red,
+            fontSize: 15,
+          }}>
+          Following
+        </Text>
+      </Neomorph>
+    );
+  };
+
   useEffect(() => {
-    user.published && loadLike(user.published);
-  }, [user.published]);
+    host.published && loadLike(host.published);
+  }, [host.published]);
 
   const header = () => {
     return (
@@ -100,7 +170,7 @@ export default UserPage = ({route, navigation}) => {
             <Avatar
               rounded
               size="xlarge"
-              source={{uri: user?.avatar ? user.avatar : defaultAvatar}}
+              source={{uri: host?.avatar ? host.avatar : defaultAvatar}}
             />
           </View>
 
@@ -115,7 +185,7 @@ export default UserPage = ({route, navigation}) => {
                 color: 'gray',
                 fontSize: 20,
               }}>
-              {user?.artName ? user.artName : 'Anonymous'}
+              {host?.artName ? host.artName : 'Anonymous'}
             </Text>
             <View
               style={{
@@ -128,7 +198,7 @@ export default UserPage = ({route, navigation}) => {
                   color: 'gray',
                   fontSize: 15,
                 }}>
-                10
+                {host?.followers ? Object.keys(host.followers).length : 0}
               </Text>
 
               <Text
@@ -165,7 +235,7 @@ export default UserPage = ({route, navigation}) => {
             alignItems: 'center',
             paddingEnd: 20,
           }}>
-          <TouchableOpacity
+          <TouchableWithoutFeedback
             style={{
               backgroundColor: COLORS.primary,
               borderRadius: 5,
@@ -173,26 +243,11 @@ export default UserPage = ({route, navigation}) => {
               padding: 5,
             }}
             onPress={handleFollow}>
-            <Neomorph
-              style={{
-                shadowRadius: 10,
-                borderRadius: 25,
-                backgroundColor: COLORS.primary,
-                width: 80,
-                height: 40,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              <Text
-                style={{
-                  color: 'gray',
-                  fontSize: 15,
-                }}>
-                Follow
-              </Text>
-            </Neomorph>
-          </TouchableOpacity>
-          <TouchableOpacity
+            {followings && followings[hostId]
+              ? followingButton()
+              : followButton()}
+          </TouchableWithoutFeedback>
+          <TouchableWithoutFeedback
             style={{
               backgroundColor: COLORS.primary,
               borderRadius: 5,
@@ -217,7 +272,7 @@ export default UserPage = ({route, navigation}) => {
                 Join my private club
               </Text>
             </Neomorph>
-          </TouchableOpacity>
+          </TouchableWithoutFeedback>
         </View>
       </View>
     );
@@ -233,10 +288,10 @@ export default UserPage = ({route, navigation}) => {
       <ScrollView>
         {header()}
 
-        {user &&
-          user?.published &&
-          Object.keys(user.published).map((key, index) => {
-            const image = user.published[key];
+        {host &&
+          host?.published &&
+          Object.keys(host.published).map((key, index) => {
+            const image = host.published[key];
             return ImageView(
               image,
               likes,
