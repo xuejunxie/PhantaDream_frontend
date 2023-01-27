@@ -102,7 +102,13 @@ export default Billing = () => {
                 style={{
                   flex: 1,
                 }}>
-                <Text> No bills yet </Text>
+                <Text
+                  style={{
+                    color: 'gray',
+                  }}>
+                  {' '}
+                  No bills yet{' '}
+                </Text>
               </ListItem.Title>
             </ListItem.Content>
           </ListItem>

@@ -376,8 +376,24 @@ const Settings = () => {
         };
       }}>
       <SettingStack.Screen name="Settings" component={SettingView} />
-      <SettingStack.Screen name="Billing" component={Billing} />
-      <SettingStack.Screen name="Following" component={Following} />
+      <SettingStack.Screen
+        name="Billing"
+        component={Billing}
+        options={{
+          headerStyle: {
+            backgroundColor: COLORS.primary,
+          },
+        }}
+      />
+      <SettingStack.Screen
+        name="Following"
+        component={Following}
+        options={{
+          headerStyle: {
+            backgroundColor: COLORS.primary,
+          },
+        }}
+      />
     </SettingStack.Navigator>
   );
 };

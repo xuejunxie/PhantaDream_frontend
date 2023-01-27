@@ -192,7 +192,7 @@ export default function SignIn({navigation}) {
           <Neomorph
             inner={pressed}
             style={{
-              shadowRadius: 10,
+              shadowRadius: 5,
               borderRadius: 25,
               backgroundColor: COLORS.primary,
               width: 200,

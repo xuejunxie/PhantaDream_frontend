@@ -69,7 +69,7 @@ export default function Hot() {
         .doc(image.id)
         .onSnapshot(documentSnapshot => {
           // const newLikes = {};
-          if (documentSnapshot.data()) {
+          if (documentSnapshot?.data()) {
             // const newLikes = likes;
             // newLikes[image.id] = documentSnapshot.data().likes;
             // setLikes(newLikes);

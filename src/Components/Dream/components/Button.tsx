@@ -39,7 +39,7 @@ export const Button = ({title, onPress}: ButtonProps) => {
         <Neomorph
           inner={press}
           style={{
-            shadowRadius: 10,
+            shadowRadius: 5,
             borderRadius: 25,
             backgroundColor: COLORS.primary,
             width: 100,

@@ -360,7 +360,7 @@ export default function Dream() {
           <Neomorph
             inner={press}
             style={{
-              shadowRadius: 10,
+              shadowRadius: 5,
               borderRadius: 25,
               backgroundColor: COLORS.primary,
               width: 60,
@@ -520,7 +520,7 @@ export default function Dream() {
                 <Neomorph
                   inner={false}
                   style={{
-                    shadowRadius: 10,
+                    shadowRadius: 5,
                     borderRadius: 25,
                     backgroundColor: COLORS.primary,
                     width: 120,
@@ -675,7 +675,7 @@ export default function Dream() {
           }}>
           <Neomorph
             style={{
-              shadowRadius: 10,
+              shadowRadius: 5,
               borderRadius: 25,
               backgroundColor: COLORS.primary,
               width: SIZES.canvas,

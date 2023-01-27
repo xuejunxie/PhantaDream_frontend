@@ -29,7 +29,7 @@ const render_dummy = (start, end) =>
       }}>
       <Neomorph
         style={{
-          shadowRadius: 10,
+          shadowRadius: 5,
           borderRadius: 25,
           backgroundColor: COLORS.primary,
           width: size,
@@ -78,7 +78,7 @@ const FirstRoute = () => {
           <Neomorph
             inner={pressed}
             style={{
-              shadowRadius: 10,
+              shadowRadius: 5,
               borderRadius: 25,
               backgroundColor: COLORS.primary,
               width: 200,

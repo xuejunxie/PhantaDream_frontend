@@ -101,7 +101,7 @@ export default function Liked() {
           <Neomorph
             inner={press}
             style={{
-              shadowRadius: 10,
+              shadowRadius: 5,
               borderRadius: 25,
               backgroundColor: COLORS.primary,
               width: 60,
@@ -170,7 +170,7 @@ export default function Liked() {
           }}>
           <Neomorph
             style={{
-              shadowRadius: 10,
+              shadowRadius: 5,
               borderRadius: 25,
               backgroundColor: COLORS.primary,
               width: SIZES.canvas,
