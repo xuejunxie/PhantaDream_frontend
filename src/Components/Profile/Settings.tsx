@@ -391,6 +391,9 @@ const Settings = () => {
         options={{
           headerStyle: {
             backgroundColor: COLORS.primary,
+            elevation: 0,
+            shadowOpacity: 0,
+            borderBottomWidth: 0,
           },
         }}
       />
