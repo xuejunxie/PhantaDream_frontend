@@ -38,6 +38,7 @@ import {
 import {useEffect} from 'react';
 import {faEnvelope, faStar} from '@fortawesome/free-regular-svg-icons';
 import Billing from './Settings/Billing';
+import Following from './Settings/Following';
 import * as RootNavigation from '../common/RootNavigation';
 import {TextInput} from 'react-native-gesture-handler';
 import {useSelector} from 'react-redux';
@@ -73,10 +74,10 @@ const list = [
   //   title: 'Private club friends',
   //   icon: faUserFriends,
   // },
-  // {
-  //   title: 'Followeing',
-  //   icon: faStar,
-  // },
+  {
+    title: 'Following',
+    icon: faStar,
+  },
   // {
   //   title: 'Messages',
   //   icon: faEnvelope,
@@ -376,6 +377,7 @@ const Settings = () => {
       }}>
       <SettingStack.Screen name="Settings" component={SettingView} />
       <SettingStack.Screen name="Billing" component={Billing} />
+      <SettingStack.Screen name="Following" component={Following} />
     </SettingStack.Navigator>
   );
 };

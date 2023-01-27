@@ -64,7 +64,7 @@ export default UserPage = ({route, navigation}) => {
   };
 
   const handleAskToJoin = () => {
-    console.log('ask to join');
+    // ask to join private club
   };
 
   const loadLike = images => {
@@ -126,6 +126,29 @@ export default UserPage = ({route, navigation}) => {
             fontSize: 15,
           }}>
           Following
+        </Text>
+      </Neomorph>
+    );
+  };
+
+  const privateClubButton = () => {
+    return (
+      <Neomorph
+        style={{
+          shadowRadius: 10,
+          borderRadius: 25,
+          backgroundColor: COLORS.primary,
+          width: 160,
+          height: 40,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <Text
+          style={{
+            color: 'gray',
+            fontSize: 15,
+          }}>
+          Join my private club
         </Text>
       </Neomorph>
     );
@@ -209,7 +232,7 @@ export default UserPage = ({route, navigation}) => {
                 }}>
                 followers
               </Text>
-              <Text
+              {/* <Text
                 style={{
                   color: 'gray',
                   fontSize: 15,
@@ -224,7 +247,7 @@ export default UserPage = ({route, navigation}) => {
                   marginLeft: 5,
                 }}>
                 in private club
-              </Text>
+              </Text> */}
             </View>
           </View>
         </View>
@@ -233,13 +256,11 @@ export default UserPage = ({route, navigation}) => {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            paddingEnd: 20,
           }}>
           <TouchableWithoutFeedback
             style={{
               backgroundColor: COLORS.primary,
               borderRadius: 5,
-              marginRight: 10,
               padding: 5,
             }}
             onPress={handleFollow}>
@@ -247,32 +268,15 @@ export default UserPage = ({route, navigation}) => {
               ? followingButton()
               : followButton()}
           </TouchableWithoutFeedback>
-          <TouchableWithoutFeedback
+          {/* <TouchableWithoutFeedback
             style={{
               backgroundColor: COLORS.primary,
               borderRadius: 5,
               padding: 5,
             }}
             onPress={handleAskToJoin}>
-            <Neomorph
-              style={{
-                shadowRadius: 10,
-                borderRadius: 25,
-                backgroundColor: COLORS.primary,
-                width: 160,
-                height: 40,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              <Text
-                style={{
-                  color: 'gray',
-                  fontSize: 15,
-                }}>
-                Join my private club
-              </Text>
-            </Neomorph>
-          </TouchableWithoutFeedback>
+            {privateClubButton()}
+          </TouchableWithoutFeedback> */}
         </View>
       </View>
     );
