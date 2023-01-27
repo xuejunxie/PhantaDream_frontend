@@ -83,6 +83,8 @@ const Settings = () => {
   const name = artName ? artName : givenName + ' ' + familyName;
   const handleNameObject = useSelector(state => state.user.data.handleName);
 
+  console.log(avatar);
+
   // select an avatar from photo and upload the picture to the database
   const uploadAvatar = () => {
     // select a photo from the photo library
@@ -107,16 +109,18 @@ const Settings = () => {
           task
             .then(() => {
               console.log('Image uploaded to the bucket!');
+              reference.getDownloadURL().then(url => {
+                realtime()
+                  .ref(`/users/${auth().currentUser.uid}/avatar`)
+                  .set(url)
+                  .catch(e => console.log(e));
+              });
             })
             .catch(e => {
               console.log(e);
             });
           // set the avatar to the new avatar
           // save uri to user database
-          realtime()
-            .ref(`/users/${auth().currentUser.uid}/avatar`)
-            .set(response.assets[0].uri)
-            .catch(e => console.log(e));
         }
       },
     );
@@ -222,7 +226,7 @@ const Settings = () => {
         onPress: simpleNavigate('Following'),
       },
       {
-        title: 'Billing',
+        title: 'Payment history',
         icon: faDollar,
         onPress: simpleNavigate('Billing'),
       },

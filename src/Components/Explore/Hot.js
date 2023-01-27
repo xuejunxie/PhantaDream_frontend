@@ -89,9 +89,14 @@ export default function Hot() {
   return (
     <View>
       <ScrollView>
-        {images.map(
-          image => ImageView(image, likes, isLiked(image), dispatch),
-          (showAvatar = true),
+        {images.map(image =>
+          ImageView(
+            image,
+            likes,
+            isLiked(image),
+            dispatch,
+            (showAvatar = true),
+          ),
         )}
       </ScrollView>
       {/* show a heart overlay on the bottom right of Hots */}
