@@ -569,6 +569,9 @@ export default function Dream() {
     }
   }, [shareButtonPressed]);
 
+  const avatar = useSelector(state => state.user.data.avatar);
+  const artName = useSelector(state => state.user.data.artName);
+
   const excuteShare = () => {
     // upload image to firebase storage create an entry on firestore
 
@@ -592,7 +595,11 @@ export default function Dream() {
             date: date,
             artist: artist,
             creator: auth().currentUser.uid,
-            owner: {id: auth().currentUser.uid},
+            owner: {
+              id: auth().currentUser.uid,
+              avatar: avatar,
+              artName: artName,
+            },
             likes: 0,
             seed: seed,
             public: true,

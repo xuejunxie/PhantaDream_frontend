@@ -136,7 +136,6 @@ const Settings = () => {
               console.log(e);
             });
           // set the avatar to the new avatar
-          setAvatar(response.assets[0].uri);
           // save uri to user database
           realtime()
             .ref(`/users/${auth().currentUser.uid}/avatar`)

@@ -1,4 +1,11 @@
-import {View, Image, ScrollView, Text, Alert} from 'react-native';
+import {
+  View,
+  Image,
+  ScrollView,
+  Text,
+  Alert,
+  RefreshControl,
+} from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import firestore from '@react-native-firebase/firestore';
 import realtime from '@react-native-firebase/database';
@@ -20,7 +27,38 @@ const hapticOptions = {
 
 export default function Liked() {
   // Get user liked images
-  const likedImages = useSelector(state => state.user.data.liked_images);
+  const likedImageObject = useSelector(state => state.user.data.liked_images);
+  const likedImagesArray = likedImageObject
+    ? Object.values(likedImageObject)
+    : [];
+
+  const [likes, setLikes] = useState({});
+
+  const loadLike = images => {
+    return new Promise((resolve, reject) => {
+      // get likes
+      console.log('load like');
+      images.map(image => {
+        firestore()
+          .collection('images')
+          .doc(image.id)
+          .onSnapshot(documentSnapshot => {
+            const newLikes = {};
+            if (documentSnapshot.data()) {
+              const newLikes = likes;
+              newLikes[image.id] = documentSnapshot.data().likes;
+              setLikes(newLikes);
+            }
+          });
+      });
+      resolve();
+    });
+  };
+
+  useEffect(() => {
+    console.log('liked images changed');
+    loadLike(likedImagesArray);
+  }, [likedImageObject]);
 
   const dispatch = useDispatch();
   const [selectedImage, setSelectedImage] = React.useState(null);
@@ -31,7 +69,7 @@ export default function Liked() {
   useEffect(() => {
     if (selectedImage) {
       if (LikeButtonPressed) {
-        const liked = likedImages[selectedImage.id] ? false : true;
+        const liked = likedImageObject[selectedImage.id] ? false : true;
         like(selectedImage, liked, dispatch);
         setLikeButtonPressed(false);
       }
@@ -94,7 +132,7 @@ export default function Liked() {
           setLikeButtonPressed,
           renderIcon(
             faHeart,
-            selectedImage && likedImages[selectedImage.id]
+            selectedImage && likedImageObject[selectedImage.id]
               ? COLORS.red
               : 'gray',
           ),
@@ -109,7 +147,7 @@ export default function Liked() {
   };
 
   const imageView = image => {
-    const liked = likedImages[image.id] ? true : false;
+    const liked = likedImageObject[image.id] ? true : false;
     const isSelected = selectedImage && selectedImage.id === image.id;
     return (
       <View
@@ -178,7 +216,7 @@ export default function Liked() {
               fontSize: 15,
               marginTop: 10,
             }}>
-            Likes: {image.likes}
+            Likes: {likes[image.id] ? likes[image.id] : image.likes}
           </Text>
           <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
             Prompt: {image.prompt}
@@ -191,7 +229,12 @@ export default function Liked() {
   const scrollViewRef = useRef();
   let scrollViewHeight = 0;
 
-  const likedImagesArray = Object.values(likedImages);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    loadLike(likedImagesArray).then(() => setRefreshing(false));
+  }, []);
 
   return (
     <View>
@@ -212,7 +255,10 @@ export default function Liked() {
             }
           }
           scrollViewHeight = contentHeight;
-        }}>
+        }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
         {likedImagesArray.map(image => imageView(image))}
       </ScrollView>
     </View>

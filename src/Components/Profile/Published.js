@@ -1,4 +1,11 @@
-import {View, Image, ScrollView, Text, Alert} from 'react-native';
+import {
+  View,
+  Image,
+  ScrollView,
+  Text,
+  Alert,
+  RefreshControl,
+} from 'react-native';
 import React, {useState, useEffect, useRef} from 'react';
 import firestore from '@react-native-firebase/firestore';
 import realtime from '@react-native-firebase/database';
@@ -18,73 +25,44 @@ const hapticOptions = {
 import like from '../common/like';
 import {SET_PROMPT} from '../../redux/types';
 
-function useForceUpdate() {
-  const [value, setValue] = useState(0); // integer state
-  return () => setValue(value => value + 1); // update state to force render
-  // A function that increment 👆🏻 the previous state like here
-  // is better than directly setting `setValue(value + 1)`
-}
-
 var scrollViewHeight = 0;
 
 export default function Published() {
   // Get user published images
-  const [publishedImages, setPublishedImages] = useState([]);
   const [likes, setLikes] = useState({});
   const [selectedImage, setSelectedImage] = useState(null);
-  const forceUpdate = useForceUpdate();
   const scrollViewRef = useRef();
 
-  const loadPublished = () => {
-    return new Promise((resolve, reject) => {
-      // get published images
-      console.log('load published');
-      realtime()
-        .ref('users/' + auth().currentUser.uid + '/published')
-        .on('value', snapshot => {
-          if (snapshot.val()) {
-            var published = snapshot.val();
-            var images = [];
-            for (const key in published) {
-              images.push(published[key]);
-            }
-            setPublishedImages(images);
-            resolve(images);
-          } else {
-            setPublishedImages([]);
-            resolve([]);
-          }
-        });
-    });
-  };
+  const publishedImagesObject = useSelector(state => state.user.data.published);
+  const publishedImages = publishedImagesObject
+    ? Object.values(publishedImagesObject)
+    : [];
 
   const loadLike = images => {
-    // get likes
-    console.log('load like');
-    images.map(image => {
-      firestore()
-        .collection('images')
-        .doc(image.id)
-        .onSnapshot(documentSnapshot => {
-          const newLikes = {};
-          if (documentSnapshot.data()) {
-            const newLikes = likes;
-            newLikes[image.id] = documentSnapshot.data().likes;
-            setLikes(newLikes);
-            forceUpdate();
-          }
-        });
+    return new Promise((resolve, reject) => {
+      // get likes
+      console.log('load like');
+      images.map(image => {
+        firestore()
+          .collection('images')
+          .doc(image.id)
+          .onSnapshot(documentSnapshot => {
+            const newLikes = {};
+            if (documentSnapshot.data()) {
+              const newLikes = likes;
+              newLikes[image.id] = documentSnapshot.data().likes;
+              setLikes(newLikes);
+            }
+          });
+      });
+      resolve();
     });
   };
-
-  useEffect(() => {
-    loadPublished();
-  }, []);
 
   useEffect(() => {
     console.log('published images changed');
     loadLike(publishedImages);
-  }, [publishedImages]);
+  }, [publishedImagesObject]);
 
   // unpublish selected image
   const unpublish = () => {
@@ -206,6 +184,8 @@ export default function Published() {
   const likedImages = useSelector(state => state.user.data.liked_images);
 
   const imageView = image => {
+    const isSelected = selectedImage && selectedImage.id === image.id;
+
     return (
       <View
         key={image.id}
@@ -219,21 +199,11 @@ export default function Published() {
           onPress={() => {
             ReactNativeHapticFeedback.trigger('impactMedium', hapticOptions);
 
-            setPublishedImages(
-              publishedImages.map(Pimage => {
-                if (Pimage.id === image.id) {
-                  Pimage.selected = !Pimage.selected;
-                  if (Pimage.selected) {
-                    setSelectedImage(Pimage);
-                  } else {
-                    setSelectedImage(null);
-                  }
-                } else {
-                  Pimage.selected = false;
-                }
-                return Pimage;
-              }),
-            );
+            if (isSelected) {
+              setSelectedImage(null);
+            } else {
+              setSelectedImage(image);
+            }
           }}>
           <Neomorph
             style={{
@@ -273,14 +243,24 @@ export default function Published() {
             Prompt: {image.prompt}
           </Text>
         </View>
-        {image.selected && actionButtons()}
+        {isSelected && actionButtons()}
       </View>
     );
   };
 
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    loadLike(publishedImages).then(() => setRefreshing(false));
+  }, []);
+
   return (
     <View>
       <ScrollView
+        style={{
+          height: '100%',
+        }}
         ref={scrollViewRef}
         onContentSizeChange={(contentWidth, contentHeight) => {
           if (selectedImage === null) {
@@ -297,7 +277,10 @@ export default function Published() {
             }
           }
           scrollViewHeight = contentHeight;
-        }}>
+        }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
         {publishedImages
           .sort((a, b) => new Date(a.date) - new Date(b.date))
           .map(image => imageView(image))}
