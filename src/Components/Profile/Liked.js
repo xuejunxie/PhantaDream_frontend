@@ -44,7 +44,7 @@ export default function Liked() {
           .doc(image.id)
           .onSnapshot(documentSnapshot => {
             const newLikes = {};
-            if (documentSnapshot.data()) {
+            if (documentSnapshot?.data()) {
               const newLikes = likes;
               newLikes[image.id] = documentSnapshot.data().likes;
               setLikes(newLikes);
@@ -239,6 +239,7 @@ export default function Liked() {
   return (
     <View>
       <ScrollView
+        style={{height: '100%'}}
         ref={scrollViewRef}
         onContentSizeChange={(contentWidth, contentHeight) => {
           if (selectedImage === null) {

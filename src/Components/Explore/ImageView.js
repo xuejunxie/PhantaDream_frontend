@@ -13,11 +13,12 @@ import {faHeart as faHeartO} from '@fortawesome/free-regular-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import like from '../common/like';
 import * as RootNavigation from '../common/RootNavigation';
+import {useRoute} from '@react-navigation/native';
 
 const defaultAvatar =
   'https://i0.wp.com/bangla.indiarag.com/wp-content/uploads/2019/01/dummy-snapcode-avatar@2x.png';
 
-const ImageView = (image, likes, liked, dispatch) => {
+const ImageView = (image, likes, liked, dispatch, showAvatar) => {
   return (
     <View
       key={image.id}
@@ -80,38 +81,40 @@ const ImageView = (image, likes, liked, dispatch) => {
                 id: image.owner.id,
               });
             }}>
-            <View
-              style={{
-                color: COLORS.red,
-                fontSize: 15,
-                marginTop: 10,
-                flex: 1,
-                alignSelf: 'flex-start',
-                flexDirection: 'row',
-              }}>
-              <Image
-                source={{
-                  uri: image?.owner?.avatar
-                    ? image.owner.avatar
-                    : defaultAvatar,
-                }}
+            {showAvatar && (
+              <View
                 style={{
-                  width: 30,
-                  height: 30,
-                  borderRadius: 15,
-                }}
-              />
-              <Text
-                style={{
-                  color: 'gray',
+                  color: COLORS.red,
                   fontSize: 15,
-                  marginLeft: 10,
-                  textAlign: 'center',
-                  alignSelf: 'center',
+                  marginTop: 10,
+                  flex: 1,
+                  alignSelf: 'flex-start',
+                  flexDirection: 'row',
                 }}>
-                {image.owner.artName}
-              </Text>
-            </View>
+                <Image
+                  source={{
+                    uri: image?.owner?.avatar
+                      ? image.owner.avatar
+                      : defaultAvatar,
+                  }}
+                  style={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: 15,
+                  }}
+                />
+                <Text
+                  style={{
+                    color: 'gray',
+                    fontSize: 15,
+                    marginLeft: 10,
+                    textAlign: 'center',
+                    alignSelf: 'center',
+                  }}>
+                  {image.owner.artName}
+                </Text>
+              </View>
+            )}
           </TouchableWithoutFeedback>
 
           <Text

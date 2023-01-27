@@ -5,7 +5,7 @@ import realtime from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 
 export default function editData() {
-  // get all image from firestore
+  //   get all image from firestore
   //   firestore()
   //     .collection('images')
   //     .get()
@@ -13,30 +13,36 @@ export default function editData() {
   //       querySnapshot.forEach(documentSnapshot => {
   //         const image = documentSnapshot.data();
   //         // set the onwer avatar and artName to the image
-  //         // realtime()
-  //         //   .ref('users/' + image.owner + '/avatar')
-  //         //   .once('value', snapshot => {
-  //         //     if (snapshot.val()) {
-  //         //       const avatar = snapshot.val();
-  //         //       realtime()
-  //         //         .ref('users/' + image.owner + '/artName')
-  //         //         .once('value', snapshot => {
-  //         //           if (snapshot.val()) {
-  //         //             const artName = snapshot.val();
-  //         //             firestore()
-  //         //               .collection('images')
-  //         //               .doc(image.id)
-  //         //               .update({
-  //         //                 owner: {
-  //         //                   avatar: avatar,
-  //         //                   artName: artName,
-  //         //                   id: image.owner,
-  //         //                 },
-  //         //               });
-  //         //           }
-  //         //         });
-  //         //     }
-  //         //   });
+  //         if (typeof image.owner === 'string') {
+  //           console.log(image.owner, image.id);
+  //           realtime()
+  //             .ref('users/' + image.owner + '/avatar')
+  //             .once('value', snapshot => {
+  //               var avatar = '';
+  //               if (snapshot.val()) {
+  //                 avatar = snapshot.val();
+  //               }
+  //               realtime()
+  //                 .ref('users/' + image.owner + '/artName')
+  //                 .once('value', snapshot => {
+  //                   console.log(snapshot.val());
+  //                   if (snapshot.val()) {
+  //                     const artName = snapshot.val();
+  //                     console.log(avatar, artName);
+  //                     firestore()
+  //                       .collection('images')
+  //                       .doc(image.id)
+  //                       .update({
+  //                         owner: {
+  //                           avatar: avatar,
+  //                           artName: artName,
+  //                           id: image.owner,
+  //                         },
+  //                       });
+  //                   }
+  //                 });
+  //             });
+  //         }
   //         // remove artName and avatar field in image
   //         // firestore().collection('images').doc(image.id).update({
   //         //   artName: firestore.FieldValue.delete(),

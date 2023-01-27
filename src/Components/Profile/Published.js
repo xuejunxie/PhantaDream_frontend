@@ -48,7 +48,7 @@ export default function Published() {
           .doc(image.id)
           .onSnapshot(documentSnapshot => {
             const newLikes = {};
-            if (documentSnapshot.data()) {
+            if (documentSnapshot?.data()) {
               const newLikes = likes;
               newLikes[image.id] = documentSnapshot.data().likes;
               setLikes(newLikes);

@@ -9,4 +9,7 @@ const SIZES = {
   canvas: 300,
 };
 
-export {COLORS, SIZES};
+const defaultAvatar =
+  'https://i0.wp.com/bangla.indiarag.com/wp-content/uploads/2019/01/dummy-snapcode-avatar@2x.png?ssl=1';
+
+export {COLORS, SIZES, defaultAvatar};

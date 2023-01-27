@@ -233,7 +233,7 @@ export default function Dream() {
     realtime()
       .ref('/users/' + auth().currentUser.uid)
       .update({
-        charge: Charge - 1,
+        charge: realtime.ServerValue.increment(-1),
       });
   };
 

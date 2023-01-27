@@ -23,11 +23,7 @@ import {
 import SignIn from './Components/Auth/SignIn';
 import {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {
-  LOAD_LIKED_IMAGES,
-  UPDATE_LIKED_IMAGES,
-  UPDATE_USER,
-} from './redux/types';
+import {UPDATE_USER} from './redux/types';
 import realtime from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';

@@ -28,9 +28,6 @@ import UserPage from './UserPage';
 
 const loadSize = 1;
 
-const defaultAvatar =
-  'https://i0.wp.com/bangla.indiarag.com/wp-content/uploads/2019/01/dummy-snapcode-avatar@2x.png?ssl=1';
-
 export default function ForYou() {
   const [images, setImages] = useState([]);
 
@@ -72,7 +69,7 @@ export default function ForYou() {
         .doc(image.id)
         .onSnapshot(documentSnapshot => {
           // const newLikes = {};
-          if (documentSnapshot.data()) {
+          if (documentSnapshot?.data()) {
             // const newLikes = likes;
             // newLikes[image.id] = documentSnapshot.data().likes;
             // setLikes(newLikes);
@@ -167,7 +164,13 @@ export default function ForYou() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }>
         {images.map(image => {
-          return ImageView(image, likes, isLiked(image), dispatch);
+          return ImageView(
+            image,
+            likes,
+            isLiked(image),
+            dispatch,
+            (showAvatar = true),
+          );
         })}
       </ScrollView>
       <HeartIcon />
