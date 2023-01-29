@@ -287,30 +287,7 @@ export default UserPage = ({route, navigation}) => {
         width: '100%',
         backgroundColor: COLORS.primary,
       }}>
-      {host.active ? (
-        <ScrollView>
-          {header()}
-
-          {host &&
-            host?.published &&
-            Object.keys(host.published).map((key, index) => {
-              const image = host.published[key];
-              return ImageView(
-                image,
-                likes,
-                isLiked(image),
-                dispatch,
-                (showAvatar = false),
-              );
-            })}
-          <View
-            style={{
-              height: 100,
-              width: '100%',
-            }}
-          />
-        </ScrollView>
-      ) : (
+      {host.active === false ? (
         <View
           style={{
             alignItems: 'center',
@@ -338,6 +315,29 @@ export default UserPage = ({route, navigation}) => {
             </Text>
           </View>
         </View>
+      ) : (
+        <ScrollView>
+          {header()}
+
+          {host &&
+            host?.published &&
+            Object.keys(host.published).map((key, index) => {
+              const image = host.published[key];
+              return ImageView(
+                image,
+                likes,
+                isLiked(image),
+                dispatch,
+                (showAvatar = false),
+              );
+            })}
+          <View
+            style={{
+              height: 100,
+              width: '100%',
+            }}
+          />
+        </ScrollView>
       )}
     </View>
   );
