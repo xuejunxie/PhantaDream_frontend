@@ -287,28 +287,58 @@ export default UserPage = ({route, navigation}) => {
         width: '100%',
         backgroundColor: COLORS.primary,
       }}>
-      <ScrollView>
-        {header()}
+      {host.active ? (
+        <ScrollView>
+          {header()}
 
-        {host &&
-          host?.published &&
-          Object.keys(host.published).map((key, index) => {
-            const image = host.published[key];
-            return ImageView(
-              image,
-              likes,
-              isLiked(image),
-              dispatch,
-              (showAvatar = false),
-            );
-          })}
+          {host &&
+            host?.published &&
+            Object.keys(host.published).map((key, index) => {
+              const image = host.published[key];
+              return ImageView(
+                image,
+                likes,
+                isLiked(image),
+                dispatch,
+                (showAvatar = false),
+              );
+            })}
+          <View
+            style={{
+              height: 100,
+              width: '100%',
+            }}
+          />
+        </ScrollView>
+      ) : (
         <View
           style={{
-            height: 100,
+            alignItems: 'center',
+            height: 300,
             width: '100%',
-          }}
-        />
-      </ScrollView>
+            marginBottom: 40,
+          }}>
+          <TouchableOpacity
+            onPress={() => {
+              // go back to previous page
+              navigation.goBack();
+            }}
+            style={{
+              marginRight: 10,
+              position: 'absolute',
+              left: 40,
+              top: 60,
+            }}>
+            <FontAwesomeIcon icon={faChevronLeft} size={20} color={'gray'} />
+          </TouchableOpacity>
+          <View
+            style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+            <Text style={{color: 'gray', fontSize: 20}}>
+              This account is deactivated
+            </Text>
+          </View>
+        </View>
+      )}
     </View>
   );
 };
