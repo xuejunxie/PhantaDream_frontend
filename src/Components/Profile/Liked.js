@@ -27,7 +27,8 @@ const hapticOptions = {
 
 export default function Liked() {
   // Get user liked images
-  const likedImageObject = useSelector(state => state.user.data.liked_images);
+  const likedImageObject =
+    useSelector(state => state.user.data?.liked_images) || {};
   const likedImagesArray = likedImageObject
     ? Object.values(likedImageObject)
     : [];

@@ -46,6 +46,7 @@ import * as RootNavigation from '../common/RootNavigation';
 import {TextInput} from 'react-native-gesture-handler';
 import {useSelector} from 'react-redux';
 import Follower from './Settings/Follower';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const styles = StyleSheet.create({
   scroll: {
@@ -86,6 +87,7 @@ const Settings = () => {
   const givenName = useSelector(state => state.user.data?.fullName?.givenName);
   const name = artName ? artName : givenName + ' ' + familyName;
   const handleNameObject = useSelector(state => state.user.data?.handleName);
+  // console.log(useSelector(state => state.user.data));
 
   // select an avatar from photo and upload the picture to the database
   const uploadAvatar = () => {
@@ -312,9 +314,9 @@ const Settings = () => {
                   );
                 }}
                 style={{fontSize: 15, color: 'gray'}}>
-                {handleNameObject.name}
+                {handleNameObject?.name}
               </TextInput>
-              {new Date().getTime() - handleNameObject.time >
+              {new Date().getTime() - handleNameObject?.time >
                 1000 * 60 * 60 * 24 && (
                 <TouchableOpacity
                   onPress={() => {
@@ -358,21 +360,26 @@ const Settings = () => {
           onPress: () => console.log('Cancel Pressed'),
           style: 'cancel',
         },
-        {text: 'OK', onPress: () => signOut()},
+        {
+          text: 'OK',
+          onPress: signOut,
+        },
       ],
       {cancelable: false},
     );
   };
 
   const signOut = () => {
-    new Promise((resolve, reject) => {
-      RootNavigation.navigate('Auth');
-      resolve();
-    }).then(() => {
-      auth()
-        .signOut()
-        .then(() => {});
-    });
+    auth()
+      .signOut()
+      .then(() => {
+        console.log('sign out');
+        RootNavigation.navigate('Auth');
+
+        // remove stored token
+        AsyncStorage.removeItem('auth_identityToken');
+        AsyncStorage.removeItem('auth_nonce');
+      });
   };
 
   function listItem(key, onPress, title, icon) {

@@ -78,7 +78,7 @@ function Home(): JSX.Element {
         }}
         component={Explore}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Market"
         options={{
           tabBarLabel: 'Market',
@@ -89,7 +89,7 @@ function Home(): JSX.Element {
           },
         }}
         component={Market}
-      />
+      /> */}
       {/* <Tab.Screen
         name="PhantaSpace"
         options={{
@@ -123,7 +123,7 @@ function App(): JSX.Element {
     console.log(DeviceInfo.getDeviceId());
   }, []);
 
-  const userData = useSelector(state => state.user.data);
+  const userData = useSelector(state => state.user?.data);
 
   return (
     <NavigationContainer ref={navigationRef}>

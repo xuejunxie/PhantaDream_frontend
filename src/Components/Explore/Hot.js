@@ -48,10 +48,11 @@ export default function Hot() {
       });
   }, []);
 
-  const hearts = useSelector(state => state.user.data.heart);
+  const hearts = useSelector(state => state.user.data?.heart);
 
   // Get user liked images
-  const likedImages = useSelector(state => state.user.data.liked_images);
+  const likedImages =
+    useSelector(state => state.user.data?.liked_images) || {} || {};
 
   const dispatch = useDispatch();
 

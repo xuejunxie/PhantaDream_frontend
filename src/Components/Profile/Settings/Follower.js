@@ -37,7 +37,7 @@ import {useSelector} from 'react-redux';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 
 export default Follower = () => {
-  const followers = useSelector(state => state.user.data.followers);
+  const followers = useSelector(state => state.user.data?.followers);
   const [hosts, setHosts] = useState({});
 
   useState(() => {

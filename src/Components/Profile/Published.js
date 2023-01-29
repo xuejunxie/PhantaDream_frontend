@@ -33,7 +33,9 @@ export default function Published() {
   const [selectedImage, setSelectedImage] = useState(null);
   const scrollViewRef = useRef();
 
-  const publishedImagesObject = useSelector(state => state.user.data.published);
+  const publishedImagesObject = useSelector(
+    state => state.user.data?.published,
+  );
   const publishedImages = publishedImagesObject
     ? Object.values(publishedImagesObject)
     : [];
@@ -181,7 +183,7 @@ export default function Published() {
     }
   }, [CopyButtonPressed]);
 
-  const likedImages = useSelector(state => state.user.data.liked_images);
+  const likedImages = useSelector(state => state.user.data?.liked_images) || {};
 
   const imageView = image => {
     const isSelected = selectedImage && selectedImage.id === image.id;

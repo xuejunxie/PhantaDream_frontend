@@ -85,8 +85,7 @@ export default function Dream() {
   const [loading, setLoading] = useState(false);
   // const [charge, setCharge] = useState(0);
   // const [heart, setHeart] = useState(false);
-  const Charge = useSelector(state => state.user.data.charge);
-  const Heart = useSelector(state => state.user.data.heart);
+  const Charge = useSelector(state => state.user.data?.charge);
 
   const [CopyButtonPressed, setCopyButtonPressed] = useState(false);
   const [saveButtonPressed, setSaveButtonPressed] = useState(false);
@@ -568,8 +567,8 @@ export default function Dream() {
     }
   }, [shareButtonPressed]);
 
-  const avatar = useSelector(state => state.user.data.avatar);
-  const artName = useSelector(state => state.user.data.artName);
+  const avatar = useSelector(state => state.user.data?.avatar);
+  const artName = useSelector(state => state.user.data?.artName);
 
   const excuteShare = () => {
     // upload image to firebase storage create an entry on firestore

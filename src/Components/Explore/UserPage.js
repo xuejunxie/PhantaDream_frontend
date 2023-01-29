@@ -22,7 +22,7 @@ export default UserPage = ({route, navigation}) => {
   const [host, setHost] = useState({});
   const dispatch = useDispatch();
   const [likes, setLikes] = useState({});
-  const likedImages = useSelector(state => state.user.data.liked_images);
+  const likedImages = useSelector(state => state.user.data?.liked_images) || {};
   const isLiked = image => {
     return likedImages[image.id] ? true : false;
   };
@@ -30,10 +30,8 @@ export default UserPage = ({route, navigation}) => {
   useEffect(() => {
     realtime()
       .ref(`/users/${hostId}`)
-      .once('value')
-      .then(snapshot => {
+      .on('value', snapshot => {
         setHost(snapshot.val());
-        // console.log(snapshot.val());
       });
   }, []);
   // instgram like user page
@@ -41,7 +39,7 @@ export default UserPage = ({route, navigation}) => {
   // show follow button
   // show ask to join private club button
 
-  const followings = useSelector(state => state.user.data.followings);
+  const followings = useSelector(state => state.user.data?.followings);
 
   const handleFollow = () => {
     if (followings && followings[hostId]) {

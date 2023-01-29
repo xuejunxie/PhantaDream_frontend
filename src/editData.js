@@ -138,19 +138,18 @@ export default function editData() {
   //           .set(documentSnapshot.data());
   //       });
   //     });
-
   // get all user with Apple John in artName
-  realtime()
-    .ref('users')
-    .orderByChild('artName')
-    .equalTo('Apple John')
-    .once('value', snapshot => {
-      allAppleJonh = snapshot.val();
-      Object.keys(allAppleJonh).forEach(key => {
-        const id = key;
-        // remove all images with Apple John in artName
-        console.log(id);
-      });
-    });
+  //   realtime()
+  //     .ref('users')
+  //     .orderByChild('artName')
+  //     .equalTo('Apple John')
+  //     .once('value', snapshot => {
+  //       allAppleJonh = snapshot.val();
+  //       Object.keys(allAppleJonh).forEach(key => {
+  //         const id = key;
+  //         // remove all images with Apple John in artName
+  //         console.log(id);
+  //       });
+  //     });
   // get all user with Apple John in handleName
 }

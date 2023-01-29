@@ -23,6 +23,8 @@ import {appleAuth} from '@invertase/react-native-apple-authentication';
 import firestore from '@react-native-firebase/firestore';
 import realtime from '@react-native-firebase/database';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useDispatch} from 'react-redux';
+import {UPDATE_USER} from '../../redux/types';
 
 const newUserCharge = 20;
 const newUserHeart = 20;
@@ -30,46 +32,46 @@ const newUserHeart = 20;
 export default function SignIn({navigation}) {
   const [pressed, setPressed] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
+  const dispatch = useDispatch();
+  // const storeTokens = async (identityToken, nonce) => {
+  //   try {
+  //     await AsyncStorage.setItem('auth_identityToken', identityToken);
+  //     await AsyncStorage.setItem('auth_nonce', nonce);
+  //   } catch (e) {
+  //     console.log('Error storing tokens:', e);
+  //   }
+  // };
 
-  const storeTokens = async (identityToken, nonce) => {
-    try {
-      await AsyncStorage.setItem('auth_identityToken', identityToken);
-      await AsyncStorage.setItem('auth_nonce', nonce);
-    } catch (e) {
-      console.log('Error storing tokens:', e);
-    }
-  };
-
-  // sign in with stored tokens
-  const signInWithStoredTokens = async () => {
-    try {
-      const identityToken = await AsyncStorage.getItem('auth_identityToken');
-      const nonce = await AsyncStorage.getItem('auth_nonce');
-      if (identityToken && nonce) {
-        const appleCredential = auth.AppleAuthProvider.credential(
-          identityToken,
-          nonce,
-        );
-        // Sign in with stored tokens
-        auth()
-          .signInWithCredential(appleCredential)
-          .then(res => {
-            navigation.navigate('Home');
-          });
-      }
-    } catch (e) {
-      console.log('Error signing in with stored tokens:', e);
-    }
-  };
-  useEffect(() => {
-    // check if user is already signed in
-    const user = auth().currentUser;
-    if (user) {
-      navigation.navigate('Home');
-    } else {
-      signInWithStoredTokens();
-    }
-  }, []);
+  // // sign in with stored tokens
+  // const signInWithStoredTokens = async () => {
+  //   try {
+  //     const identityToken = await AsyncStorage.getItem('auth_identityToken');
+  //     const nonce = await AsyncStorage.getItem('auth_nonce');
+  //     if (identityToken && nonce) {
+  //       const appleCredential = auth.AppleAuthProvider.credential(
+  //         identityToken,
+  //         nonce,
+  //       );
+  //       // Sign in with stored tokens
+  //       auth()
+  //         .signInWithCredential(appleCredential)
+  //         .then(res => {
+  //           navigation.navigate('Home');
+  //         });
+  //     }
+  //   } catch (e) {
+  //     console.log('Error signing in with stored tokens:', e);
+  //   }
+  // };
+  // useEffect(() => {
+  //   // check if user is already signed in
+  //   const user = auth().currentUser;
+  //   if (user) {
+  //     navigation.navigate('Home');
+  //   } else {
+  //     signInWithStoredTokens();
+  //   }
+  // }, []);
 
   async function signInButton() {
     // Start the sign-in request
@@ -85,7 +87,7 @@ export default function SignIn({navigation}) {
 
     // Create a Firebase credential from the response
     const {identityToken, nonce} = appleAuthRequestResponse;
-    storeTokens(identityToken, nonce);
+    // storeTokens(identityToken, nonce);
     const appleCredential = auth.AppleAuthProvider.credential(
       identityToken,
       nonce,
@@ -108,25 +110,29 @@ export default function SignIn({navigation}) {
           // check the user name is Chinese
           const inChinese = /[\u4e00-\u9fa5]/.test(userName.givenName);
 
+          const userData = {
+            email: appleAuthRequestResponse.email,
+            fullName: userName,
+            charge: newUserCharge,
+            heart: newUserHeart,
+            artName: inChinese
+              ? userName.familyName + ' ' + userName.givenName
+              : userName.givenName + ' ' + userName.familyName,
+            handleName: {
+              name: inChinese
+                ? userName.familyName + userName.givenName
+                : userName.givenName +
+                  userName.familyName +
+                  Math.floor(Math.random() * 10000),
+              time: 0,
+            },
+          };
+
+          dispatch({type: UPDATE_USER, payload: userData});
+
           realtime()
             .ref('/users/' + user.uid)
-            .set({
-              email: appleAuthRequestResponse.email,
-              fullName: userName,
-              charge: newUserCharge,
-              heart: newUserHeart,
-              artName: inChinese
-                ? userName.familyName + ' ' + userName.givenName
-                : userName.givenName + ' ' + userName.familyName,
-              handleName: {
-                name: inChinese
-                  ? userName.familyName + userName.givenName
-                  : userName.givenName +
-                    userName.familyName +
-                    Math.floor(Math.random() * 10000),
-                time: 0,
-              },
-            });
+            .set(userData);
         }
         navigation.navigate('Home');
       });

@@ -109,7 +109,7 @@ export default function Following() {
       });
   };
 
-  const hearts = useSelector(state => state.user.data.heart);
+  const hearts = useSelector(state => state.user.data?.heart);
 
   const HeartIcon = () => {
     return (
@@ -140,7 +140,7 @@ export default function Following() {
 
   // const likedImages = useSelector(state => state.like.likedImages);
 
-  const likedImages = useSelector(state => state.user.data.liked_images);
+  const likedImages = useSelector(state => state.user.data?.liked_images) || {};
   const dispatch = useDispatch();
 
   const isLiked = image => {
