@@ -123,10 +123,12 @@ function App(): JSX.Element {
     console.log(DeviceInfo.getDeviceId());
   }, []);
 
+  const userData = useSelector(state => state.user.data);
+
   return (
     <NavigationContainer ref={navigationRef}>
       <Stack.Navigator
-        initialRouteName={auth().currentUser ? 'Home' : 'Auth'}
+        initialRouteName={auth().currentUser && userData ? 'Home' : 'Auth'}
         screenOptions={{
           headerShown: false,
         }}>

@@ -30,6 +30,7 @@ import {
   faDoorOpen,
   faEdit,
   faExclamation,
+  faFan,
   faHeart,
   faHome,
   faPaintBrush,
@@ -44,6 +45,7 @@ import Following from './Settings/Following';
 import * as RootNavigation from '../common/RootNavigation';
 import {TextInput} from 'react-native-gesture-handler';
 import {useSelector} from 'react-redux';
+import Follower from './Settings/Follower';
 
 const styles = StyleSheet.create({
   scroll: {
@@ -76,14 +78,14 @@ const Settings = () => {
   // const [name, setName] = React.useState('');
   // const [avatar, setAvatar] = React.useState(defaultAvatar);
 
-  const avatar = useSelector(state => state.user.data.avatar);
-  const artName = useSelector(state => state.user.data.artName);
-  const familyName = useSelector(state => state.user.data.fullName.familyName);
-  const givenName = useSelector(state => state.user.data.fullName.givenName);
+  const avatar = useSelector(state => state.user.data?.avatar);
+  const artName = useSelector(state => state.user.data?.artName);
+  const familyName = useSelector(
+    state => state.user.data?.fullName?.familyName,
+  );
+  const givenName = useSelector(state => state.user.data?.fullName?.givenName);
   const name = artName ? artName : givenName + ' ' + familyName;
-  const handleNameObject = useSelector(state => state.user.data.handleName);
-
-  console.log(avatar);
+  const handleNameObject = useSelector(state => state.user.data?.handleName);
 
   // select an avatar from photo and upload the picture to the database
   const uploadAvatar = () => {
@@ -226,6 +228,11 @@ const Settings = () => {
         onPress: simpleNavigate('Following'),
       },
       {
+        title: 'Follower',
+        icon: faUserFriends,
+        onPress: simpleNavigate('Follower'),
+      },
+      {
         title: 'Payment history',
         icon: faDollar,
         onPress: simpleNavigate('Billing'),
@@ -341,11 +348,31 @@ const Settings = () => {
   };
 
   const SignOutFunction = () => {
-    auth()
-      .signOut()
-      .then(() => {
-        RootNavigation.navigate('Auth');
-      });
+    // sign out confirmation
+    Alert.alert(
+      'Sign out',
+      'Are you sure you want to sign out?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {text: 'OK', onPress: () => signOut()},
+      ],
+      {cancelable: false},
+    );
+  };
+
+  const signOut = () => {
+    new Promise((resolve, reject) => {
+      RootNavigation.navigate('Auth');
+      resolve();
+    }).then(() => {
+      auth()
+        .signOut()
+        .then(() => {});
+    });
   };
 
   function listItem(key, onPress, title, icon) {
@@ -390,6 +417,18 @@ const Settings = () => {
       <SettingStack.Screen
         name="Following"
         component={Following}
+        options={{
+          headerStyle: {
+            backgroundColor: COLORS.primary,
+            elevation: 0,
+            shadowOpacity: 0,
+            borderBottomWidth: 0,
+          },
+        }}
+      />
+      <SettingStack.Screen
+        name="Follower"
+        component={Follower}
         options={{
           headerStyle: {
             backgroundColor: COLORS.primary,

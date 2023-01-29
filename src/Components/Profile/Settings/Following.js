@@ -167,7 +167,7 @@ export default Following = () => {
                   </View>
                 </TouchableWithoutFeedback>
               </View>
-              <View
+              {/* <View
                 style={{
                   flex: 1,
                   alignItems: 'flex-end',
@@ -183,7 +183,7 @@ export default Following = () => {
                     ? followingButton()
                     : followButton()}
                 </TouchableWithoutFeedback>
-              </View>
+              </View> */}
             </View>
           ))}
         </View>

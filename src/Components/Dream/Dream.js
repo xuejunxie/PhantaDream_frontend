@@ -51,7 +51,6 @@ import storage from '@react-native-firebase/storage';
 import artists from './artists.json';
 
 import RadioButtonRN from 'radio-buttons-react-native';
-import Payment from './Payment';
 import ImageMarker from 'react-native-image-marker';
 import {useDispatch, useSelector} from 'react-redux';
 import {IAP} from './PaymentIAP';

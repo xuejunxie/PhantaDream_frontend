@@ -13,6 +13,7 @@ import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 
 import {COLORS} from '../common/globalValues';
 import {Button} from 'react-native';
+import {ethers} from 'ethers';
 
 const dummy = require('../Explore/dummy.json');
 const size = 280;
