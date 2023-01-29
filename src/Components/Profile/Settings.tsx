@@ -22,6 +22,9 @@ import realtime from '@react-native-firebase/database';
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import {launchImageLibrary} from 'react-native-image-picker';
+import * as RootNavigation from '../common/RootNavigation';
+import {TextInput} from 'react-native-gesture-handler';
+import {useSelector} from 'react-redux';
 
 import {
   faBolt,
@@ -36,17 +39,15 @@ import {
   faPaintBrush,
   faSignOut,
   faSignOutAlt,
+  faUser,
   faUserFriends,
 } from '@fortawesome/free-solid-svg-icons';
 import {useEffect} from 'react';
 import {faEnvelope, faStar} from '@fortawesome/free-regular-svg-icons';
 import Billing from './Settings/Billing';
 import Following from './Settings/Following';
-import * as RootNavigation from '../common/RootNavigation';
-import {TextInput} from 'react-native-gesture-handler';
-import {useSelector} from 'react-redux';
 import Follower from './Settings/Follower';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import Account from './Settings/Account';
 
 const styles = StyleSheet.create({
   scroll: {
@@ -240,9 +241,9 @@ const Settings = () => {
         onPress: simpleNavigate('Billing'),
       },
       {
-        title: 'Sign out',
-        icon: faSignOut,
-        onPress: SignOutFunction,
+        title: 'Account',
+        icon: faUser,
+        onPress: simpleNavigate('Account'),
       },
     ];
 
@@ -349,39 +350,6 @@ const Settings = () => {
     RootNavigation.navigate('UserPage', {id: auth().currentUser.uid});
   };
 
-  const SignOutFunction = () => {
-    // sign out confirmation
-    Alert.alert(
-      'Sign out',
-      'Are you sure you want to sign out?',
-      [
-        {
-          text: 'Cancel',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
-        },
-        {
-          text: 'OK',
-          onPress: signOut,
-        },
-      ],
-      {cancelable: false},
-    );
-  };
-
-  const signOut = () => {
-    auth()
-      .signOut()
-      .then(() => {
-        console.log('sign out');
-        RootNavigation.navigate('Auth');
-
-        // remove stored token
-        AsyncStorage.removeItem('auth_identityToken');
-        AsyncStorage.removeItem('auth_nonce');
-      });
-  };
-
   function listItem(key, onPress, title, icon) {
     return (
       <TouchableOpacity key={key} onPress={onPress}>
@@ -436,6 +404,18 @@ const Settings = () => {
       <SettingStack.Screen
         name="Follower"
         component={Follower}
+        options={{
+          headerStyle: {
+            backgroundColor: COLORS.primary,
+            elevation: 0,
+            shadowOpacity: 0,
+            borderBottomWidth: 0,
+          },
+        }}
+      />
+      <SettingStack.Screen
+        name="Account"
+        component={Account}
         options={{
           headerStyle: {
             backgroundColor: COLORS.primary,

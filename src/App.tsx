@@ -1,7 +1,7 @@
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-import {LogBox} from 'react-native';
+import {Alert, LogBox} from 'react-native';
 
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 import Explore from './Components/Explore/Explore';
@@ -44,12 +44,14 @@ function Home(): JSX.Element {
   }, []);
 
   useEffect(() => {
-    realtime()
-      .ref('users/' + auth().currentUser.uid)
-      .on('value', snapshot => {
-        var user = snapshot.val();
-        dispatch({type: UPDATE_USER, payload: user});
-      });
+    if (auth().currentUser) {
+      realtime()
+        .ref('users/' + auth().currentUser.uid)
+        .on('value', snapshot => {
+          var user = snapshot.val();
+          dispatch({type: UPDATE_USER, payload: user});
+        });
+    }
   }, []);
 
   return (

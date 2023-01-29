@@ -15,6 +15,7 @@ import {
   TextInput,
   Text,
   View,
+  Alert,
 } from 'react-native';
 import {COLORS} from '../common/globalValues';
 
@@ -133,7 +134,40 @@ export default function SignIn({navigation}) {
           realtime()
             .ref('/users/' + user.uid)
             .set(userData);
+        } else {
+          // get the user data from the database
+          realtime()
+            .ref('/users/' + user.uid)
+            .once('value')
+            .then(snapshot => {
+              const userData = snapshot.val();
+              dispatch({type: UPDATE_USER, payload: userData});
+              if (userData.active == false) {
+                Alert.alert(
+                  'Your account has been deactivated',
+                  'Do you want to reactivate your account?',
+                  [
+                    {
+                      text: 'Cancel',
+                      onPress: () => {
+                        auth().signOut();
+                      },
+                    },
+                    {
+                      text: 'OK',
+                      onPress: () => {
+                        realtime()
+                          .ref('users/' + user.uid)
+                          .update({active: true});
+                      },
+                    },
+                  ],
+                  {cancelable: false},
+                );
+              }
+            });
         }
+
         navigation.navigate('Home');
       });
   }
