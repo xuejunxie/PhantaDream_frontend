@@ -10,6 +10,13 @@ const SIZES = {
 };
 
 const defaultAvatar =
-  'https://i0.wp.com/bangla.indiarag.com/wp-content/uploads/2019/01/dummy-snapcode-avatar@2x.png?ssl=1';
+  'https://i0.wp.com/bangla.indiarag.com/wp-content/uploads/2019/01/dummy-snapcode-avatar@2x.png';
 
-export {COLORS, SIZES, defaultAvatar};
+const productID = {
+  // In-App Purchase
+  charge1: 'charge1',
+  charge2: 'charge2',
+  charge3: 'charge3',
+};
+
+export {COLORS, SIZES, defaultAvatar, productID};

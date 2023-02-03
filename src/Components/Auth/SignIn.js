@@ -17,10 +17,13 @@ import {
   View,
   Alert,
 } from 'react-native';
-import {COLORS} from '../common/globalValues';
+import {COLORS, defaultAvatar} from '../common/globalValues';
 
 import auth from '@react-native-firebase/auth';
-import {appleAuth} from '@invertase/react-native-apple-authentication';
+import {
+  appleAuth,
+  AppleButton,
+} from '@invertase/react-native-apple-authentication';
 import firestore from '@react-native-firebase/firestore';
 import realtime from '@react-native-firebase/database';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -116,6 +119,7 @@ export default function SignIn({navigation}) {
             fullName: userName,
             charge: newUserCharge,
             heart: newUserHeart,
+            avatar: defaultAvatar,
             artName: inChinese
               ? userName.familyName + ' ' + userName.givenName
               : userName.givenName + ' ' + userName.familyName,
@@ -222,7 +226,7 @@ export default function SignIn({navigation}) {
           // make it center
           alignItems: 'center',
         }}>
-        <TouchableWithoutFeedback
+        {/* <TouchableWithoutFeedback
           onPressIn={() => {
             setPressed(true);
             ReactNativeHapticFeedback.trigger('impactMedium', options);
@@ -248,8 +252,22 @@ export default function SignIn({navigation}) {
               }}>
               Sign In with Apple
             </Text>
-          </Neomorph>
-        </TouchableWithoutFeedback>
+          </Neomorph> */}
+        {/* </TouchableWithoutFeedback> */}
+
+        <AppleButton
+          buttonStyle={AppleButton.Style.WHITE}
+          buttonType={AppleButton.Type.SIGN_IN}
+          style={{
+            width: 200, // You must specify a width
+            height: 45, // You must specify a height
+            marginTop: 20,
+          }}
+          onPress={() => {
+            ReactNativeHapticFeedback.trigger('impactMedium', options);
+            signInButton();
+          }}
+        />
       </View>
       <View
         style={{

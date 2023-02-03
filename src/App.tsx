@@ -80,7 +80,7 @@ function Home(): JSX.Element {
         }}
         component={Explore}
       />
-      {/* <Tab.Screen
+      <Tab.Screen
         name="Market"
         options={{
           tabBarLabel: 'Market',
@@ -91,7 +91,7 @@ function Home(): JSX.Element {
           },
         }}
         component={Market}
-      /> */}
+      />
       {/* <Tab.Screen
         name="PhantaSpace"
         options={{
@@ -106,7 +106,7 @@ function Home(): JSX.Element {
       <Tab.Screen
         name="Profile"
         options={{
-          tabBarLabel: 'Profile',
+          tabBarLabel: 'Me',
           tabBarIcon: ({color}) => (
             <FontAwesomeIcon icon={faUser} color={color} size={20} />
           ),

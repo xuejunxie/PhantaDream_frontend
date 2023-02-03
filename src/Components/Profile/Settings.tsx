@@ -39,11 +39,22 @@ import {
   faPaintBrush,
   faSignOut,
   faSignOutAlt,
+  faBell,
   faUser,
   faUserFriends,
+  faUsers,
+  faCloudBolt,
+  faCloud,
+  faShip,
+  faSkull,
+  faSkullCrossbones,
 } from '@fortawesome/free-solid-svg-icons';
 import {useEffect} from 'react';
-import {faEnvelope, faStar} from '@fortawesome/free-regular-svg-icons';
+import {
+  faEnvelope,
+  faLightbulb,
+  faStar,
+} from '@fortawesome/free-regular-svg-icons';
 import Billing from './Settings/Billing';
 import Following from './Settings/Following';
 import Follower from './Settings/Follower';
@@ -236,6 +247,20 @@ const Settings = () => {
         onPress: simpleNavigate('Follower'),
       },
       {
+        title: 'Private Clubs',
+        icon: faSkullCrossbones,
+        onPress: simpleNavigate('PrivateClubs'),
+      },
+      {
+        title: 'Private Club members',
+        icon: faUsers,
+        onPress: simpleNavigate('PrivateClubMembers'),
+      },
+      {
+        title: 'Notifications',
+        icon: faBell,
+      },
+      {
         title: 'Payment history',
         icon: faDollar,
         onPress: simpleNavigate('Billing'),
@@ -337,11 +362,11 @@ const Settings = () => {
           </View>
         </View>
 
-        <View>
+        <ScrollView>
           {list.map((item, i) => {
             return listItem(i, item.onPress, item.title, item.icon);
           })}
-        </View>
+        </ScrollView>
       </View>
     );
   }

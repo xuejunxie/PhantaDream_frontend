@@ -1,7 +1,8 @@
 import {Platform} from 'react-native';
+import {productID} from '../../common/globalValues';
 
 const productSkus = Platform.select({
-  ios: ['charge1', 'charge2', 'charge3'],
+  ios: [productID.charge1, productID.charge2, productID.charge3],
 
   android: [
     'android.test.purchased',

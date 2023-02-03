@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, useWindowDimensions, Image, ScrollView} from 'react-native';
 import {TabView, TabBar, SceneMap} from 'react-native-tab-view';
 import {getDefaultHeaderHeight} from '@react-navigation/elements';
@@ -125,6 +125,13 @@ const renderScene = SceneMap({
 });
 
 export default function Market() {
+  useEffect(() => {
+    const provider = new ethers.providers.JsonRpcProvider(
+      'https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
+    );
+    const signer = provider.getSigner();
+  }, []);
+
   const layout = useWindowDimensions();
 
   const [index, setIndex] = React.useState(0);

@@ -23,7 +23,7 @@ const hapticOptions = {
   ignoreAndroidSystemSettings: false,
 };
 
-import {COLORS, SIZES} from '../common/globalValues';
+import {COLORS, productID, SIZES} from '../common/globalValues';
 import axios from 'axios';
 import {Buffer} from 'buffer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -270,11 +270,11 @@ export default function Dream() {
 
         const statusURL = serverURL + 'status/' + taskID;
         const imageURL = serverURL + userId + '/' + imageId;
-
         const getImage = async () => {
           await axios
             .get(statusURL)
             .then(function (response) {
+              // console.log(response.data.state);
               if (response.data.state === 'SUCCESS') {
                 axios
                   .get(imageURL, {responseType: 'arraybuffer'})
@@ -451,7 +451,6 @@ export default function Dream() {
 
   // modal for sharing to public or private
   const [shareModalVisible, setShareModalVisible] = useState(false);
-  const [shareToPbulic, setShareToPublic] = useState(true);
   const ShareModal = () => {
     return (
       <Modal
@@ -511,8 +510,7 @@ export default function Dream() {
               }}>
               <TouchableOpacity
                 onPress={() => {
-                  setShareToPublic(true);
-                  excuteShare();
+                  excuteShare('published');
                   setShareModalVisible(false);
                 }}>
                 <Neomorph
@@ -536,6 +534,32 @@ export default function Dream() {
                   </Text>
                 </Neomorph>
               </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  excuteShare('private');
+                  setShareModalVisible(false);
+                }}>
+                <Neomorph
+                  inner={false}
+                  style={{
+                    shadowRadius: 5,
+                    borderRadius: 25,
+                    backgroundColor: COLORS.primary,
+                    width: 140,
+                    height: 40,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      fontWeight: 'bold',
+                      color: 'gray',
+                    }}>
+                    Private club
+                  </Text>
+                </Neomorph>
+              </TouchableOpacity>
             </View>
             <Text
               style={{
@@ -544,7 +568,8 @@ export default function Dream() {
                 margin: 10,
               }}>
               All your generated art works will be saved on your device only by
-              default. Only public art works will be saved on our server.
+              default. Only shared art works will be saved on our server. Only
+              your approved friends can see your private club art works.
             </Text>
           </View>
         </View>
@@ -570,7 +595,7 @@ export default function Dream() {
   const avatar = useSelector(state => state.user.data?.avatar);
   const artName = useSelector(state => state.user.data?.artName);
 
-  const excuteShare = () => {
+  const excuteShare = place => {
     // upload image to firebase storage create an entry on firestore
 
     const imageId = pickedImage.id;
@@ -613,7 +638,7 @@ export default function Dream() {
 
           // store published image on user's published images
           realtime()
-            .ref('users/' + auth().currentUser.uid + '/published')
+            .ref('users/' + auth().currentUser.uid + '/' + place)
             .child(imageId)
             .set(imageMeta);
         });
@@ -762,21 +787,21 @@ export default function Dream() {
   const chargePurchaseSelection = [
     {
       label: '$0.99 for 30 ',
-      productID: 'charge1',
+      productID: productID.charge1,
       subscription: false,
       price: 0.99,
       charge: 30,
     },
     {
       label: '$19.99 for 800 ',
-      productID: 'charge2',
+      productID: productID.charge2,
       subscription: false,
       price: 19.99,
       charge: 800,
     },
     {
       label: '$399.99 for 20000 ',
-      productID: 'charge3',
+      productID: productID.charge3,
       subscription: false,
       price: 399.99,
       charge: 20000,

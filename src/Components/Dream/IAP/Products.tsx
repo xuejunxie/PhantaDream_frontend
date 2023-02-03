@@ -43,6 +43,7 @@ export const Products = () => {
 
   const handleBuyProduct = async (sku: Sku) => {
     dispatch({type: BUY_CHARGE_LOADING, payload: true});
+
     try {
       await requestPurchase({sku});
     } catch (error) {
