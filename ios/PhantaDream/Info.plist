@@ -57,6 +57,11 @@
 	<string>Save PhantaDream generated photo to user cameral roll</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Save PhantaDream generated photo to user cameral roll</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen.storyboard</string>
 	<key>UIRequiredDeviceCapabilities</key>

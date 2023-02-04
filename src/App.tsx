@@ -6,7 +6,7 @@ import {Alert, LogBox} from 'react-native';
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 import Explore from './Components/Explore/Explore';
 import Dream from './Components/Dream/Dream';
-import Profile from './Components/Profile/Profile';
+import Me from './Components/Me/Me';
 import {COLORS} from './Components/common/globalValues';
 import Market from './Components/Market/Market';
 import DeviceInfo from 'react-native-device-info';
@@ -18,6 +18,11 @@ import {
   faMagic,
   faGlobe,
   faExchangeAlt,
+  faMagnifyingGlass,
+  faEnvelope,
+  faBrain,
+  faMagicWandSparkles,
+  faWandMagicSparkles,
 } from '@fortawesome/free-solid-svg-icons';
 
 import SignIn from './Components/Auth/SignIn';
@@ -65,7 +70,13 @@ function Home(): JSX.Element {
         options={{
           tabBarLabel: 'Dream',
           tabBarIcon: ({color, focused}) => {
-            return <FontAwesomeIcon icon={faMagic} color={color} size={20} />;
+            return (
+              <FontAwesomeIcon
+                icon={faMagicWandSparkles}
+                color={color}
+                size={20}
+              />
+            );
           },
         }}
         component={Dream}
@@ -75,12 +86,12 @@ function Home(): JSX.Element {
         options={{
           tabBarLabel: 'Explore',
           tabBarIcon: ({color}) => (
-            <FontAwesomeIcon icon={faPaperPlane} color={color} size={20} />
+            <FontAwesomeIcon icon={faMagnifyingGlass} color={color} size={20} />
           ),
         }}
         component={Explore}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Market"
         options={{
           tabBarLabel: 'Market',
@@ -91,27 +102,37 @@ function Home(): JSX.Element {
           },
         }}
         component={Market}
-      />
+      /> */}
       {/* <Tab.Screen
         name="PhantaSpace"
         options={{
-          tabBarLabel: 'PhantaSpace',
+          tabBarLabel: 'Phanta Space',
           tabBarIcon: ({color}) => (
             <FontAwesomeIcon icon={faGlobe} color={color} size={20} />
           ),
         }}
         component={Market}
       /> */}
+      <Tab.Screen
+        name="Messages"
+        options={{
+          tabBarLabel: 'Messages',
+          tabBarIcon: ({color}) => (
+            <FontAwesomeIcon icon={faEnvelope} color={color} size={20} />
+          ),
+        }}
+        component={Market}
+      />
 
       <Tab.Screen
-        name="Profile"
+        name="Me"
         options={{
           tabBarLabel: 'Me',
           tabBarIcon: ({color}) => (
             <FontAwesomeIcon icon={faUser} color={color} size={20} />
           ),
         }}
-        component={Profile}
+        component={Me}
       />
     </Tab.Navigator>
   );

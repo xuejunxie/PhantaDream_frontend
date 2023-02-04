@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Account = () => {
+export default Setting = () => {
   const list = [
     {
       title: 'Sign out',

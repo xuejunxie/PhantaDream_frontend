@@ -13,8 +13,6 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {COLORS} from '../common/globalValues';
 import {Avatar, ListItem} from '@rneui/themed';
 
-import InfoText from './InfoText';
-
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 
 import auth from '@react-native-firebase/auth';
@@ -48,6 +46,7 @@ import {
   faShip,
   faSkull,
   faSkullCrossbones,
+  faGear,
 } from '@fortawesome/free-solid-svg-icons';
 import {useEffect} from 'react';
 import {
@@ -55,10 +54,10 @@ import {
   faLightbulb,
   faStar,
 } from '@fortawesome/free-regular-svg-icons';
-import Billing from './Settings/Billing';
-import Following from './Settings/Following';
-import Follower from './Settings/Follower';
-import Account from './Settings/Account';
+import Billing from './Account/Billing';
+import Following from './Account/Following';
+import Follower from './Account/Follower';
+import Setting from './Account/Setting';
 
 const styles = StyleSheet.create({
   scroll: {
@@ -85,7 +84,7 @@ const styles = StyleSheet.create({
 const defaultAvatar =
   'https://i0.wp.com/bangla.indiarag.com/wp-content/uploads/2019/01/dummy-snapcode-avatar@2x.png?ssl=1';
 
-const Settings = () => {
+const Account = () => {
   // set user name
 
   // const [name, setName] = React.useState('');
@@ -224,7 +223,7 @@ const Settings = () => {
       });
   };
 
-  function SettingView({navigation}) {
+  function AccountView({navigation}) {
     const simpleNavigate = title => {
       return () => navigation.navigate(title);
     };
@@ -266,9 +265,9 @@ const Settings = () => {
         onPress: simpleNavigate('Billing'),
       },
       {
-        title: 'Account',
-        icon: faUser,
-        onPress: simpleNavigate('Account'),
+        title: 'Setting',
+        icon: faGear,
+        onPress: simpleNavigate('Setting'),
       },
     ];
 
@@ -394,18 +393,18 @@ const Settings = () => {
     );
   }
 
-  const SettingStack = createStackNavigator();
+  const AccountStack = createStackNavigator();
 
   return (
-    <SettingStack.Navigator
-      initialRouteName="Settings"
+    <AccountStack.Navigator
+      initialRouteName="Accounts"
       screenOptions={({route}) => {
         return {
-          headerShown: route.name !== 'Settings',
+          headerShown: route.name !== 'Accounts',
         };
       }}>
-      <SettingStack.Screen name="Settings" component={SettingView} />
-      <SettingStack.Screen
+      <AccountStack.Screen name="Accounts" component={AccountView} />
+      <AccountStack.Screen
         name="Billing"
         component={Billing}
         options={{
@@ -414,7 +413,7 @@ const Settings = () => {
           },
         }}
       />
-      <SettingStack.Screen
+      <AccountStack.Screen
         name="Following"
         component={Following}
         options={{
@@ -426,7 +425,7 @@ const Settings = () => {
           },
         }}
       />
-      <SettingStack.Screen
+      <AccountStack.Screen
         name="Follower"
         component={Follower}
         options={{
@@ -438,9 +437,9 @@ const Settings = () => {
           },
         }}
       />
-      <SettingStack.Screen
-        name="Account"
-        component={Account}
+      <AccountStack.Screen
+        name="Setting"
+        component={Setting}
         options={{
           headerStyle: {
             backgroundColor: COLORS.primary,
@@ -450,8 +449,8 @@ const Settings = () => {
           },
         }}
       />
-    </SettingStack.Navigator>
+    </AccountStack.Navigator>
   );
 };
 
-export default Settings;
+export default Account;

@@ -110,6 +110,15 @@ export default function Dream() {
   // loading: boolean
   //
 
+  const initImage = {
+    id: 'empty',
+    image: empty_image,
+    prompt: '',
+    date: new Date().getTime(),
+    loading: false,
+    selected: false,
+  };
+
   const loadImages = async () => {
     const allKeys = await AsyncStorage.getAllKeys();
 
@@ -118,16 +127,7 @@ export default function Dream() {
       return key.indexOf('auth_') === -1;
     });
     if (keys.length === 0) {
-      setImages([
-        {
-          id: 'empty',
-          image: empty_image,
-          prompt: '',
-          date: new Date().getTime(),
-          loading: false,
-          selected: false,
-        },
-      ]);
+      setImages([initImage]);
     } else {
       const result = await AsyncStorage.multiGet(keys);
       const parsedResult = result.map((item, index) => {
@@ -652,11 +652,15 @@ export default function Dream() {
   useEffect(() => {
     if (pickedImage) {
       if (deleteButtonPressed) {
-        setImages(
-          images.filter(image => {
-            return image.id !== pickedImage.id;
-          }),
-        );
+        if (images.length === 1) {
+          setImages([initImage]);
+        } else {
+          setImages(
+            images.filter(image => {
+              return image.id !== pickedImage.id;
+            }),
+          );
+        }
         AsyncStorage.removeItem(pickedImage.id);
         setPickedImage(null);
         setDeleteButtonPressed(false);
@@ -678,7 +682,7 @@ export default function Dream() {
         <TouchableWithoutFeedback
           onPress={() => {
             ReactNativeHapticFeedback.trigger('impactMedium', hapticOptions);
-            if (!item.loading) {
+            if (!item.loading && item.id !== 'empty') {
               setImages(
                 images.map(image => {
                   if (image.id === item.id) {
