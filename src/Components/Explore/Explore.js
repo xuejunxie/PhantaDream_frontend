@@ -32,7 +32,7 @@ export default function Explore() {
   const [routes] = React.useState([
     {key: 'first', title: 'For you'},
     {key: 'second', title: 'Hot'},
-    {key: 'third', title: 'Private club'},
+    // {key: 'third', title: 'Private club'},
   ]);
 
   const frame = useSafeAreaFrame();

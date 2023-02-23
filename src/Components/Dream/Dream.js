@@ -61,17 +61,8 @@ import {
   SET_PRODUCT_ID,
 } from '../../redux/types';
 
-const loading_image = 'https://i.gifer.com/1amw.gif';
-const loading_images = [
-  'https://i.gifer.com/1amw.gif',
-  'https://media.tenor.com/cFEmSJ-8lggAAAAC/pusheen-painting.gif',
-  'https://i.pinimg.com/originals/30/f3/05/30f305ac514a32a71efe7970201efb46.gif',
-  'https://i.pinimg.com/originals/d6/29/58/d6295823df458fa00714ad31fb03c467.gif',
-  'https://media1.giphy.com/media/2Y7tZMmIpwV6Lnc5QC/giphy.gif?cid=e3b0c442aabfa9339177545073f7a8298231d2eda72b81b3&rid=giphy.gif',
-  'https://media3.giphy.com/media/27bTQ0NagT4UDZ5pJd/giphy.gif',
-];
-const empty_image =
-  'https://www.canvaschamp.com/static/images/landingpage/blankprestretchedcanvas/streach-choice.jpg';
+const loading_image = require('./asset/loading.gif');
+const empty_image = require('./asset/empty.jpg');
 
 const tabBarHeight = 29;
 
@@ -112,7 +103,7 @@ export default function Dream() {
 
   const initImage = {
     id: 'empty',
-    image: empty_image,
+    image: '',
     prompt: '',
     date: new Date().getTime(),
     loading: false,
@@ -710,9 +701,15 @@ export default function Dream() {
               marginTop: 20,
             }}>
             <Image
-              source={{
-                uri: item.loading ? loading_image : item.image,
-              }}
+              source={
+                item.loading
+                  ? loading_image
+                  : item.id === 'empty'
+                  ? empty_image
+                  : {
+                      uri: item.image,
+                    }
+              }
               style={{
                 width: SIZES.canvas,
                 height: SIZES.canvas,

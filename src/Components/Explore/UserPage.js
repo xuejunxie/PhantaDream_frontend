@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, TouchableOpacity} from 'react-native';
+import {View, Text, TouchableOpacity, Alert} from 'react-native';
 import {COLORS, defaultAvatar} from '../common/globalValues';
 import {Avatar, ListItem} from '@rneui/themed';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
@@ -63,6 +63,35 @@ export default UserPage = ({route, navigation}) => {
 
   const handleAskToJoin = () => {
     // ask to join private club
+    // send message to host
+    realtime()
+      .ref(
+        `/users/${hostId}/messages/${
+          auth().currentUser.uid
+        }/${new Date().getTime()}/`,
+      )
+      .set({
+        message: 'I want to join your private club',
+        type: 'private club request',
+        timestamp: new Date().getTime(),
+        read: false,
+        approved: false,
+        send: false,
+      });
+
+    realtime()
+      .ref(
+        `/users/${
+          auth().currentUser.uid
+        }/messages/${hostId}/${new Date().getTime()}/`,
+      )
+      .set({
+        message: 'Private club request sent',
+        type: 'private club request sent',
+        timestamp: new Date().getTime(),
+        read: true,
+        send: true,
+      });
   };
 
   const loadLike = images => {
@@ -83,14 +112,14 @@ export default UserPage = ({route, navigation}) => {
     });
   };
 
-  const followButton = () => {
+  const NeoButton = ({text, width}) => {
     return (
       <Neomorph
         style={{
           shadowRadius: 5,
           borderRadius: 25,
           backgroundColor: COLORS.primary,
-          width: 100,
+          width: width,
           height: 40,
           justifyContent: 'center',
           alignItems: 'center',
@@ -100,57 +129,23 @@ export default UserPage = ({route, navigation}) => {
             color: 'gray',
             fontSize: 15,
           }}>
-          Follow
+          {text}
         </Text>
       </Neomorph>
     );
   };
 
-  const followingButton = () => {
-    return (
-      <Neomorph
-        style={{
-          shadowRadius: 5,
-          borderRadius: 25,
-          backgroundColor: COLORS.primary,
-          width: 100,
-          height: 40,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <Text
-          style={{
-            color: COLORS.red,
-            fontSize: 15,
-          }}>
-          Following
-        </Text>
-      </Neomorph>
-    );
-  };
+  const followButton = () => NeoButton({text: 'Follow', width: 100});
 
-  const privateClubButton = () => {
-    return (
-      <Neomorph
-        style={{
-          shadowRadius: 5,
-          borderRadius: 25,
-          backgroundColor: COLORS.primary,
-          width: 160,
-          height: 40,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <Text
-          style={{
-            color: 'gray',
-            fontSize: 15,
-          }}>
-          Join my private club
-        </Text>
-      </Neomorph>
-    );
-  };
+  const followingButton = () => NeoButton({text: 'Following', width: 100});
+
+  const joinPrivateClubButton = () =>
+    NeoButton({text: 'Join my private Club', width: 170});
+
+  const requestSentButton = () => NeoButton({text: 'Request Sent', width: 170});
+
+  const inPrivateClubButton = () =>
+    NeoButton({text: 'In Private Club', width: 170});
 
   useEffect(() => {
     host.published && loadLike(host.published);
@@ -230,7 +225,7 @@ export default UserPage = ({route, navigation}) => {
                 }}>
                 followers
               </Text>
-              {/* <Text
+              <Text
                 style={{
                   color: 'gray',
                   fontSize: 15,
@@ -245,7 +240,7 @@ export default UserPage = ({route, navigation}) => {
                   marginLeft: 5,
                 }}>
                 in private club
-              </Text> */}
+              </Text>
             </View>
           </View>
         </View>
@@ -259,22 +254,45 @@ export default UserPage = ({route, navigation}) => {
             style={{
               backgroundColor: COLORS.primary,
               borderRadius: 5,
-              padding: 5,
+              padding: 10,
             }}
             onPress={handleFollow}>
             {followings && followings[hostId]
               ? followingButton()
               : followButton()}
           </TouchableWithoutFeedback>
-          {/* <TouchableWithoutFeedback
-            style={{
-              backgroundColor: COLORS.primary,
-              borderRadius: 5,
-              padding: 5,
-            }}
-            onPress={handleAskToJoin}>
-            {privateClubButton()}
-          </TouchableWithoutFeedback> */}
+          {host?.messages?.privateClubRequest?.[auth().currentUser.uid] ? (
+            host?.messages?.privateClubRequest?.[auth().currentUser.uid]
+              .approved ? (
+              <TouchableWithoutFeedback
+                style={{
+                  backgroundColor: COLORS.primary,
+                  borderRadius: 5,
+                  padding: 10,
+                }}>
+                {inPrivateClubButton()}
+              </TouchableWithoutFeedback>
+            ) : (
+              <TouchableWithoutFeedback
+                style={{
+                  backgroundColor: COLORS.primary,
+                  borderRadius: 5,
+                  padding: 10,
+                }}>
+                {requestSentButton()}
+              </TouchableWithoutFeedback>
+            )
+          ) : (
+            <TouchableWithoutFeedback
+              style={{
+                backgroundColor: COLORS.primary,
+                borderRadius: 5,
+                padding: 10,
+              }}
+              onPress={handleAskToJoin}>
+              {joinPrivateClubButton()}
+            </TouchableWithoutFeedback>
+          )}
         </View>
       </View>
     );

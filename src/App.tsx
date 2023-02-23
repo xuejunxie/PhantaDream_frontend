@@ -23,6 +23,9 @@ import {
   faBrain,
   faMagicWandSparkles,
   faWandMagicSparkles,
+  faHandsBubbles,
+  faWalkieTalkie,
+  faFileWord,
 } from '@fortawesome/free-solid-svg-icons';
 
 import SignIn from './Components/Auth/SignIn';
@@ -35,6 +38,8 @@ import firestore from '@react-native-firebase/firestore';
 import {navigationRef} from './Components/common/RootNavigation';
 import UserPage from './Components/Explore/UserPage';
 import editData from './editData';
+import Notification from './Components/Notification/Notification';
+import Chat from './Components/Notification/Chat';
 
 LogBox.ignoreAllLogs();
 
@@ -114,14 +119,14 @@ function Home(): JSX.Element {
         component={Market}
       /> */}
       <Tab.Screen
-        name="Messages"
+        name="Notification"
         options={{
-          tabBarLabel: 'Messages',
+          tabBarLabel: 'Notification',
           tabBarIcon: ({color}) => (
             <FontAwesomeIcon icon={faEnvelope} color={color} size={20} />
           ),
         }}
-        component={Market}
+        component={Notification}
       />
 
       <Tab.Screen
@@ -158,6 +163,7 @@ function App(): JSX.Element {
         <Stack.Screen name="Auth" component={SignIn} />
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="UserPage" component={UserPage} />
+        <Stack.Screen name="Chat" component={Chat} />
       </Stack.Navigator>
     </NavigationContainer>
   );
