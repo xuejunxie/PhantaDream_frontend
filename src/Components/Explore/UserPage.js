@@ -105,7 +105,7 @@ export default UserPage = ({route, navigation}) => {
           setLikes(likes => {
             return {
               ...likes,
-              [key]: documentSnapshot.data().likes,
+              [key]: documentSnapshot.data()?.likes,
             };
           });
         });

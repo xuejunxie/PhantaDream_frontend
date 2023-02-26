@@ -96,7 +96,7 @@ function Home(): JSX.Element {
         }}
         component={Explore}
       />
-      {/* <Tab.Screen
+      <Tab.Screen
         name="Market"
         options={{
           tabBarLabel: 'Market',
@@ -107,8 +107,8 @@ function Home(): JSX.Element {
           },
         }}
         component={Market}
-      /> */}
-      {/* <Tab.Screen
+      />
+      <Tab.Screen
         name="PhantaSpace"
         options={{
           tabBarLabel: 'Phanta Space',
@@ -117,11 +117,11 @@ function Home(): JSX.Element {
           ),
         }}
         component={Market}
-      /> */}
+      />
       <Tab.Screen
         name="Notification"
         options={{
-          tabBarLabel: 'Notification',
+          tabBarLabel: 'Message',
           tabBarIcon: ({color}) => (
             <FontAwesomeIcon icon={faEnvelope} color={color} size={20} />
           ),

@@ -3,6 +3,7 @@ const COLORS = {
   primary: '#e0e5ec',
   red: '#E2725B', // terracotta red
   green: '#e1ece0',
+  blue: '#c3dae8',
 };
 
 const SIZES = {

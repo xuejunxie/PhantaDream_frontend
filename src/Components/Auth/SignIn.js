@@ -96,7 +96,6 @@ export default function SignIn({navigation}) {
       identityToken,
       nonce,
     );
-
     // Sign the user in with the credential
     auth()
       .signInWithCredential(appleCredential)
