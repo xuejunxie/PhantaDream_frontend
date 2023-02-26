@@ -935,6 +935,7 @@ export default function Dream() {
         {ShareModal()}
         <ScrollView
           ref={scrollViewRef}
+          onLayout={() => scrollViewRef.current.scrollToEnd({animated: true})}
           onContentSizeChange={(contentWidth, contentHeight) => {
             if (pickedImage === null) {
               // if user unselected the image, don't scroll

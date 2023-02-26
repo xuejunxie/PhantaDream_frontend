@@ -26,6 +26,10 @@ import {
   faHandsBubbles,
   faWalkieTalkie,
   faFileWord,
+  faSms,
+  faComment,
+  faComments,
+  faCommentAlt,
 } from '@fortawesome/free-solid-svg-icons';
 
 import SignIn from './Components/Auth/SignIn';
@@ -96,7 +100,7 @@ function Home(): JSX.Element {
         }}
         component={Explore}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Market"
         options={{
           tabBarLabel: 'Market',
@@ -107,8 +111,8 @@ function Home(): JSX.Element {
           },
         }}
         component={Market}
-      />
-      <Tab.Screen
+      /> */}
+      {/* <Tab.Screen
         name="PhantaSpace"
         options={{
           tabBarLabel: 'Phanta Space',
@@ -117,13 +121,13 @@ function Home(): JSX.Element {
           ),
         }}
         component={Market}
-      />
+      /> */}
       <Tab.Screen
         name="Notification"
         options={{
-          tabBarLabel: 'Message',
+          tabBarLabel: 'Chat',
           tabBarIcon: ({color}) => (
-            <FontAwesomeIcon icon={faEnvelope} color={color} size={20} />
+            <FontAwesomeIcon icon={faCommentAlt} color={color} size={20} />
           ),
         }}
         component={Notification}
