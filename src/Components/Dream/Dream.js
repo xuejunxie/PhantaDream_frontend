@@ -255,8 +255,10 @@ export default function Dream() {
         user: userId,
         img_name: imageId,
         seed: seed,
+        model: 1,
       })
       .then(function (response) {
+        console.log('send');
         const taskID = response.data.task_id;
 
         const statusURL = serverURL + 'status/' + taskID;
@@ -285,6 +287,7 @@ export default function Dream() {
                       date: new Date().getTime(),
                       artist: artistsUsed,
                       seed: seed,
+                      model: 1,
                     };
                     // save the image information to user database
                     realtime()
@@ -300,6 +303,7 @@ export default function Dream() {
                       date: new Date().getTime(),
                       artist: artistsUsed,
                       seed: seed,
+                      model: 1,
                     };
                     AsyncStorage.setItem(imageId, JSON.stringify(image_entry));
                     // replace the last image with the new image
@@ -316,19 +320,23 @@ export default function Dream() {
                     spendCharge();
                   });
               } else {
+                console.log('get');
+
                 setTimeout(getImage, 5000);
               }
             })
             .catch(function (error) {
-              console.log(error);
+              console.log('get sattus error', error);
               send();
+              setTimeout(getImage, 5000);
+
               return;
             });
         };
         getImage();
       })
       .catch(function (error) {
-        console.log(error);
+        console.log('get post response error', error);
         send();
         return;
       });
@@ -616,6 +624,7 @@ export default function Dream() {
             },
             likes: 0,
             seed: seed,
+            model: 1,
             public: true,
           };
           // store image meta on firestore
