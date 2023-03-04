@@ -114,8 +114,7 @@ const ChatUI = ({route, navigation}) => {
                           style={{
                             color: 'black',
                             margin: 5,
-                            marginRight: messages[key].send ? 40 : 0,
-                            marginLeft: messages[key].send ? 40 : 0,
+                            maxWidth: 270,
                             fontSize: 18,
                             textAlign: messages[key].send ? 'right' : 'left',
                           }}>
