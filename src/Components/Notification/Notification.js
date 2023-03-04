@@ -17,6 +17,7 @@ import * as RootNavigation from '../common/RootNavigation';
 import {createStackNavigator} from '@react-navigation/stack';
 import {TextInput} from 'react-native-gesture-handler';
 import {useSelector} from 'react-redux';
+import {CachedImage} from '@georstat/react-native-image-cache';
 
 const styles = StyleSheet.create({
   container: {
@@ -182,12 +183,15 @@ export default function Notification() {
             id: you.id,
           })
         }>
-        <Avatar
-          rounded
-          size="medium"
-          source={{
-            uri: you.avatar,
+        <CachedImage
+          style={{
+            height: 50,
+            width: 50,
+            borderRadius: 25,
+            overflow: 'hidden',
           }}
+          resizeMode="cover"
+          source={you.avatar}
         />
         <View style={styles.listItemContent}>
           <Text style={styles.name}>{you.name}</Text>

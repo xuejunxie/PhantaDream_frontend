@@ -15,10 +15,13 @@ import {useSelector} from 'react-redux';
 import {COLORS, defaultAvatar} from '../common/globalValues';
 import {ScrollView} from 'react-native-gesture-handler';
 import realtime from '@react-native-firebase/database';
+import {Avatar} from '@rneui/themed';
+import {CachedImage} from '@georstat/react-native-image-cache';
 
 const ChatUI = ({route, navigation}) => {
   const {name, avatar, id} = route.params;
   const messages = useSelector(state => state.user?.data?.messages)?.[id];
+  const myAvatar = useSelector(state => state.user?.data?.avatar);
   const [inputText, setInputText] = useState(''); //initial text of TextInput
   const scrollViewRef = useRef();
 
@@ -66,7 +69,7 @@ const ChatUI = ({route, navigation}) => {
                 <View
                   key={key}
                   style={{
-                    margin: 10,
+                    margin: 8,
                   }}>
                   <NeomorphFlex
                     inner={false}
@@ -85,15 +88,40 @@ const ChatUI = ({route, navigation}) => {
                           ? COLORS.blue
                           : COLORS.primary,
                       }}>
-                      <Text
+                      <View
                         style={{
-                          color: 'black',
-                          margin: 10,
-                          fontSize: 18,
-                          textAlign: messages[key].send ? 'right' : 'left',
+                          padding: 2,
+                          flexDirection: messages[key].send
+                            ? 'row-reverse'
+                            : 'row',
                         }}>
-                        {messages[key].message}
-                      </Text>
+                        <View
+                          style={{
+                            justifyContent: 'center',
+                          }}>
+                          <CachedImage
+                            style={{
+                              height: 30,
+                              width: 30,
+                              borderRadius: 15,
+                              overflow: 'hidden',
+                            }}
+                            resizeMode="cover"
+                            source={messages[key].send ? myAvatar : avatar}
+                          />
+                        </View>
+                        <Text
+                          style={{
+                            color: 'black',
+                            margin: 5,
+                            marginRight: messages[key].send ? 40 : 0,
+                            marginLeft: messages[key].send ? 40 : 0,
+                            fontSize: 18,
+                            textAlign: messages[key].send ? 'right' : 'left',
+                          }}>
+                          {messages[key].message}
+                        </Text>
+                      </View>
                     </View>
                   </NeomorphFlex>
                 </View>

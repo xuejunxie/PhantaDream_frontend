@@ -1000,6 +1000,9 @@ PODS:
     - React
   - react-native-cameraroll (5.2.0):
     - React-Core
+  - react-native-file-access (2.5.3):
+    - React-Core
+    - ZIPFoundation (= 0.9.11)
   - react-native-image-picker (5.0.0):
     - React-Core
   - react-native-pager-view (6.1.2):
@@ -1119,7 +1122,7 @@ PODS:
     - React
   - RNReactNativeHapticFeedback (1.14.0):
     - React-Core
-  - RNReanimated (2.13.0):
+  - RNReanimated (2.14.4):
     - DoubleConversion
     - FBLazyVector
     - FBReactNativeSpec
@@ -1152,6 +1155,7 @@ PODS:
   - RNSVG (13.6.0):
     - React-Core
   - Yoga (1.14.0)
+  - ZIPFoundation (0.9.11)
 
 DEPENDENCIES:
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
@@ -1179,6 +1183,7 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - react-native-apple-pay (from `../node_modules/react-native-apple-payment`)
   - "react-native-cameraroll (from `../node_modules/@react-native-camera-roll/camera-roll`)"
+  - react-native-file-access (from `../node_modules/react-native-file-access`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
@@ -1241,6 +1246,7 @@ SPEC REPOS:
     - Libuv-gRPC
     - nanopb
     - PromisesObjC
+    - ZIPFoundation
 
 EXTERNAL SOURCES:
   boost:
@@ -1289,6 +1295,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-apple-payment"
   react-native-cameraroll:
     :path: "../node_modules/@react-native-camera-roll/camera-roll"
+  react-native-file-access:
+    :path: "../node_modules/react-native-file-access"
   react-native-image-picker:
     :path: "../node_modules/react-native-image-picker"
   react-native-pager-view:
@@ -1407,6 +1415,7 @@ SPEC CHECKSUMS:
   React-logger: 1623c216abaa88974afce404dc8f479406bbc3a0
   react-native-apple-pay: 2fe2270baf2cf49f42bd67676d5a343e3c7c9912
   react-native-cameraroll: 0ff04cc4e0ff5f19a94ff4313e5c8bc4503cd86d
+  react-native-file-access: e2617a7300406307be44267b36d196c78d6b2a96
   react-native-image-picker: 9160f95f836aae4a9afb90a7b2ab78b2b534e5bd
   react-native-pager-view: 54bed894cecebe28cede54c01038d9d1e122de43
   react-native-safe-area-context: 99b24a0c5acd0d5dcac2b1a7f18c49ea317be99a
@@ -1437,10 +1446,11 @@ SPEC CHECKSUMS:
   RNIap: 8c0ae1131a410593631418fa82587c7a54fb31c9
   RNImageMarker: 76cd113306bcfad2f74f78d83d5accfd50b4434a
   RNReactNativeHapticFeedback: 1e3efeca9628ff9876ee7cdd9edec1b336913f8c
-  RNReanimated: ce445c233a6ff5600223484a88ad5704945d972a
+  RNReanimated: 6668b0587bebd4b15dd849b99e5a9c70fc12ed95
   RNScreens: 34cc502acf1b916c582c60003dc3089fa01dc66d
   RNSVG: 3a79c0c4992213e4f06c08e62730c5e7b9e4dc17
   Yoga: 99caf8d5ab45e9d637ee6e0174ec16fbbb01bcfc
+  ZIPFoundation: b1f0de4eed33e74a676f76e12559ab6b75990197
 
 PODFILE CHECKSUM: a1d675ebddf7024cb70e06ddcbc1c56f4a77efd2
 

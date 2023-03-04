@@ -20,6 +20,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import like from '../common/like';
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 import {SET_PROMPT} from '../../redux/types';
+import {CachedImage} from '@georstat/react-native-image-cache';
 const hapticOptions = {
   enableVibrateFallback: true,
   ignoreAndroidSystemSettings: false,
@@ -172,22 +173,23 @@ export default function Liked() {
           <Neomorph
             style={{
               shadowRadius: 5,
-              borderRadius: 25,
+              borderRadius: 10,
               backgroundColor: COLORS.primary,
               width: SIZES.canvas,
               height: SIZES.canvas,
               marginTop: 20,
             }}>
-            <Image
-              source={{
-                uri: image.url,
-              }}
+            <CachedImage
+              source={image.url}
+              resizeMode="cover"
               style={{
                 width: SIZES.canvas,
                 height: SIZES.canvas,
 
-                borderRadius: 25,
-              }}></Image>
+                borderRadius: 10,
+                overflow: 'hidden',
+              }}
+            />
             <View
               style={{
                 position: 'absolute',

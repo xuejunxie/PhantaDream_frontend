@@ -44,6 +44,15 @@ import UserPage from './Components/Explore/UserPage';
 import editData from './editData';
 import Notification from './Components/Notification/Notification';
 import Chat from './Components/Notification/Chat';
+import {CacheManager} from '@georstat/react-native-image-cache';
+import {Dirs} from 'react-native-file-access';
+CacheManager.config = {
+  baseDir: `${Dirs.CacheDir}/images_cache/`,
+  blurRadius: 15,
+  cacheLimit: 0,
+  sourceAnimationDuration: 1000,
+  thumbnailAnimationDuration: 1000,
+};
 
 LogBox.ignoreAllLogs();
 

@@ -14,6 +14,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import like from '../common/like';
 import * as RootNavigation from '../common/RootNavigation';
 import {useRoute} from '@react-navigation/native';
+import {CachedImage} from '@georstat/react-native-image-cache';
 
 const defaultAvatar =
   'https://i0.wp.com/bangla.indiarag.com/wp-content/uploads/2019/01/dummy-snapcode-avatar@2x.png';
@@ -43,12 +44,13 @@ const ImageView = (image, likes, liked, dispatch, showAvatar) => {
             height: SIZES.canvas,
             margin: 10,
           }}>
-          <Image
-            source={{uri: image.url}}
+          <CachedImage
+            source={image.url}
             style={{
               width: SIZES.canvas,
               height: SIZES.canvas,
               borderRadius: 10,
+              overflow: 'hidden',
             }}
           />
           <View
@@ -91,17 +93,17 @@ const ImageView = (image, likes, liked, dispatch, showAvatar) => {
                   alignSelf: 'flex-start',
                   flexDirection: 'row',
                 }}>
-                <Image
-                  source={{
-                    uri: image?.owner?.avatar
-                      ? image.owner.avatar
-                      : defaultAvatar,
-                  }}
+                <CachedImage
+                  source={
+                    image?.owner?.avatar ? image.owner.avatar : defaultAvatar
+                  }
                   style={{
                     width: 30,
                     height: 30,
                     borderRadius: 15,
+                    overflow: 'hidden',
                   }}
+                  resizeMode="cover"
                 />
                 <Text
                   style={{

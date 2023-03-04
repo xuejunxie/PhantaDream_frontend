@@ -58,6 +58,7 @@ import Billing from './Account/Billing';
 import Following from './Account/Following';
 import Follower from './Account/Follower';
 import Setting from './Account/Setting';
+import {CachedImage} from '@georstat/react-native-image-cache';
 
 const styles = StyleSheet.create({
   scroll: {
@@ -285,7 +286,16 @@ const Account = () => {
               uploadAvatar();
             }}>
             <View style={styles.userImage}>
-              <Avatar rounded size="large" source={{uri: avatar}} />
+              <CachedImage
+                style={{
+                  height: 80,
+                  width: 80,
+                  borderRadius: 40,
+                  overflow: 'hidden',
+                }}
+                resizeMode="cover"
+                source={avatar}
+              />
             </View>
           </TouchableOpacity>
           <View

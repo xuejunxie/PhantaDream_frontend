@@ -24,6 +24,7 @@ const hapticOptions = {
 };
 import like from '../common/like';
 import {SET_PROMPT} from '../../redux/types';
+import {CachedImage} from '@georstat/react-native-image-cache';
 
 var scrollViewHeight = 0;
 
@@ -210,22 +211,23 @@ export default function Published() {
           <Neomorph
             style={{
               shadowRadius: 5,
-              borderRadius: 25,
+              borderRadius: 10,
               backgroundColor: COLORS.primary,
               width: SIZES.canvas,
               height: SIZES.canvas,
               marginTop: 20,
             }}>
-            <Image
-              source={{
-                uri: image.url,
-              }}
+            <CachedImage
+              source={image.url}
+              resizeMode="cover"
               style={{
                 width: SIZES.canvas,
                 height: SIZES.canvas,
 
-                borderRadius: 25,
-              }}></Image>
+                borderRadius: 10,
+                overflow: 'hidden',
+              }}
+            />
           </Neomorph>
         </TouchableWithoutFeedback>
         <View
