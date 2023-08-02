@@ -76,7 +76,8 @@ export default function Dream() {
   const [loading, setLoading] = useState(false);
   // const [charge, setCharge] = useState(0);
   // const [heart, setHeart] = useState(false);
-  const Charge = useSelector(state => state.user.data?.charge);
+  // const Charge = useSelector(state => state.user.data?.charge);
+  const Charge = 100;
 
   const [CopyButtonPressed, setCopyButtonPressed] = useState(false);
   const [saveButtonPressed, setSaveButtonPressed] = useState(false);
@@ -243,97 +244,102 @@ export default function Dream() {
 
   // send prompt to server
 
-  const serverURL = 'http://phantaspace.ddns.net:7863/';
+  const serverURL = 'http://phantaspace.ddns.net:7865/sdapi/v1/';
 
   const send = async () => {
     const imageId = uuid.v1();
-    const userId = auth().currentUser.uid;
+    // const userId = auth().currentUser.uid;
     const seed = Math.floor(Math.random() * 1e8);
     axios
       .post(serverURL + 'txt2img', {
         prompt: prompt,
-        user: userId,
-        img_name: imageId,
-        seed: seed,
-        model: 1,
+        step: 20,
+        width: 800,
+        height: 800,
+        cfg_scale: 7,
+        // user: userId,
+        // img_name: imageId,
+        // seed: seed,
+        // model: 1,
       })
       .then(function (response) {
         console.log('send');
-        const taskID = response.data.task_id;
+        // console.log(response.data);
+        // const taskID = response.data.task_id;
 
-        const statusURL = serverURL + 'status/' + taskID;
-        const imageURL = serverURL + userId + '/' + imageId;
-        const getImage = async () => {
-          await axios
-            .get(statusURL)
-            .then(function (response) {
-              // console.log(response.data.state);
-              if (response.data.state === 'SUCCESS') {
-                axios
-                  .get(imageURL, {responseType: 'arraybuffer'})
-                  .then(function (response) {
-                    const image_data = Buffer.from(
-                      response.data,
-                      'binary',
-                    ).toString('base64');
-                    const image_file = `data:image/png;base64,${image_data}`;
-                    // const image_file = URL.createObjectURL(response.data);
-                    setPrompt('');
-                    // save the image locally with AsyncStorage
-                    const generatedImageMeta = {
-                      id: imageId,
-                      imageURL: imageURL,
-                      prompt: prompt,
-                      date: new Date().getTime(),
-                      artist: artistsUsed,
-                      seed: seed,
-                      model: 1,
-                    };
-                    // save the image information to user database
-                    realtime()
-                      .ref('/users/' + auth().currentUser.uid + '/generated')
-                      .child(imageId)
-                      .set(generatedImageMeta);
+        // const statusURL = serverURL + 'status/' + taskID;
+        // const imageURL = serverURL + userId + '/' + imageId;
+        // const getImage = async () => {
+        //   await axios
+        //     .get(statusURL)
+        //     .then(function (response) {
+        //       // console.log(response.data.state);
+        //       if (response.data.state === 'SUCCESS') {
+        //         axios
+        //           .get(imageURL, {responseType: 'arraybuffer'})
+        //           .then(function (response) {
+        const image_data = Buffer.from(
+          response.data.images[0],
+          'binary',
+        ).toString('base64');
+        const image_file = `data:image/png;base64,${response.data.images[0]}`;
+        //             // const image_file = URL.createObjectURL(response.data);
+        setPrompt('');
+        //             // save the image locally with AsyncStorage
+        //             const generatedImageMeta = {
+        //               id: imageId,
+        //               imageURL: imageURL,
+        //               prompt: prompt,
+        //               date: new Date().getTime(),
+        //               artist: artistsUsed,
+        //               seed: seed,
+        //               model: 1,
+        //             };
+        //             // save the image information to user database
+        //             realtime()
+        //               .ref('/users/' + auth().currentUser.uid + '/generated')
+        //               .child(imageId)
+        //               .set(generatedImageMeta);
 
-                    const image_entry = {
-                      id: imageId,
-                      image: image_file,
-                      imageURL: imageURL,
-                      prompt: prompt,
-                      date: new Date().getTime(),
-                      artist: artistsUsed,
-                      seed: seed,
-                      model: 1,
-                    };
-                    AsyncStorage.setItem(imageId, JSON.stringify(image_entry));
-                    // replace the last image with the new image
-                    image_entry.loading = false;
-                    image_entry.selected = true;
-                    if (images[0].id === 'empty') {
-                      setImages([image_entry]);
-                    } else {
-                      setImages([...images, image_entry]);
-                    }
-                    setLoading(false);
-                    setPickedImage(image_entry);
-                    setArtistsUsed([]);
-                    spendCharge();
-                  });
-              } else {
-                console.log('get');
-
-                setTimeout(getImage, 5000);
-              }
-            })
-            .catch(function (error) {
-              console.log('get sattus error', error);
-              send();
-              setTimeout(getImage, 5000);
-
-              return;
-            });
+        const image_entry = {
+          id: imageId,
+          image: image_file,
+          // imageURL: imageURL,
+          prompt: prompt,
+          date: new Date().getTime(),
+          artist: artistsUsed,
+          seed: seed,
+          model: 1,
         };
-        getImage();
+        //             AsyncStorage.setItem(imageId, JSON.stringify(image_entry));
+        //             // replace the last image with the new image
+        image_entry.loading = false;
+        image_entry.selected = true;
+        if (images[0].id === 'empty') {
+          setImages([image_entry]);
+        } else {
+          setImages([...images, image_entry]);
+        }
+        setLoading(false);
+        setPickedImage(image_entry);
+        setArtistsUsed([]);
+        //             spendCharge();
+        //           });
+        //       } else {
+        //         console.log('get');
+
+        //         setTimeout(getImage, 5000);
+        //       }
+        //     })
+        //     .catch(function (error) {
+        //       console.log('get sattus error', error);
+        //       send();
+        //       setTimeout(getImage, 5000);
+
+        //       return;
+        //     });
+        // };
+        // getImage();
       })
       .catch(function (error) {
         console.log('get post response error', error);

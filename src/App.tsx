@@ -84,6 +84,16 @@ function Home(): JSX.Element {
       // inactiveColor="#3e2465"
       barStyle={{backgroundColor: COLORS.primary}}>
       <Tab.Screen
+        name="Notification"
+        options={{
+          tabBarLabel: 'Chat',
+          tabBarIcon: ({color}) => (
+            <FontAwesomeIcon icon={faCommentAlt} color={color} size={20} />
+          ),
+        }}
+        component={Notification}
+      />
+      <Tab.Screen
         name="Dream"
         options={{
           tabBarLabel: 'Dream',
@@ -131,16 +141,6 @@ function Home(): JSX.Element {
         }}
         component={Market}
       /> */}
-      <Tab.Screen
-        name="Notification"
-        options={{
-          tabBarLabel: 'Chat',
-          tabBarIcon: ({color}) => (
-            <FontAwesomeIcon icon={faCommentAlt} color={color} size={20} />
-          ),
-        }}
-        component={Notification}
-      />
 
       <Tab.Screen
         name="Me"
@@ -169,7 +169,7 @@ function App(): JSX.Element {
   return (
     <NavigationContainer ref={navigationRef}>
       <Stack.Navigator
-        initialRouteName={auth().currentUser && userData ? 'Home' : 'Auth'}
+        initialRouteName={auth().currentUser && userData ? 'Home' : 'Home'}
         screenOptions={{
           headerShown: false,
         }}>
