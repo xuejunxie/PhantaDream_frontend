@@ -46,6 +46,17 @@ import Notification from './Components/Notification/Notification';
 import Chat from './Components/Notification/Chat';
 import {CacheManager} from '@georstat/react-native-image-cache';
 import {Dirs} from 'react-native-file-access';
+
+import Parse from 'parse/react-native.js';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+Parse.setAsyncStorage(AsyncStorage);
+
+const PARSE_APPLICATION_ID = 's2JueYbVaKF6dOubZHR0SFpeJCYZkNJgYK3l4nKR';
+const PARSE_HOST_URL = 'https://parseapi.back4app.com/';
+const PARSE_JAVASCRIPT_KEY = 'RqHDzcKTaB71eazM27ZITuRfugyeIhC7mGjCWuSA';
+Parse.initialize(PARSE_APPLICATION_ID, PARSE_JAVASCRIPT_KEY);
+Parse.serverURL = PARSE_HOST_URL;
+
 CacheManager.config = {
   baseDir: `${Dirs.CacheDir}/images_cache/`,
   blurRadius: 15,
@@ -169,7 +180,7 @@ function App(): JSX.Element {
   return (
     <NavigationContainer ref={navigationRef}>
       <Stack.Navigator
-        initialRouteName={auth().currentUser && userData ? 'Home' : 'Home'}
+        initialRouteName={auth().currentUser && userData ? 'Home' : 'Auth'}
         screenOptions={{
           headerShown: false,
         }}>

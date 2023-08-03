@@ -39,6 +39,7 @@
     "dotenv": "^16.0.3",
     "env": "^0.0.2",
     "ethers": "^5.7.2",
+    "parse": "^4.1.0",
     "patch-package": "^6.5.0",
     "radio-buttons-react-native": "^1.0.4",
     "react": "18.1.0",
@@ -49,6 +50,7 @@
     "react-native-dotenv": "^3.4.2",
     "react-native-file-access": "^2.5.3",
     "react-native-gesture-handler": "^2.8.0",
+    "react-native-get-random-values": "^1.9.0",
     "react-native-haptic-feedback": "^1.14.0",
     "react-native-iap": "^12.5.0",
     "react-native-image-marker": "^0.6.3",
@@ -66,7 +68,8 @@
     "react-redux": "^8.0.5",
     "redux-devtools-extension": "^2.13.9",
     "redux-thunk": "^2.4.2",
-    "typescript": "^4.6.3"
+    "typescript": "^4.6.3",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

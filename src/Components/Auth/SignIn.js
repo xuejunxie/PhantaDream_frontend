@@ -30,6 +30,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch} from 'react-redux';
 import {UPDATE_USER} from '../../redux/types';
 
+import Parse from 'parse/react-native.js';
+
+import 'react-native-get-random-values';
+import {v4 as uuidv4} from 'uuid';
+
 const newUserCharge = 20;
 const newUserHeart = 20;
 
@@ -77,103 +82,192 @@ export default function SignIn({navigation}) {
   //   }
   // }, []);
 
-  async function signInButton() {
-    // Start the sign-in request
-    const appleAuthRequestResponse = await appleAuth.performRequest({
-      requestedOperation: appleAuth.Operation.LOGIN,
-      requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
-    });
+  // async function signInButton() {
+  //   // Start the sign-in request
+  //   const appleAuthRequestResponse = await appleAuth.performRequest({
+  //     requestedOperation: appleAuth.Operation.LOGIN,
+  //     requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+  //   });
 
-    // Ensure Apple returned a user identityToken
-    if (!appleAuthRequestResponse.identityToken) {
-      throw new Error('Apple Sign-In failed - no identify token returned');
+  //   // Ensure Apple returned a user identityToken
+  //   if (!appleAuthRequestResponse.identityToken) {
+  //     throw new Error('Apple Sign-In failed - no identify token returned');
+  //   }
+
+  //   // Create a Firebase credential from the response
+  //   const {identityToken, nonce} = appleAuthRequestResponse;
+  //   // storeTokens(identityToken, nonce);
+
+  //   const appleCredential = auth.AppleAuthProvider.credential(
+  //     identityToken,
+  //     nonce,
+  //   );
+
+  //   // Sign the user in with the credential
+  //   auth()
+  //     .signInWithCredential(appleCredential)
+  //     .then(res => {
+  //       const user = res.user;
+  //       if (res.additionalUserInfo.isNewUser) {
+  //         // create a new user data entry in the database
+  //         var userName = appleAuthRequestResponse.fullName;
+  //         if (userName == null) {
+  //           userName = {
+  //             familyName: 'Joe',
+  //             givenName: 'Average',
+  //           };
+  //         }
+  //         // check the user name is Chinese
+  //         const inChinese = /[\u4e00-\u9fa5]/.test(userName.givenName);
+
+  //         const userData = {
+  //           email: appleAuthRequestResponse.email,
+  //           fullName: userName,
+  //           charge: newUserCharge,
+  //           heart: newUserHeart,
+  //           avatar: defaultAvatar,
+  //           artName: inChinese
+  //             ? userName.familyName + ' ' + userName.givenName
+  //             : userName.givenName + ' ' + userName.familyName,
+  //           handleName: {
+  //             name: inChinese
+  //               ? userName.familyName + userName.givenName
+  //               : userName.givenName +
+  //                 userName.familyName +
+  //                 Math.floor(Math.random() * 10000),
+  //             time: 0,
+  //           },
+  //         };
+
+  //         dispatch({type: UPDATE_USER, payload: userData});
+
+  //         realtime()
+  //           .ref('/users/' + user.uid)
+  //           .set(userData);
+  //       } else {
+  //         // get the user data from the database
+  //         realtime()
+  //           .ref('/users/' + user.uid)
+  //           .once('value')
+  //           .then(snapshot => {
+  //             const userData = snapshot.val();
+  //             dispatch({type: UPDATE_USER, payload: userData});
+  //             if (userData.active == false) {
+  //               Alert.alert(
+  //                 'Your account has been deactivated',
+  //                 'Do you want to reactivate your account?',
+  //                 [
+  //                   {
+  //                     text: 'Cancel',
+  //                     onPress: () => {
+  //                       auth().signOut();
+  //                     },
+  //                   },
+  //                   {
+  //                     text: 'OK',
+  //                     onPress: () => {
+  //                       realtime()
+  //                         .ref('users/' + user.uid)
+  //                         .update({active: true});
+  //                     },
+  //                   },
+  //                 ],
+  //                 {cancelable: false},
+  //               );
+  //             }
+  //           });
+  //       }
+
+  //       navigation.navigate('Home');
+  //     });
+  // }
+
+  const signInButton = async function () {
+    try {
+      let response = {};
+      let appleId = '';
+      let appleToken = '';
+      var appleEmail = '';
+      let fullName = '';
+      if (Platform.OS === 'ios') {
+        // Performs login request requesting user email
+        response = await appleAuth.performRequest({
+          requestedOperation: appleAuth.Operation.LOGIN,
+          requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+        });
+        // On iOS, user ID and email are easily retrieved from request
+        appleId = response.user;
+        appleToken = response.identityToken;
+        appleEmail = response.email;
+        fullName = response.fullName;
+      } else if (Platform.OS === 'android') {
+        // Configure the request
+        appleAuthAndroid.configure({
+          // The Service ID you registered with Apple
+          clientId: 'YOUR_SERVICE_IO',
+          // Return URL added to your Apple dev console
+          redirectUri: 'YOUR_SERVICE_URL',
+          responseType: appleAuthAndroid.ResponseType.ALL,
+          scope: appleAuthAndroid.Scope.ALL,
+        });
+        response = await appleAuthAndroid.signIn();
+        // Decode user ID and email from token returned from Apple,
+        // this is a common workaround for Apple sign-in via web API
+        const decodedIdToken = jwt_decode(response.id_token);
+        appleId = decodedIdToken.sub;
+        appleToken = response.id_token;
+        appleEmail = decodedIdToken.email;
+      }
+      appleEmail = 'test@test.com';
+
+      console.log('appleId', appleId);
+      console.log('appleToken', appleToken);
+      console.log('appleEmail', appleEmail);
+      // Format authData to provide correctly for Apple linkWith on Parse
+      const authData = {
+        id: appleId,
+        token: appleToken,
+      };
+      // Log in or sign up on Parse using this Apple credentials
+      let userToLogin = new Parse.User();
+
+      userToLogin.set('username', 'test@test.com');
+
+      userToLogin.set('email', 'test@test.com');
+
+      const uniqueId = uuidv4();
+      userToLogin.set('userId', uniqueId);
+
+      return await userToLogin
+        .linkWith('apple', {
+          authData: authData,
+        })
+        .then(async loggedInUser => {
+          // logIn returns the corresponding ParseUser object
+          Alert.alert(
+            'Success!',
+            `User ${loggedInUser.get('username')} has successfully signed in!`,
+          );
+          // To verify that this is in fact the current user, currentAsync can be used
+          const currentUser = await Parse.User.currentAsync();
+          console.log(loggedInUser === currentUser);
+          // Navigation.navigate takes the user to the screen named after the one
+          // passed as parameter
+          navigation.navigate('Home');
+          return true;
+        })
+        .catch(async error => {
+          // Error can be caused by wrong parameters or lack of Internet connection
+          Alert.alert('Error 1 !', error.message);
+          return false;
+        });
+    } catch (error) {
+      // Error can be caused by wrong parameters or lack of Internet connection
+      console.log('Error 2 !', error);
+      Alert.alert('Error 2 !', error);
+      return false;
     }
-
-    // Create a Firebase credential from the response
-    const {identityToken, nonce} = appleAuthRequestResponse;
-    // storeTokens(identityToken, nonce);
-    const appleCredential = auth.AppleAuthProvider.credential(
-      identityToken,
-      nonce,
-    );
-    // Sign the user in with the credential
-    auth()
-      .signInWithCredential(appleCredential)
-      .then(res => {
-        const user = res.user;
-        if (res.additionalUserInfo.isNewUser) {
-          // create a new user data entry in the database
-          var userName = appleAuthRequestResponse.fullName;
-          if (userName == null) {
-            userName = {
-              familyName: 'Joe',
-              givenName: 'Average',
-            };
-          }
-          // check the user name is Chinese
-          const inChinese = /[\u4e00-\u9fa5]/.test(userName.givenName);
-
-          const userData = {
-            email: appleAuthRequestResponse.email,
-            fullName: userName,
-            charge: newUserCharge,
-            heart: newUserHeart,
-            avatar: defaultAvatar,
-            artName: inChinese
-              ? userName.familyName + ' ' + userName.givenName
-              : userName.givenName + ' ' + userName.familyName,
-            handleName: {
-              name: inChinese
-                ? userName.familyName + userName.givenName
-                : userName.givenName +
-                  userName.familyName +
-                  Math.floor(Math.random() * 10000),
-              time: 0,
-            },
-          };
-
-          dispatch({type: UPDATE_USER, payload: userData});
-
-          realtime()
-            .ref('/users/' + user.uid)
-            .set(userData);
-        } else {
-          // get the user data from the database
-          realtime()
-            .ref('/users/' + user.uid)
-            .once('value')
-            .then(snapshot => {
-              const userData = snapshot.val();
-              dispatch({type: UPDATE_USER, payload: userData});
-              if (userData.active == false) {
-                Alert.alert(
-                  'Your account has been deactivated',
-                  'Do you want to reactivate your account?',
-                  [
-                    {
-                      text: 'Cancel',
-                      onPress: () => {
-                        auth().signOut();
-                      },
-                    },
-                    {
-                      text: 'OK',
-                      onPress: () => {
-                        realtime()
-                          .ref('users/' + user.uid)
-                          .update({active: true});
-                      },
-                    },
-                  ],
-                  {cancelable: false},
-                );
-              }
-            });
-        }
-
-        navigation.navigate('Home');
-      });
-  }
+  };
 
   return (
     <View
