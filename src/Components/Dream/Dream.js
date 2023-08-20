@@ -114,10 +114,12 @@ export default function Dream() {
   const loadImages = async () => {
     const allKeys = await AsyncStorage.getAllKeys();
 
-    // remove keys with "auth_" prefix
+    // remove keys with "Parse" prefix
     const keys = allKeys.filter(key => {
-      return key.indexOf('auth_') === -1;
+      return key.indexOf('Parse') === -1;
     });
+
+    console.log(keys);
     if (keys.length === 0) {
       setImages([initImage]);
     } else {
@@ -134,10 +136,13 @@ export default function Dream() {
       });
       setImages(sourtedResult);
     }
+
+    console.log('images', images);
   };
   useEffect(() => {
     // AsyncStorage.clear();
     loadImages();
+
     // loadBalance();
   }, []);
 

@@ -49,6 +49,7 @@ import {Dirs} from 'react-native-file-access';
 
 import Parse from 'parse/react-native.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {initializeParse} from '@parse/react-native';
 Parse.setAsyncStorage(AsyncStorage);
 
 const PARSE_APPLICATION_ID = 's2JueYbVaKF6dOubZHR0SFpeJCYZkNJgYK3l4nKR';
@@ -56,6 +57,9 @@ const PARSE_HOST_URL = 'https://parseapi.back4app.com/';
 const PARSE_JAVASCRIPT_KEY = 'RqHDzcKTaB71eazM27ZITuRfugyeIhC7mGjCWuSA';
 Parse.initialize(PARSE_APPLICATION_ID, PARSE_JAVASCRIPT_KEY);
 Parse.serverURL = PARSE_HOST_URL;
+
+const PARSE_REALTIME_URL = 'https://phantadream.b4a.io/';
+initializeParse(PARSE_REALTIME_URL, PARSE_APPLICATION_ID, PARSE_JAVASCRIPT_KEY);
 
 CacheManager.config = {
   baseDir: `${Dirs.CacheDir}/images_cache/`,
@@ -94,7 +98,7 @@ function Home(): JSX.Element {
       activeColor="#315399"
       // inactiveColor="#3e2465"
       barStyle={{backgroundColor: COLORS.primary}}>
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Notification"
         options={{
           tabBarLabel: 'Chat',
@@ -103,7 +107,7 @@ function Home(): JSX.Element {
           ),
         }}
         component={Notification}
-      />
+      /> */}
       <Tab.Screen
         name="Dream"
         options={{
