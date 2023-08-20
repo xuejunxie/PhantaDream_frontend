@@ -272,6 +272,8 @@ const Account = () => {
       },
     ];
 
+    const dummy_avatar = require('./asset/dummy_avatar.png');
+
     return (
       <View
         style={{
@@ -294,7 +296,8 @@ const Account = () => {
                   overflow: 'hidden',
                 }}
                 resizeMode="cover"
-                source={avatar}
+                // source={avatar}
+                source={dummy_avatar}
               />
             </View>
           </TouchableOpacity>

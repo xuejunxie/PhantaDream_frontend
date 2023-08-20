@@ -15,7 +15,7 @@ const productSkus = Platform.select({
 }) as string[];
 
 const subscriptionSkus = Platform.select({
-  ios: ['ai.phantadream.app'],
+  ios: ['ai.phanta.dream'],
   android: ['test.sub1'],
   default: [],
 }) as string[];
