@@ -897,6 +897,10 @@ export default function Dream() {
     );
   };
 
+  const [placeHolder, setPlaceHolder] = useState(
+    '🤯 Tap here to write down your dream',
+  );
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -946,6 +950,7 @@ export default function Dream() {
               }}
               onBlur={() => {
                 setArtistSuggestionVisible(false);
+                setPlaceHolder('🤯 Tap here to write down your dream');
               }}
               value={prompt}
               style={{
@@ -953,7 +958,11 @@ export default function Dream() {
                 // align text to center
                 textAlign: 'center',
               }}
-              placeholder="🤯 Tap here to write down your dream "
+              onFocus={() => {
+                // Clear the placeholder text when focused
+                setPlaceHolder('');
+              }}
+              placeholder={placeHolder}
               returnKeyType="send"
               numberOfLines={1}
               blurOnSubmit={true}

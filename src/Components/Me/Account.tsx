@@ -6,6 +6,7 @@ import {
   Text,
   ScrollView,
   Alert,
+  Image,
 } from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 
@@ -60,6 +61,8 @@ import Follower from './Account/Follower';
 import Setting from './Account/Setting';
 import {CachedImage} from '@georstat/react-native-image-cache';
 
+const dummy_avatar = require('./asset/dummy_avatar.png');
+
 const styles = StyleSheet.create({
   scroll: {
     backgroundColor: COLORS.primary,
@@ -82,8 +85,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const defaultAvatar =
-  'https://i0.wp.com/bangla.indiarag.com/wp-content/uploads/2019/01/dummy-snapcode-avatar@2x.png?ssl=1';
+const defaultAvatar = '';
 
 const Account = () => {
   // set user name
@@ -272,8 +274,6 @@ const Account = () => {
       },
     ];
 
-    const dummy_avatar = require('./asset/dummy_avatar.png');
-
     return (
       <View
         style={{
@@ -288,17 +288,28 @@ const Account = () => {
               uploadAvatar();
             }}>
             <View style={styles.userImage}>
-              <CachedImage
-                style={{
-                  height: 80,
-                  width: 80,
-                  borderRadius: 40,
-                  overflow: 'hidden',
-                }}
-                resizeMode="cover"
-                // source={avatar}
-                source={dummy_avatar}
-              />
+              {avatar == '' ? (
+                <Image
+                  style={{
+                    height: 80,
+                    width: 80,
+                    borderRadius: 40,
+                    overflow: 'hidden',
+                  }}
+                  source={dummy_avatar}
+                />
+              ) : (
+                <CachedImage
+                  style={{
+                    height: 80,
+                    width: 80,
+                    borderRadius: 40,
+                    overflow: 'hidden',
+                  }}
+                  resizeMode="cover"
+                  source={avatar}
+                />
+              )}
             </View>
           </TouchableOpacity>
           <View

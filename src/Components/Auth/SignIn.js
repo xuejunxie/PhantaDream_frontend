@@ -30,8 +30,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch} from 'react-redux';
 import {UPDATE_USER} from '../../redux/types';
 
-const newUserCharge = 20;
-const newUserHeart = 20;
+const newUserCharge = 100;
+const newUserHeart = 100;
 
 export default function SignIn({navigation}) {
   const [pressed, setPressed] = useState(false);
@@ -118,7 +118,7 @@ export default function SignIn({navigation}) {
             fullName: userName,
             charge: newUserCharge,
             heart: newUserHeart,
-            avatar: defaultAvatar,
+            avatar: '',
             artName: inChinese
               ? userName.familyName + ' ' + userName.givenName
               : userName.givenName + ' ' + userName.familyName,
