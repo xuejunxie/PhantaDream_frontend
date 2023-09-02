@@ -26,6 +26,8 @@ import {
 } from '@invertase/react-native-apple-authentication';
 import firestore from '@react-native-firebase/firestore';
 import realtime from '@react-native-firebase/database';
+import storage from '@react-native-firebase/storage';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch} from 'react-redux';
 import {UPDATE_USER} from '../../redux/types';
@@ -76,6 +78,26 @@ export default function SignIn({navigation}) {
   //     signInWithStoredTokens();
   //   }
   // }, []);
+
+  // generate avatar, and store it in the database, add it to the user data
+  // const generate_avatar = (username) => {
+  //   axios
+  //     .post(serverURL + 'txt2img', {
+  //       prompt: username,
+  //       steps: 20,
+  //       width: 768,
+  //       height: 768,
+  //       cfg_scale: 7,
+  //       seed: seed,
+  //     })
+  //     .then(res => {
+  //       const avatar = res.data.image[0];
+  //       // upload the avatar to the storage
+  //       const storageRef = storage().ref();
+  //       const reference = storage().ref(
+  //         `/users/${auth().currentUser.uid}/avatar`,
+  //       );
+  //       const task = reference.putFile(avatar);
 
   async function signInButton() {
     // Start the sign-in request

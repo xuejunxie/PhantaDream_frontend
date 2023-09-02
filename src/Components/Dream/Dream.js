@@ -253,10 +253,11 @@ export default function Dream() {
     axios
       .post(serverURL + 'txt2img', {
         prompt: prompt,
-        step: 20,
-        width: 1024,
-        height: 1024,
+        steps: 20,
+        width: 768,
+        height: 768,
         cfg_scale: 7,
+        seed: seed,
       })
       .then(function (response) {
         console.log('send');
@@ -309,6 +310,9 @@ export default function Dream() {
         // send();
         return;
       });
+
+    // check progress using get from http://phantaspace.ddns.net:7865/sdapi/v1/progress
+    // if progress is not 100, keep checking
   };
   // buttom press components
   const operations = (press, setPress, icon) => {
@@ -621,18 +625,37 @@ export default function Dream() {
   useEffect(() => {
     if (pickedImage) {
       if (deleteButtonPressed) {
-        if (images.length === 1) {
-          setImages([initImage]);
-        } else {
-          setImages(
-            images.filter(image => {
-              return image.id !== pickedImage.id;
-            }),
-          );
-        }
-        AsyncStorage.removeItem(pickedImage.id);
-        setPickedImage(null);
-        setDeleteButtonPressed(false);
+        Alert.alert(
+          'Delete',
+          'Are you sure you want to delete?',
+          [
+            {
+              text: 'Cancel',
+              onPress: () => {
+                setDeleteButtonPressed(false);
+              },
+              style: 'cancel',
+            },
+            {
+              text: 'OK',
+              onPress: () => {
+                if (images.length === 1) {
+                  setImages([initImage]);
+                } else {
+                  setImages(
+                    images.filter(image => {
+                      return image.id !== pickedImage.id;
+                    }),
+                  );
+                }
+                AsyncStorage.removeItem(pickedImage.id);
+                setPickedImage(null);
+                setDeleteButtonPressed(false);
+              },
+            },
+          ],
+          {cancelable: false},
+        );
       }
     }
   }, [deleteButtonPressed]);
@@ -765,25 +788,25 @@ export default function Dream() {
 
   const chargePurchaseSelection = [
     {
-      label: '$0.99 for 30 ',
+      label: '$0.99 for 100 ',
       productID: productID.charge1,
       subscription: false,
       price: 0.99,
-      charge: 30,
+      charge: 100,
     },
     {
-      label: '$19.99 for 800 ',
+      label: '$9.99 for 2000 ',
       productID: productID.charge2,
       subscription: false,
       price: 19.99,
-      charge: 800,
+      charge: 2000,
     },
     {
-      label: '$399.99 for 20000 ',
+      label: '$99.99 for 40000 ',
       productID: productID.charge3,
       subscription: false,
       price: 399.99,
-      charge: 20000,
+      charge: 40000,
     },
   ];
 
@@ -879,18 +902,28 @@ export default function Dream() {
           flexDirection: 'row',
           justifyContent: 'center',
           alignItems: 'center',
-          marginTop: 20,
-          marginBottom: 20,
         }}>
+        <Text style={{color: 'gray', fontSize: 15, marginRight: 10}}>
+          add artist style:
+        </Text>
         <TouchableOpacity
           onPress={() => {
             refreshArtist();
-            setPrompt(prompt + ', ' + artistSeggestion);
+            setPrompt(prompt + ', ' + artistSeggestion + ' art style');
             setArtistsUsed([...artistsUsed, artistSeggestion]);
             refreshArtist();
+          }}
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderWidth: 10,
+            borderColor: COLORS.blue,
+            backgroundColor: COLORS.blue,
+            borderRadius: 10,
           }}>
-          <Text style={{color: 'gray', fontSize: 15, marginRight: 10}}>
-            Tap here to add artist style: {artistSeggestion}
+          <Text style={{color: 'black', fontSize: 15, marginRight: 10}}>
+            {artistSeggestion}
           </Text>
         </TouchableOpacity>
       </View>
@@ -938,6 +971,8 @@ export default function Dream() {
           {ChargeModal()}
           {buyChargeLoadingModal()}
         </ScrollView>
+
+        {artistSuggestionVisible && artistView()}
 
         <View>
           {!loading && (
@@ -1015,7 +1050,6 @@ export default function Dream() {
             />
           )}
         </View>
-        {artistSuggestionVisible && artistView()}
       </View>
     </KeyboardAvoidingView>
   );
