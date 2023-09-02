@@ -77,7 +77,7 @@ export default function Dream() {
   // const [charge, setCharge] = useState(0);
   // const [heart, setHeart] = useState(false);
   const Charge = useSelector(state => state.user.data?.charge);
-
+  const artistList = useSelector(state => state.user.data?.artistList);
   const [CopyButtonPressed, setCopyButtonPressed] = useState(false);
   const [saveButtonPressed, setSaveButtonPressed] = useState(false);
   const [shareButtonPressed, setShareButtonPressed] = useState(false);
@@ -224,6 +224,18 @@ export default function Dream() {
       .ref('/users/' + auth().currentUser.uid)
       .update({
         charge: realtime.ServerValue.increment(-1),
+      });
+  };
+
+  const addArtist = artist => {
+    realtime()
+      .ref('/users/' + auth().currentUser.uid)
+      .update({
+        artistList: {
+          preferred: artistList?.preferred
+            ? [...new Set(artistList?.preferred.concat(artist))]
+            : [artist],
+        },
       });
   };
 
@@ -897,36 +909,77 @@ export default function Dream() {
 
   const artistView = () => {
     return (
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <Text style={{color: 'gray', fontSize: 15, marginRight: 10}}>
-          add artist style:
-        </Text>
-        <TouchableOpacity
-          onPress={() => {
-            refreshArtist();
-            setPrompt(prompt + ', ' + artistSeggestion + ' art style');
-            setArtistsUsed([...artistsUsed, artistSeggestion]);
-            refreshArtist();
-          }}
+      <ScrollView
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
+        keyboardShouldPersistTaps="always">
+        <View
           style={{
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
-            borderWidth: 10,
-            borderColor: COLORS.blue,
-            backgroundColor: COLORS.blue,
-            borderRadius: 10,
           }}>
-          <Text style={{color: 'black', fontSize: 15, marginRight: 10}}>
-            {artistSeggestion}
-          </Text>
-        </TouchableOpacity>
-      </View>
+          <View>
+            <Text style={{color: 'gray', fontSize: 15, marginRight: 10}}>
+              add artist style:
+            </Text>
+          </View>
+          <View>
+            <TouchableOpacity
+              onPress={() => {
+                refreshArtist();
+                setPrompt(prompt + ', ' + artistSeggestion + ' art style');
+                setArtistsUsed([...artistsUsed, artistSeggestion]);
+                refreshArtist();
+                addArtist(artistSeggestion);
+              }}
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderWidth: 10,
+                height: 40,
+                marginRight: 10,
+                borderColor: COLORS.blue,
+                backgroundColor: COLORS.blue,
+                borderRadius: 10,
+              }}>
+              <Text style={{color: 'black', fontSize: 15, marginRight: 10}}>
+                {artistSeggestion}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          {artistList?.preferred.map(artist => {
+            return (
+              <View>
+                <TouchableOpacity
+                  onPress={() => {
+                    // refreshArtist();
+                    setPrompt(prompt + ', ' + artist + ' art style');
+                    setArtistsUsed([...artistsUsed, artist]);
+                    // refreshArtist();
+                    addArtist(artist);
+                  }}
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    borderWidth: 10,
+                    height: 40,
+                    marginRight: 10,
+                    borderColor: COLORS.blue,
+                    backgroundColor: COLORS.blue,
+                    borderRadius: 10,
+                  }}>
+                  <Text style={{color: 'black', fontSize: 15, marginRight: 10}}>
+                    {artist}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            );
+          })}
+        </View>
+      </ScrollView>
     );
   };
 
