@@ -4,6 +4,8 @@ import {
   View,
   Text,
   ScrollView,
+  Image,
+  ImageBackground,
   FlatList,
   Alert,
 } from 'react-native';
@@ -100,9 +102,9 @@ export default function Notification() {
 
   const fetchMessages = () => {
     if (messagesObject) {
-      const messagePromises = Object.keys(messagesObject).map(key => {
-        var youLastMessage = Object.values(messagesObject[key])[
-          Object.keys(messagesObject[key]).length - 1
+      const messagePromises = Object.keys(messagesObject).map(senderID => {
+        var youLastMessage = Object.values(messagesObject[senderID])[
+          Object.keys(messagesObject[senderID]).length - 1
         ].message;
         // Show only limited length of message
         const length = 34;
@@ -111,22 +113,25 @@ export default function Notification() {
             ? youLastMessage.slice(0, length) + '...'
             : youLastMessage;
 
-        const youLastMessageTime = Object.keys(messagesObject[key])[
-          Object.keys(messagesObject[key]).length - 1
+        const youLastMessageTime = Object.keys(messagesObject[senderID])[
+          Object.keys(messagesObject[senderID]).length - 1
         ];
         return Promise.all([
-          realtime().ref(`/users/${key}/artName`).once('value'),
-          realtime().ref(`/users/${key}/avatar`).once('value'),
+          realtime().ref(`/users/${senderID}/artName`).once('value'),
+          realtime().ref(`/users/${senderID}/avatar`).once('value'),
         ]).then(([nameSnapshot, avatarSnapshot]) => {
           const youName = nameSnapshot.val();
           const youAvatar = avatarSnapshot.val();
           return {
-            id: key,
+            id: senderID,
             avatar: youAvatar,
             name: youName,
             lastMessage: youLastMessage,
             time: youLastMessageTime,
             byNow: msToTime(new Date().getTime() - youLastMessageTime) + ' ago',
+            type: messagesObject[senderID][youLastMessageTime].type,
+            image: messagesObject[senderID][youLastMessageTime].image,
+            artistName: senderID,
           };
         });
       });
@@ -171,35 +176,99 @@ export default function Notification() {
     }
   };
 
-  const listItem = ({you, index}) => {
-    return (
-      <TouchableOpacity
-        style={styles.listItem}
-        key={index}
-        onPress={() =>
-          RootNavigation.navigate('Chat', {
-            name: you.artName,
-            avatar: you.avatar,
-            id: you.id,
-          })
-        }>
-        <CachedImage
-          style={{
-            height: 50,
-            width: 50,
-            borderRadius: 25,
-            overflow: 'hidden',
-          }}
-          resizeMode="cover"
-          source={you.avatar}
-        />
-        <View style={styles.listItemContent}>
-          <Text style={styles.name}>{you.name}</Text>
-          <Text style={styles.message}>{you.lastMessage}</Text>
-        </View>
-        <Text style={styles.time}>{you.byNow}</Text>
-      </TouchableOpacity>
-    );
+  const listItem = ({sender, index}) => {
+    // console.log(sender);
+    if (sender.type === 'private club request') {
+      return (
+        <TouchableOpacity
+          style={styles.listItem}
+          key={index}
+          onPress={() =>
+            RootNavigation.navigate('Chat', {
+              name: sender.artName,
+              avatar: sender.avatar,
+              id: sender.id,
+              type: sender.type,
+            })
+          }>
+          <CachedImage
+            style={{
+              height: 50,
+              width: 50,
+              borderRadius: 25,
+              overflow: 'hidden',
+            }}
+            resizeMode="cover"
+            source={sender.avatar}
+          />
+          <View style={styles.listItemContent}>
+            <Text style={styles.name}>{sender.name}</Text>
+            <Text style={styles.message}>{sender.lastMessage}</Text>
+          </View>
+          <Text style={styles.time}>{sender.byNow}</Text>
+        </TouchableOpacity>
+      );
+    }
+
+    if ((sender.type = 'new art work')) {
+      const imageURL = sender.image.imageURL;
+      console.log(imageURL);
+      return (
+        <TouchableOpacity
+          style={styles.listItem}
+          key={index}
+          onPress={() =>
+            RootNavigation.navigate('Chat', {
+              name: sender.artistName,
+              avatar: sender.avatar,
+              id: sender.id,
+              type: sender.type,
+            })
+          }>
+          <CachedImage
+            style={{
+              height: 50,
+              width: 50,
+              borderRadius: 25,
+              overflow: 'hidden',
+            }}
+            resizeMode="cover"
+            source={imageURL}
+          />
+          {/* <Image
+            style={{
+              height: 50,
+              width: 50,
+              borderRadius: 25,
+              overflow: 'hidden',
+            }}
+            resizeMode="cover"
+            source={{uri: imageURL}}
+          /> */}
+          {/* <ImageBackground
+            style={{
+              flex: 1, // Make the image take the entire space of the TouchableOpacity
+              flexDirection: 'row', // Assuming you want to display the content in a row
+              alignItems: 'center', // Align the content vertically
+              borderRadius: 25,
+              height: '100%',
+              overflow: 'hidden',
+            }}
+            resizeMode="cover"
+            source={{uri: imageURL}}
+            onError={e => {
+              console.log('error', e);
+            }}> */}
+          <View style={styles.listItemContent}>
+            <Text style={styles.name}>{sender.artistName}</Text>
+            <Text style={styles.message}>{sender.lastMessage}</Text>
+          </View>
+          <Text style={styles.time}>{sender.byNow}</Text>
+
+          {/* </ImageBackground> */}
+        </TouchableOpacity>
+      );
+    }
   };
 
   return (
@@ -215,7 +284,7 @@ export default function Notification() {
             Object.keys(messages)
               .sort((a, b) => messages[b].time - messages[a].time)
               .map((key, index) => {
-                return listItem({you: messages[key], index});
+                return listItem({sender: messages[key], index});
               })}
         </View>
       </ScrollView>

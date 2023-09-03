@@ -8,7 +8,7 @@ export default function Payment({price, chargeOrder, fillCharge}) {
   const Method: MethodData = {
     countryCode: 'US',
     currencyCode: 'USD',
-    merchantIdentifier: 'merchant.phantadream',
+    merchantIdentifier: 'merchant.phanta.dream',
     supportedNetworks: ['Visa', 'MasterCard', 'AmEx', 'Discover'],
   };
 

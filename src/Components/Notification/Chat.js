@@ -19,7 +19,7 @@ import {Avatar} from '@rneui/themed';
 import {CachedImage} from '@georstat/react-native-image-cache';
 
 const ChatUI = ({route, navigation}) => {
-  const {name, avatar, id} = route.params;
+  const {name, avatar, id, type} = route.params;
   const messages = useSelector(state => state.user?.data?.messages)?.[id];
   const myAvatar = useSelector(state => state.user?.data?.avatar);
   const [inputText, setInputText] = useState(''); //initial text of TextInput
@@ -56,6 +56,19 @@ const ChatUI = ({route, navigation}) => {
           }}>
           <FontAwesomeIcon icon={faChevronLeft} size={20} color={'gray'} />
         </TouchableOpacity>
+        <Text
+          style={{
+            color: 'black',
+            marginRight: 10,
+            position: 'absolute',
+            left: 140,
+            top: 50,
+            fontSize: 20,
+            fontWeight: 'bold',
+          }}>
+          {name}
+        </Text>
+
         <ScrollView
           style={{
             marginTop: 100,
@@ -88,39 +101,53 @@ const ChatUI = ({route, navigation}) => {
                           ? COLORS.blue
                           : COLORS.primary,
                       }}>
-                      <View
-                        style={{
-                          padding: 2,
-                          flexDirection: messages[key].send
-                            ? 'row-reverse'
-                            : 'row',
-                        }}>
+                      {type == 'private club request' && (
                         <View
                           style={{
-                            justifyContent: 'center',
+                            padding: 2,
+                            flexDirection: messages[key].send
+                              ? 'row-reverse'
+                              : 'row',
                           }}>
-                          <CachedImage
+                          <View
                             style={{
-                              height: 30,
-                              width: 30,
-                              borderRadius: 15,
-                              overflow: 'hidden',
-                            }}
-                            resizeMode="cover"
-                            source={messages[key].send ? myAvatar : avatar}
-                          />
+                              justifyContent: 'center',
+                            }}>
+                            <CachedImage
+                              style={{
+                                height: 30,
+                                width: 30,
+                                borderRadius: 15,
+                                overflow: 'hidden',
+                              }}
+                              resizeMode="cover"
+                              source={messages[key].send ? myAvatar : avatar}
+                            />
+                          </View>
+                          <Text
+                            style={{
+                              color: 'black',
+                              margin: 5,
+                              maxWidth: 270,
+                              fontSize: 18,
+                              textAlign: messages[key].send ? 'right' : 'left',
+                            }}>
+                            {messages[key].message}
+                          </Text>
                         </View>
-                        <Text
+                      )}
+                      {type == 'new art work' && (
+                        <CachedImage
                           style={{
-                            color: 'black',
-                            margin: 5,
-                            maxWidth: 270,
-                            fontSize: 18,
-                            textAlign: messages[key].send ? 'right' : 'left',
-                          }}>
-                          {messages[key].message}
-                        </Text>
-                      </View>
+                            height: 300,
+                            width: 300,
+                            borderRadius: 15,
+                            overflow: 'hidden',
+                          }}
+                          resizeMode="cover"
+                          source={messages[key].image.imageURL}
+                        />
+                      )}
                     </View>
                   </NeomorphFlex>
                 </View>

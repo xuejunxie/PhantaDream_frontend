@@ -68,6 +68,8 @@ const tabBarHeight = 29;
 
 var scrollViewHeight = 0;
 
+const storageRef = storage().ref();
+
 export default function Dream() {
   const dispatch = useDispatch();
   const prompt = useSelector(state => state.dream.prompt);
@@ -112,7 +114,7 @@ export default function Dream() {
 
   const loadImages = async () => {
     const allKeys = await AsyncStorage.getAllKeys();
-    console.log(allKeys);
+    // console.log(allKeys);
 
     // remove keys with "auth_" prefix
     const keys = allKeys.filter(key => {
@@ -239,6 +241,35 @@ export default function Dream() {
       });
   };
 
+  function replaceNonUrlCharsWithUnderscore(inputString) {
+    // Define a regular expression that matches non-URL acceptable characters
+    var regex = /[^A-Za-z0-9\-._~:/?#[\]@!$&'()*+,;=]/g;
+
+    // Use the replace method to replace matched characters with underscores
+    var resultString = inputString.replace(regex, '_');
+
+    return resultString;
+  }
+
+  const addArtistToMessage = (artist, image_entry) => {
+    // artist_name_nospace = replaceNonUrlCharsWithUnderscore(artist);
+    // console.log(artist_name_nospace);
+    realtime()
+      .ref(
+        `/users/${
+          auth().currentUser.uid
+        }/messages/${artist}/${new Date().getTime()}/`,
+      )
+      .set({
+        message: 'New art work added',
+        type: 'new art work',
+        timestamp: new Date().getTime(),
+        read: false,
+        send: false,
+        image: image_entry,
+      });
+  };
+
   // dynamically adjust vertical offset of keyboard avoiding view
   useEffect(() => {
     const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
@@ -277,22 +308,8 @@ export default function Dream() {
         const image_file = `data:image/png;base64,${response.data.images[0]}`;
 
         setPrompt('');
-        // save the image locally with AsyncStorage
-        const generatedImageMeta = {
-          id: imageId,
-          imageURL: '',
-          prompt: prompt,
-          date: new Date().getTime(),
-          artist: artistsUsed,
-          seed: seed,
-          model: 1,
-        };
-        // save the image information to user database
-        realtime()
-          .ref('/users/' + auth().currentUser.uid + '/generated')
-          .child(imageId)
-          .set(generatedImageMeta);
 
+        // save the image locally with AsyncStorage
         const image_entry = {
           id: imageId,
           image: image_file,
@@ -303,7 +320,6 @@ export default function Dream() {
           seed: seed,
           model: 1,
         };
-        AsyncStorage.setItem(imageId, JSON.stringify(image_entry));
         // replace the last image with the new image
         image_entry.loading = false;
         image_entry.selected = true;
@@ -316,6 +332,31 @@ export default function Dream() {
         setPickedImage(image_entry);
         setArtistsUsed([]);
         spendCharge();
+        addArtist(artistsUsed[0]);
+
+        // save the image information to user database
+        const imageRef = storageRef.child('images/' + imageId + '.png');
+        imageRef.putString(image_file, 'data_url').then(() => {
+          imageRef.getDownloadURL().then(url => {
+            const generatedImageMeta = {
+              id: imageId,
+              imageURL: url,
+              prompt: prompt,
+              date: new Date().getTime(),
+              artist: artistsUsed,
+              seed: seed,
+              model: 1,
+            };
+            realtime()
+              .ref('/users/' + auth().currentUser.uid + '/generated')
+              .child(imageId)
+              .set(generatedImageMeta);
+            addArtistToMessage(artistsUsed[0], generatedImageMeta);
+            // save the url wit the image entry to local storage
+            image_entry.imageURL = url;
+            AsyncStorage.setItem(imageId, JSON.stringify(image_entry));
+          });
+        });
       })
       .catch(function (error) {
         console.log('get post response error', error);
@@ -587,7 +628,6 @@ export default function Dream() {
     const prompt = pickedImage.prompt;
     const date = pickedImage.date;
     const artist = pickedImage.artist;
-    const storageRef = storage().ref();
     const seed = pickedImage.seed;
     const imageRef = storageRef.child('images/' + imageId + '.png');
 
@@ -927,11 +967,10 @@ export default function Dream() {
           <View>
             <TouchableOpacity
               onPress={() => {
-                refreshArtist();
+                // refreshArtist();
                 setPrompt(prompt + ', ' + artistSeggestion + ' art style');
                 setArtistsUsed([...artistsUsed, artistSeggestion]);
-                refreshArtist();
-                addArtist(artistSeggestion);
+                // refreshArtist();
               }}
               style={{
                 flexDirection: 'row',
@@ -951,14 +990,13 @@ export default function Dream() {
           </View>
           {artistList?.preferred.map(artist => {
             return (
-              <View>
+              <View key={artist}>
                 <TouchableOpacity
                   onPress={() => {
                     // refreshArtist();
                     setPrompt(prompt + ', ' + artist + ' art style');
                     setArtistsUsed([...artistsUsed, artist]);
                     // refreshArtist();
-                    addArtist(artist);
                   }}
                   style={{
                     flexDirection: 'row',
