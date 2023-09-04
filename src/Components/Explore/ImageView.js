@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {View, Text, Image} from 'react-native';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import {Neomorph} from 'react-native-neomorph-shadows';
-import {COLORS, SIZES} from '../common/globalValues';
+import {COLORS, SIZES, defaultAvatar} from '../common/globalValues';
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 const hapticOptions = {
   enableVibrateFallback: true,
@@ -15,9 +15,6 @@ import like from '../common/like';
 import * as RootNavigation from '../common/RootNavigation';
 import {useRoute} from '@react-navigation/native';
 import {CachedImage} from '@georstat/react-native-image-cache';
-
-const defaultAvatar =
-  'https://i0.wp.com/bangla.indiarag.com/wp-content/uploads/2019/01/dummy-snapcode-avatar@2x.png';
 
 const ImageView = (image, likes, liked, dispatch, showAvatar) => {
   return (
@@ -95,7 +92,9 @@ const ImageView = (image, likes, liked, dispatch, showAvatar) => {
                 }}>
                 <CachedImage
                   source={
-                    image?.owner?.avatar ? image.owner.avatar : defaultAvatar
+                    image?.owner?.avatar !== ''
+                      ? image.owner.avatar
+                      : defaultAvatar
                   }
                   style={{
                     width: 30,

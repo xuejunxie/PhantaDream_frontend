@@ -190,7 +190,7 @@ export default UserPage = ({route, navigation}) => {
             />
           </View>
 
-          <View
+          {/* <View
             style={{
               flex: 1,
               marginTop: 100,
@@ -242,10 +242,10 @@ export default UserPage = ({route, navigation}) => {
                 in private club
               </Text>
             </View>
-          </View>
+          </View> */}
         </View>
 
-        <View
+        {/* <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
@@ -293,7 +293,7 @@ export default UserPage = ({route, navigation}) => {
               {joinPrivateClubButton()}
             </TouchableWithoutFeedback>
           )}
-        </View>
+        </View> */}
       </View>
     );
   };

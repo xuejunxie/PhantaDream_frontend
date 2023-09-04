@@ -11,7 +11,8 @@ import {
 import {createStackNavigator} from '@react-navigation/stack';
 
 // import { useMoralis, useMoralisWeb3Api, useMoralisWeb3ApiCall } from "react-moralis";
-import {COLORS} from '../common/globalValues';
+import {COLORS, defaultAvatar} from '../common/globalValues';
+
 import {Avatar, ListItem} from '@rneui/themed';
 
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
@@ -61,8 +62,6 @@ import Follower from './Account/Follower';
 import Setting from './Account/Setting';
 import {CachedImage} from '@georstat/react-native-image-cache';
 
-const dummy_avatar = require('./asset/dummy_avatar.png');
-
 const styles = StyleSheet.create({
   scroll: {
     backgroundColor: COLORS.primary,
@@ -84,8 +83,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
   },
 });
-
-const defaultAvatar = '';
 
 const Account = () => {
   // set user name
@@ -296,7 +293,7 @@ const Account = () => {
                     borderRadius: 40,
                     overflow: 'hidden',
                   }}
-                  source={dummy_avatar}
+                  source={defaultAvatar}
                 />
               ) : (
                 <CachedImage

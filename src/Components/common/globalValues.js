@@ -11,8 +11,7 @@ const SIZES = {
   canvas: 300,
 };
 
-const defaultAvatar =
-  'https://i0.wp.com/bangla.indiarag.com/wp-content/uploads/2019/01/dummy-snapcode-avatar@2x.png';
+const defaultAvatar = 'https://phantadream.ai/dummy_avatar.png';
 
 const productID = {
   // In-App Purchase
