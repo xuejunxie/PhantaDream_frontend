@@ -212,7 +212,7 @@ export default function Notification() {
 
     if ((sender.type = 'new art work')) {
       const imageURL = sender.image.imageURL;
-      console.log(imageURL);
+      // console.log(imageURL);
       return (
         <TouchableOpacity
           style={styles.listItem}

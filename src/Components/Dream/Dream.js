@@ -95,6 +95,9 @@ export default function Dream() {
   // load all the image from AsyncStorage
   const [images, setImages] = useState([]);
 
+  const placeholder_template = '🤯 Tap here to write down your dream';
+
+  const [placeHolder, setPlaceHolder] = useState(placeholder_template);
   // image object fields:
   // id: imageId same as the key
   // image: image_file (base64) in string
@@ -256,9 +259,9 @@ export default function Dream() {
     // console.log(artist_name_nospace);
     realtime()
       .ref(
-        `/users/${auth().currentUser.uid}/messages/${artist}/${
-          image_entry.date
-        }/`,
+        `/users/${
+          auth().currentUser.uid
+        }/messages/${artist}/${image_entry.date.toString()}/`,
       )
       .set({
         message: 'New art work added',
@@ -308,9 +311,9 @@ export default function Dream() {
         const image_file = `data:image/png;base64,${response.data.images[0]}`;
 
         setPrompt('');
-        const currentTime = new Date().getTime().toString();
+        const currentTime = new Date().getTime();
         // save the image state
-        const image_entry = {
+        var image_entry = {
           id: imageId,
           image: image_file,
           imageURL: '',
@@ -322,6 +325,7 @@ export default function Dream() {
         };
         // replace the last image with the new image
         image_entry.loading = false;
+        AsyncStorage.setItem(imageId, JSON.stringify(image_entry));
         image_entry.selected = true;
         if (images[0].id === 'empty') {
           setImages([image_entry]);
@@ -333,6 +337,7 @@ export default function Dream() {
         setArtistsUsed([]);
         spendCharge();
         addArtist(artistsUsed[0]);
+        setPlaceHolder(placeholder_template);
 
         // save the image information to user database
         const imageRef = storageRef.child('images/' + imageId + '.png');
@@ -355,6 +360,7 @@ export default function Dream() {
             // save the url wit the image entry to local storage
             image_entry.imageURL = url;
             AsyncStorage.setItem(imageId, JSON.stringify(image_entry));
+            console.log('image uploaded');
             if (images[0].id === 'empty') {
               setImages([image_entry]);
             } else {
@@ -443,6 +449,7 @@ export default function Dream() {
     if (pickedImage) {
       if (CopyButtonPressed) {
         setPrompt(pickedImage.prompt);
+        setArtistsUsed(pickedImage.artist);
       }
     }
   }, [CopyButtonPressed]);
@@ -952,6 +959,7 @@ export default function Dream() {
   const [artistSeggestion, setArtistSeggestion] = useState('');
   const [artistSuggestionVisible, setArtistSuggestionVisible] = useState(false);
   const [artistsUsed, setArtistsUsed] = useState([]);
+
   const refreshArtist = () => {
     const artist = artists[Math.floor(Math.random() * artists.length)];
     setArtistSeggestion(artist.artist);
@@ -1035,10 +1043,6 @@ export default function Dream() {
     );
   };
 
-  const [placeHolder, setPlaceHolder] = useState(
-    '🤯 Tap here to write down your dream',
-  );
-
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -1090,7 +1094,7 @@ export default function Dream() {
               }}
               onBlur={() => {
                 setArtistSuggestionVisible(false);
-                setPlaceHolder('🤯 Tap here to write down your dream');
+                setPlaceHolder(placeholder_template);
               }}
               value={prompt}
               style={{
