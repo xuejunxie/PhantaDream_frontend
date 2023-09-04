@@ -29,3 +29,7 @@ By downloading PhantaDream, you'll be joining a community of creative, passionat
 
 keywords:
 AI, Art, AIGC, Artist, Creative, Community, inspiration, NFT, loyalty
+
+Notes:
+
+The in-app purchase can be found in the "Dream" tab, click the little "⚡️“ icon. You will be able to see it.

@@ -245,16 +245,16 @@ const Account = () => {
         icon: faUserFriends,
         onPress: simpleNavigate('Follower'),
       },
-      {
-        title: 'Private Clubs',
-        icon: faSkullCrossbones,
-        onPress: simpleNavigate('PrivateClubs'),
-      },
-      {
-        title: 'Private Club members',
-        icon: faUsers,
-        onPress: simpleNavigate('PrivateClubMembers'),
-      },
+      // {
+      //   title: 'Private Clubs',
+      //   icon: faSkullCrossbones,
+      //   onPress: simpleNavigate('PrivateClubs'),
+      // },
+      // {
+      //   title: 'Private Club members',
+      //   icon: faUsers,
+      //   onPress: simpleNavigate('PrivateClubMembers'),
+      // },
       {
         title: 'Notifications',
         icon: faBell,

@@ -15,9 +15,9 @@ const defaultAvatar = 'https://phantadream.ai/dummy_avatar.png';
 
 const productID = {
   // In-App Purchase
-  charge1: 'charge1',
-  charge2: 'charge2',
-  charge3: 'charge3',
+  charge1: 'charge1.phantadream',
+  charge2: 'charge2.phantadream',
+  charge3: 'charge3.phantadream',
 };
 
 export {COLORS, SIZES, defaultAvatar, productID};

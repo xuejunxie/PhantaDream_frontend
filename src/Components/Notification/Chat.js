@@ -171,7 +171,7 @@ const ChatUI = ({route, navigation}) => {
               justifyContent: 'center',
               alignItems: 'center',
             }}>
-            <TextInput
+            {/* <TextInput
               returnKeyType="send"
               placeholder="Type your message"
               multiline={true} //allow multiple lines of text
@@ -212,7 +212,7 @@ const ChatUI = ({route, navigation}) => {
                   });
                 setInputText('');
               }}
-            />
+            /> */}
           </NeomorphFlex>
         </View>
       </KeyboardAvoidingView>
