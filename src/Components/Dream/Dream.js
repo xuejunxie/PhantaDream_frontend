@@ -256,14 +256,14 @@ export default function Dream() {
     // console.log(artist_name_nospace);
     realtime()
       .ref(
-        `/users/${
-          auth().currentUser.uid
-        }/messages/${artist}/${new Date().getTime()}/`,
+        `/users/${auth().currentUser.uid}/messages/${artist}/${
+          image_entry.date
+        }/`,
       )
       .set({
         message: 'New art work added',
         type: 'new art work',
-        timestamp: new Date().getTime(),
+        timestamp: image_entry.date,
         read: false,
         send: false,
         image: image_entry,
@@ -308,14 +308,14 @@ export default function Dream() {
         const image_file = `data:image/png;base64,${response.data.images[0]}`;
 
         setPrompt('');
-
-        // save the image locally with AsyncStorage
+        const currentTime = new Date().getTime().toString();
+        // save the image state
         const image_entry = {
           id: imageId,
           image: image_file,
           imageURL: '',
           prompt: prompt,
-          date: new Date().getTime(),
+          date: currentTime,
           artist: artistsUsed,
           seed: seed,
           model: 1,
@@ -342,7 +342,7 @@ export default function Dream() {
               id: imageId,
               imageURL: url,
               prompt: prompt,
-              date: new Date().getTime(),
+              date: currentTime,
               artist: artistsUsed,
               seed: seed,
               model: 1,
@@ -355,6 +355,11 @@ export default function Dream() {
             // save the url wit the image entry to local storage
             image_entry.imageURL = url;
             AsyncStorage.setItem(imageId, JSON.stringify(image_entry));
+            if (images[0].id === 'empty') {
+              setImages([image_entry]);
+            } else {
+              setImages([...images, image_entry]);
+            }
           });
         });
       })
@@ -629,48 +634,39 @@ export default function Dream() {
     const date = pickedImage.date;
     const artist = pickedImage.artist;
     const seed = pickedImage.seed;
-    const imageRef = storageRef.child('images/' + imageId + '.png');
+    const url = pickedImage.imageURL;
 
-    imageRef
-      .putString(image, 'data_url')
+    const imageMeta = {
+      url: url,
+      id: imageId,
+      prompt: prompt,
+      date: date,
+      artist: artist,
+      creator: auth().currentUser.uid,
+      owner: {
+        id: auth().currentUser.uid,
+        avatar: avatar,
+        artName: artName,
+      },
+      likes: 0,
+      seed: seed,
+      model: 1,
+      public: true,
+    };
+    // store image meta on firestore
+    firestore()
+      .collection('images')
+      .doc(imageId)
+      .set(imageMeta)
       .then(() => {
-        imageRef.getDownloadURL().then(url => {
-          const imageMeta = {
-            url: url,
-            id: imageId,
-            prompt: prompt,
-            date: date,
-            artist: artist,
-            creator: auth().currentUser.uid,
-            owner: {
-              id: auth().currentUser.uid,
-              avatar: avatar,
-              artName: artName,
-            },
-            likes: 0,
-            seed: seed,
-            model: 1,
-            public: true,
-          };
-          // store image meta on firestore
-          firestore()
-            .collection('images')
-            .doc(imageId)
-            .set(imageMeta)
-            .then(() => {
-              Alert.alert('Image Shared!');
-            });
-
-          // store published image on user's published images
-          realtime()
-            .ref('users/' + auth().currentUser.uid + '/' + place)
-            .child(imageId)
-            .set(imageMeta);
-        });
-      })
-      .catch(error => {
-        console.log(error);
+        Alert.alert('Image Shared!');
       });
+
+    // store published image on user's published images
+    realtime()
+      .ref('users/' + auth().currentUser.uid + '/' + place)
+      .child(imageId)
+      .set(imageMeta);
   };
 
   // delete photo
@@ -701,6 +697,24 @@ export default function Dream() {
                   );
                 }
                 AsyncStorage.removeItem(pickedImage.id);
+                // remove image on users' generated images and messages
+                realtime()
+                  .ref('users/' + auth().currentUser.uid + '/generated')
+                  .child(pickedImage.id)
+                  .remove();
+                realtime()
+                  .ref('users/' + auth().currentUser.uid + '/messages')
+                  .child(pickedImage.artist[0])
+                  .child(pickedImage.date)
+                  .remove();
+                // remove image on storage
+                storageRef
+                  .child('images/' + pickedImage.id + '.png')
+                  .delete()
+                  .then(() => {
+                    console.log('image deleted');
+                  });
+
                 setPickedImage(null);
                 setDeleteButtonPressed(false);
               },
