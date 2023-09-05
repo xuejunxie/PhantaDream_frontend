@@ -7,16 +7,21 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   scrollView,
+  Keyboard,
 } from 'react-native';
 import {Neomorph, NeomorphFlex} from 'react-native-neomorph-shadows';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faChevronLeft, faUserCircle} from '@fortawesome/free-solid-svg-icons';
 import {useSelector} from 'react-redux';
-import {COLORS, defaultAvatar} from '../common/globalValues';
+import {COLORS, defaultAvatar, serverURL} from '../common/globalValues';
 import {ScrollView} from 'react-native-gesture-handler';
 import realtime from '@react-native-firebase/database';
 import {Avatar} from '@rneui/themed';
 import {CachedImage} from '@georstat/react-native-image-cache';
+import axios from 'axios';
+import auth from '@react-native-firebase/auth';
+import uuid from 'react-native-uuid';
+import storage from '@react-native-firebase/storage';
 
 const ChatUI = ({route, navigation}) => {
   const {name, avatar, id, type} = route.params;
@@ -28,6 +33,131 @@ const ChatUI = ({route, navigation}) => {
   useEffect(() => {
     scrollViewRef.current.scrollToEnd({animated: true});
   }, []);
+
+  const sendMessage = () => {
+    realtime()
+      .ref(
+        `/users/${id}/messages/${
+          auth().currentUser.uid
+        }/${new Date().getTime()}/`,
+      )
+      .set({
+        message: inputText,
+        timestamp: new Date().getTime(),
+        read: false,
+        send: false,
+      });
+    realtime()
+      .ref(
+        `/users/${
+          auth().currentUser.uid
+        }/messages/${id}/${new Date().getTime()}/`,
+      )
+      .set({
+        message: inputText,
+        timestamp: new Date().getTime(),
+        read: true,
+        send: true,
+      });
+    setInputText('');
+  };
+
+  const [latestImage, setLatestImage] = useState(null);
+
+  const spendCharge = () => {
+    realtime()
+      .ref('/users/' + auth().currentUser.uid)
+      .update({
+        charge: realtime.ServerValue.increment(-1),
+      });
+  };
+
+  const generateArtWork = artistName => {
+    const currentTime = new Date().getTime();
+
+    realtime()
+      .ref(
+        `/users/${
+          auth().currentUser.uid
+        }/messages/${artistName}/${currentTime}/`,
+      )
+      .set({
+        message: inputText,
+        timestamp: currentTime,
+        type: 'new art work request',
+        read: true,
+        send: true,
+      });
+
+    realtime()
+      .ref(
+        `/users/${auth().currentUser.uid}/messages/${artistName}/${
+          currentTime + 1
+        }/`,
+      )
+      .set({
+        message: 'generating art work...',
+        timestamp: currentTime + 1,
+        type: 'new art work',
+        read: true,
+        send: false,
+      });
+
+    const seed = Math.floor(Math.random() * 1e8);
+    const imageId = uuid.v1();
+    scrollViewRef.current.scrollToEnd({animated: true});
+
+    // generate art work
+    axios
+      .post(serverURL + 'txt2img', {
+        prompt: inputText + `, ${artistName} art style`,
+        steps: 20,
+        width: 768,
+        height: 768,
+        cfg_scale: 7,
+        seed: seed,
+      })
+      .then(function (response) {
+        console.log('send');
+        scrollViewRef.current.scrollToEnd({animated: true});
+
+        const image_file = `data:image/png;base64,${response.data.images[0]}`;
+
+        setInputText('');
+
+        // show the image in the latest message
+        setLatestImage(image_file);
+        spendCharge();
+        // send the image to the user database
+        storage()
+          .ref()
+          .child(`images/${imageId}.png`)
+          .putString(image_file, 'data_url')
+          .then(() => {
+            storage()
+              .ref(`images/${imageId}.png`)
+              .getDownloadURL()
+              .then(url => {
+                realtime()
+                  .ref(
+                    `/users/${auth().currentUser.uid}/messages/${artistName}/${
+                      currentTime + 1
+                    }/`,
+                  )
+                  .set({
+                    timestamp: currentTime + 1,
+                    type: 'new art work',
+                    read: true,
+                    send: false,
+                    image: {
+                      imageURL: url,
+                      artist: artistName,
+                    },
+                  });
+              });
+          });
+      });
+  };
 
   return (
     <View
@@ -101,52 +231,65 @@ const ChatUI = ({route, navigation}) => {
                           ? COLORS.blue
                           : COLORS.primary,
                       }}>
-                      {type == 'private club request' && (
-                        <View
-                          style={{
-                            padding: 2,
-                            flexDirection: messages[key].send
-                              ? 'row-reverse'
-                              : 'row',
-                          }}>
+                      {type == 'private club request' ||
+                        (messages[key]?.type === 'new art work request' && (
                           <View
                             style={{
-                              justifyContent: 'center',
+                              padding: 2,
+                              flexDirection: messages[key].send
+                                ? 'row-reverse'
+                                : 'row',
                             }}>
-                            <CachedImage
+                            <View
                               style={{
-                                height: 30,
-                                width: 30,
-                                borderRadius: 15,
-                                overflow: 'hidden',
-                              }}
-                              resizeMode="cover"
-                              source={messages[key].send ? myAvatar : avatar}
-                            />
+                                justifyContent: 'center',
+                              }}>
+                              <CachedImage
+                                style={{
+                                  height: 30,
+                                  width: 30,
+                                  borderRadius: 15,
+                                  overflow: 'hidden',
+                                }}
+                                resizeMode="cover"
+                                source={
+                                  messages[key].send ? myAvatar : defaultAvatar
+                                }
+                              />
+                            </View>
+                            <Text
+                              style={{
+                                color: 'black',
+                                margin: 10,
+                                maxWidth: 270,
+                                fontSize: 18,
+                                textAlign: messages[key].send
+                                  ? 'right'
+                                  : 'left',
+                              }}>
+                              {messages[key].message}
+                            </Text>
                           </View>
-                          <Text
+                        ))}
+                      {messages[key]?.type === 'new art work' && (
+                        <View>
+                          <Text>{name}:</Text>
+                          <Text>{messages[key]?.message}</Text>
+                          <CachedImage
                             style={{
-                              color: 'black',
-                              margin: 5,
-                              maxWidth: 270,
-                              fontSize: 18,
-                              textAlign: messages[key].send ? 'right' : 'left',
-                            }}>
-                            {messages[key].message}
-                          </Text>
+                              height: 300,
+                              width: 300,
+                              borderRadius: 15,
+                              overflow: 'hidden',
+                            }}
+                            resizeMode="cover"
+                            source={
+                              messages[key].image
+                                ? messages[key].image.imageURL
+                                : latestImage
+                            }
+                          />
                         </View>
-                      )}
-                      {type == 'new art work' && (
-                        <CachedImage
-                          style={{
-                            height: 300,
-                            width: 300,
-                            borderRadius: 15,
-                            overflow: 'hidden',
-                          }}
-                          resizeMode="cover"
-                          source={messages[key].image.imageURL}
-                        />
                       )}
                     </View>
                   </NeomorphFlex>
@@ -158,7 +301,7 @@ const ChatUI = ({route, navigation}) => {
           style={{
             width: '100%',
             bottom: 0,
-            marginBottom: 30,
+            marginBottom: 5,
             alignItems: 'center',
           }}>
           <NeomorphFlex
@@ -167,14 +310,17 @@ const ChatUI = ({route, navigation}) => {
               shadowRadius: 3,
               borderRadius: 15,
               backgroundColor: COLORS.primary,
-              width: 360,
+              width: 400,
               justifyContent: 'center',
               alignItems: 'center',
             }}>
-            {/* <TextInput
+            <TextInput
               returnKeyType="send"
               placeholder="Type your message"
-              multiline={true} //allow multiple lines of text
+              multiline={true}
+              numberOfLines={1}
+              blurOnSubmit={true}
+              onBlur={Keyboard.dismiss}
               style={{
                 width: '100%',
                 maxHeight: 200,
@@ -186,37 +332,20 @@ const ChatUI = ({route, navigation}) => {
               onChangeText={text => setInputText(text)}
               value={inputText}
               onSubmitEditing={() => {
-                realtime()
-                  .ref(
-                    `/users/${id}/messages/${
-                      auth().currentUser.uid
-                    }/${new Date().getTime()}/`,
-                  )
-                  .set({
-                    message: inputText,
-                    timestamp: new Date().getTime(),
-                    read: false,
-                    send: false,
-                  });
-                realtime()
-                  .ref(
-                    `/users/${
-                      auth().currentUser.uid
-                    }/messages/${id}/${new Date().getTime()}/`,
-                  )
-                  .set({
-                    message: inputText,
-                    timestamp: new Date().getTime(),
-                    read: true,
-                    send: true,
-                  });
-                setInputText('');
+                console.log('send');
+                if (type == 'private club request') {
+                  sendMessage();
+                }
+                if (type == 'new art work') {
+                  generateArtWork(name);
+                }
               }}
-            /> */}
+            />
           </NeomorphFlex>
         </View>
       </KeyboardAvoidingView>
     </View>
   );
 };
+
 export default ChatUI;

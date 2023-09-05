@@ -255,8 +255,23 @@ export default function Dream() {
   }
 
   const addArtistToMessage = (artist, image_entry) => {
-    // artist_name_nospace = replaceNonUrlCharsWithUnderscore(artist);
-    // console.log(artist_name_nospace);
+    //set a message to the artist
+    realtime()
+      .ref(
+        `/users/${auth().currentUser.uid}/messages/${artist}/${(
+          image_entry.date - 1
+        ).toString()}/`,
+      )
+      .set({
+        message: image_entry.prompt.replace(`, ${artist} art style`, ''),
+        type: 'new art work request',
+        timestamp: image_entry.date - 1,
+        read: false,
+        send: true,
+        // image: image_entry,
+      });
+
+    // set a message from the artist
     realtime()
       .ref(
         `/users/${
@@ -264,7 +279,7 @@ export default function Dream() {
         }/messages/${artist}/${image_entry.date.toString()}/`,
       )
       .set({
-        message: 'New art work added',
+        prompt: image_entry.prompt.replace(`, ${artist} art style`, ''),
         type: 'new art work',
         timestamp: image_entry.date,
         read: false,
@@ -994,6 +1009,7 @@ export default function Dream() {
                 setPrompt(prompt + ', ' + artistSeggestion + ' art style');
                 setArtistsUsed([...artistsUsed, artistSeggestion]);
                 // refreshArtist();
+                setArtistSuggestionVisible(false);
               }}
               style={{
                 flexDirection: 'row',
@@ -1020,6 +1036,7 @@ export default function Dream() {
                     setPrompt(prompt + ', ' + artist + ' art style');
                     setArtistsUsed([...artistsUsed, artist]);
                     // refreshArtist();
+                    setArtistSuggestionVisible(false);
                   }}
                   style={{
                     flexDirection: 'row',

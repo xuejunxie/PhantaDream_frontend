@@ -20,4 +20,6 @@ const productID = {
   charge3: 'charge3.phantadream',
 };
 
-export {COLORS, SIZES, defaultAvatar, productID};
+const serverURL = 'http://phantaspace.ddns.net:7865/sdapi/v1/';
+
+export {COLORS, SIZES, defaultAvatar, productID, serverURL};

@@ -98,7 +98,7 @@ export default function Notification() {
   const [masterDataSource, setMasterDataSource] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const messagesObject = useSelector(state => state.user?.data?.messages);
-  const [messages, setMessages] = useState({});
+  const [messages, setMessages] = useState([]);
 
   const fetchMessages = () => {
     if (messagesObject) {
@@ -109,7 +109,7 @@ export default function Notification() {
         // Show only limited length of message
         const length = 34;
         youLastMessage =
-          youLastMessage.length > length
+          youLastMessage?.length > length
             ? youLastMessage.slice(0, length) + '...'
             : youLastMessage;
 
@@ -135,12 +135,14 @@ export default function Notification() {
           };
         });
       });
-      Promise.all(messagePromises).then(messages => {
-        const messagesObj = {};
-        messages.forEach(message => {
-          messagesObj[message.id] = message;
-        });
-        setMessages(messagesObj);
+      Promise.all(messagePromises).then(messagesObj => {
+        // const messagesObj = {};
+        // messages.forEach(message => {
+        //   messagesObj[message.id] = message;
+        // });
+        const messagesArray = Object.values(messagesObj);
+        messagesArray.sort((a, b) => b.time - a.time);
+        setMessages(messagesArray);
         // setFilteredDataSource(messages);
         // setMasterDataSource(messages);
       });
@@ -211,7 +213,7 @@ export default function Notification() {
     }
 
     if ((sender.type = 'new art work')) {
-      const imageURL = sender.image.imageURL;
+      const imageURL = sender?.image?.imageURL;
       // console.log(imageURL);
       return (
         <TouchableOpacity
@@ -280,12 +282,10 @@ export default function Notification() {
           }}
         />
         <View style={styles.list}>
-          {Object.keys(messages).length > 0 &&
-            Object.keys(messages)
-              .sort((a, b) => messages[b].time - messages[a].time)
-              .map((key, index) => {
-                return listItem({sender: messages[key], index});
-              })}
+          {messages?.length > 0 &&
+            messages.map((message, index) => {
+              return listItem({sender: message, index});
+            })}
         </View>
       </ScrollView>
       {/* <View style={styles.searchSection}>
