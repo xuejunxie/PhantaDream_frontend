@@ -293,7 +293,8 @@ const Account = () => {
                     borderRadius: 40,
                     overflow: 'hidden',
                   }}
-                  source={defaultAvatar}
+                  resizeMode="cover"
+                  source={{uri: defaultAvatar}}
                 />
               ) : (
                 <CachedImage
