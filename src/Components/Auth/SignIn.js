@@ -31,9 +31,13 @@ import storage from '@react-native-firebase/storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch} from 'react-redux';
 import {UPDATE_USER} from '../../redux/types';
+import axios from 'axios';
 
 const newUserCharge = 100;
 const newUserHeart = 100;
+const serverURL = 'http://phantaspace.ddns.net:7865/sdapi/v1/';
+
+const storageRef = storage().ref();
 
 export default function SignIn({navigation}) {
   const [pressed, setPressed] = useState(false);
@@ -159,6 +163,34 @@ export default function SignIn({navigation}) {
           realtime()
             .ref('/users/' + user.uid)
             .set(userData);
+
+          // generate avatar, and store it in the database, add it to the user data
+          axios
+            .post(serverURL + 'txt2img', {
+              prompt: userName.familyName + ' ' + userName.givenName,
+              steps: 20,
+              width: 768,
+              height: 768,
+              cfg_scale: 7,
+            })
+            .then(res => {
+              const avatar = `data:image/png;base64,${res.data.images[0]}`;
+
+              const imageRef = storageRef.child(
+                'users/' + user.uid + '/avatar',
+              );
+              imageRef.putString(avatar, 'data_url').then(() => {
+                imageRef.getDownloadURL().then(url => {
+                  realtime()
+                    .ref(`/users/${user.uid}/avatar`)
+                    .set(url)
+                    .catch(e => console.log(e));
+                });
+              });
+            })
+            .catch(e => {
+              console.log(e);
+            });
         } else {
           // get the user data from the database
           realtime()

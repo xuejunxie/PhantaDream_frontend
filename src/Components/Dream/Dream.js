@@ -296,6 +296,7 @@ export default function Dream() {
     const imageId = uuid.v1();
     const userId = auth().currentUser.uid;
     const seed = Math.floor(Math.random() * 1e8);
+
     axios
       .post(serverURL + 'txt2img', {
         prompt: prompt,
@@ -334,9 +335,9 @@ export default function Dream() {
         }
         setLoading(false);
         setPickedImage(image_entry);
+        addArtist(artistsUsed[0]);
         setArtistsUsed([]);
         spendCharge();
-        addArtist(artistsUsed[0]);
         setPlaceHolder(placeholder_template);
 
         // save the image information to user database

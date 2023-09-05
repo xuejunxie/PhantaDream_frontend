@@ -131,7 +131,7 @@ const ImageView = (image, likes, liked, dispatch, showAvatar) => {
           </Text>
         </View>
         <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
-          Prompt: {image.prompt}
+          {image.prompt}
         </Text>
       </View>
     </View>
