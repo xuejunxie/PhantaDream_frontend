@@ -108,41 +108,21 @@ export default function Notification() {
           ...Object.keys(messagesObject[senderID]),
         );
 
-        // Object.keys(messagesObject[senderID]).length - 1;
-        var youLastMessage =
-          messagesObject[senderID][youLastMessageTime].message;
+        const type = messagesObject[senderID][youLastMessageTime].type;
 
-        return Promise.all([
-          realtime().ref(`/users/${senderID}/artName`).once('value'),
-          realtime().ref(`/users/${senderID}/avatar`).once('value'),
-        ]).then(([nameSnapshot, avatarSnapshot]) => {
-          const youName = nameSnapshot.val();
-          const youAvatar = avatarSnapshot.val();
+        if (type === 'new art work') {
           return {
             id: senderID,
-            avatar: youAvatar,
-            name: youName,
-            lastMessage: youLastMessage,
-            prompt: messagesObject[senderID][youLastMessageTime].prompt,
+            avatar: messagesObject[senderID][youLastMessageTime].image.imageURL,
+            name: senderID,
+            lastMessage: messagesObject[senderID][youLastMessageTime].prompt,
             time: youLastMessageTime,
             byNow: msToTime(new Date().getTime() - youLastMessageTime) + ' ago',
-            type: messagesObject[senderID][youLastMessageTime].type,
-            image: messagesObject[senderID][youLastMessageTime].image,
-            artistName: senderID,
           };
-        });
+        }
       });
-      Promise.all(messagePromises).then(messagesObj => {
-        // const messagesObj = {};
-        // messages.forEach(message => {
-        //   messagesObj[message.id] = message;
-        // });
-        const messagesArray = Object.values(messagesObj);
-        messagesArray.sort((a, b) => b.time - a.time);
-        setMessages(messagesArray);
-        // setFilteredDataSource(messages);
-        // setMasterDataSource(messages);
-      });
+
+      setMessages(messagePromises.sort((a, b) => b.time - a.time));
     }
   };
 
@@ -177,98 +157,40 @@ export default function Notification() {
 
   const listItem = ({sender, index}) => {
     // console.log(sender);
-    if (sender.type === 'private club request') {
-      console.log(sender);
-      return (
-        <TouchableOpacity
-          style={styles.listItem}
-          key={index}
-          onPress={() =>
-            RootNavigation.navigate('Chat', {
-              name: sender.name,
-              avatar: sender.avatar,
-              id: sender.id,
-              type: sender.type,
-            })
-          }>
-          <CachedImage
-            style={{
-              height: 50,
-              width: 50,
-              borderRadius: 25,
-              overflow: 'hidden',
-            }}
-            resizeMode="cover"
-            source={sender.avatar}
-          />
-          <View style={styles.listItemContent}>
-            <Text style={styles.name}>{sender.name}</Text>
-            <Text style={styles.message}>{sender.lastMessage}</Text>
-          </View>
-          <Text style={styles.time}>{sender.byNow}</Text>
-        </TouchableOpacity>
-      );
-    }
 
-    if ((sender.type = 'new art work')) {
-      const imageURL = sender?.image?.imageURL;
-      // console.log(imageURL);
-      return (
-        <TouchableOpacity
-          style={styles.listItem}
-          key={index}
-          onPress={() =>
-            RootNavigation.navigate('Chat', {
-              name: sender.artistName,
-              avatar: sender.avatar,
-              id: sender.id,
-              type: sender.type,
-            })
-          }>
-          <CachedImage
-            style={{
-              height: 50,
-              width: 50,
-              borderRadius: 25,
-              overflow: 'hidden',
-            }}
-            resizeMode="cover"
-            source={imageURL}
-          />
-          {/* <Image
-            style={{
-              height: 50,
-              width: 50,
-              borderRadius: 25,
-              overflow: 'hidden',
-            }}
-            resizeMode="cover"
-            source={{uri: imageURL}}
-          /> */}
-          {/* <ImageBackground
-            style={{
-              flex: 1, // Make the image take the entire space of the TouchableOpacity
-              flexDirection: 'row', // Assuming you want to display the content in a row
-              alignItems: 'center', // Align the content vertically
-              borderRadius: 25,
-              height: '100%',
-              overflow: 'hidden',
-            }}
-            resizeMode="cover"
-            source={{uri: imageURL}}
-            onError={e => {
-              console.log('error', e);
-            }}> */}
-          <View style={styles.listItemContent}>
-            <Text style={styles.name}>{sender.artistName}</Text>
-            <Text style={styles.message}>{sender?.prompt}</Text>
-          </View>
-          <Text style={styles.time}>{sender.byNow}</Text>
+    // console.log(imageURL);
+    return (
+      <TouchableOpacity
+        style={styles.listItem}
+        key={index}
+        onPress={() =>
+          RootNavigation.navigate('Chat', {
+            name: sender?.name,
+            avatar: sender?.avatar,
+            id: sender?.id,
+            type: sender?.type,
+          })
+        }>
+        <CachedImage
+          style={{
+            height: 50,
+            width: 50,
+            borderRadius: 25,
+            overflow: 'hidden',
+          }}
+          resizeMode="cover"
+          source={sender?.avatar}
+        />
 
-          {/* </ImageBackground> */}
-        </TouchableOpacity>
-      );
-    }
+        <View style={styles.listItemContent}>
+          <Text style={styles.name}>{sender?.name}</Text>
+          <Text style={styles.message}>{sender?.lastMessage}</Text>
+        </View>
+        <Text style={styles.time}>{sender?.byNow}</Text>
+
+        {/* </ImageBackground> */}
+      </TouchableOpacity>
+    );
   };
 
   return (
@@ -286,15 +208,6 @@ export default function Notification() {
             })}
         </View>
       </ScrollView>
-      {/* <View style={styles.searchSection}>
-        <TextInput
-          style={styles.input}
-          onChangeText={text => searchFilterFunction(text)}
-          value={search}
-          underlineColorAndroid="transparent"
-          placeholder="Search Here"
-        />
-      </View> */}
     </View>
   );
 }
