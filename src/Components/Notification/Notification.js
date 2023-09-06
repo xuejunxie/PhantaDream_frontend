@@ -103,19 +103,15 @@ export default function Notification() {
   const fetchMessages = () => {
     if (messagesObject) {
       const messagePromises = Object.keys(messagesObject).map(senderID => {
-        var youLastMessage = Object.values(messagesObject[senderID])[
-          Object.keys(messagesObject[senderID]).length - 1
-        ].message;
-        // Show only limited length of message
-        const length = 34;
-        youLastMessage =
-          youLastMessage?.length > length
-            ? youLastMessage.slice(0, length) + '...'
-            : youLastMessage;
+        // find the last message with smallest key value
+        const youLastMessageTime = Math.max(
+          ...Object.keys(messagesObject[senderID]),
+        );
 
-        const youLastMessageTime = Object.keys(messagesObject[senderID])[
-          Object.keys(messagesObject[senderID]).length - 1
-        ];
+        // Object.keys(messagesObject[senderID]).length - 1;
+        var youLastMessage =
+          messagesObject[senderID][youLastMessageTime].message;
+
         return Promise.all([
           realtime().ref(`/users/${senderID}/artName`).once('value'),
           realtime().ref(`/users/${senderID}/avatar`).once('value'),
@@ -127,6 +123,7 @@ export default function Notification() {
             avatar: youAvatar,
             name: youName,
             lastMessage: youLastMessage,
+            prompt: messagesObject[senderID][youLastMessageTime].prompt,
             time: youLastMessageTime,
             byNow: msToTime(new Date().getTime() - youLastMessageTime) + ' ago',
             type: messagesObject[senderID][youLastMessageTime].type,
@@ -181,13 +178,14 @@ export default function Notification() {
   const listItem = ({sender, index}) => {
     // console.log(sender);
     if (sender.type === 'private club request') {
+      console.log(sender);
       return (
         <TouchableOpacity
           style={styles.listItem}
           key={index}
           onPress={() =>
             RootNavigation.navigate('Chat', {
-              name: sender.artName,
+              name: sender.name,
               avatar: sender.avatar,
               id: sender.id,
               type: sender.type,
@@ -263,7 +261,7 @@ export default function Notification() {
             }}> */}
           <View style={styles.listItemContent}>
             <Text style={styles.name}>{sender.artistName}</Text>
-            <Text style={styles.message}>{sender.lastMessage}</Text>
+            <Text style={styles.message}>{sender?.prompt}</Text>
           </View>
           <Text style={styles.time}>{sender.byNow}</Text>
 

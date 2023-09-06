@@ -89,6 +89,8 @@ const ChatUI = ({route, navigation}) => {
         send: true,
       });
 
+    scrollViewRef.current.scrollToEnd({animated: true});
+
     realtime()
       .ref(
         `/users/${auth().currentUser.uid}/messages/${artistName}/${
@@ -105,6 +107,7 @@ const ChatUI = ({route, navigation}) => {
 
     const seed = Math.floor(Math.random() * 1e8);
     const imageId = uuid.v1();
+
     scrollViewRef.current.scrollToEnd({animated: true});
 
     // generate art work
@@ -147,6 +150,7 @@ const ChatUI = ({route, navigation}) => {
                   .set({
                     timestamp: currentTime + 1,
                     type: 'new art work',
+                    messages: inputText,
                     read: true,
                     send: false,
                     image: {
@@ -273,22 +277,33 @@ const ChatUI = ({route, navigation}) => {
                         ))}
                       {messages[key]?.type === 'new art work' && (
                         <View>
-                          <Text>{name}:</Text>
-                          <Text>{messages[key]?.message}</Text>
-                          <CachedImage
+                          {/* <Text
                             style={{
-                              height: 300,
-                              width: 300,
-                              borderRadius: 15,
-                              overflow: 'hidden',
-                            }}
-                            resizeMode="cover"
-                            source={
-                              messages[key].image
-                                ? messages[key].image.imageURL
-                                : latestImage
-                            }
-                          />
+                              color: 'black',
+                              fontWeight: 'bold',
+                              fontSize: 18,
+                              margin: 10,
+                            }}>
+                            {name}:
+                          </Text> */}
+                          {messages[key].image ? (
+                            <CachedImage
+                              style={{
+                                height: 300,
+                                width: 300,
+                                borderRadius: 15,
+                                overflow: 'hidden',
+                              }}
+                              resizeMode="cover"
+                              source={
+                                messages[key].image
+                                  ? messages[key].image.imageURL
+                                  : latestImage
+                              }
+                            />
+                          ) : (
+                            <Text>{messages[key]?.message}</Text>
+                          )}
                         </View>
                       )}
                     </View>
@@ -337,7 +352,7 @@ const ChatUI = ({route, navigation}) => {
                   sendMessage();
                 }
                 if (type == 'new art work') {
-                  generateArtWork(name);
+                  generateArtWork(id); // for artist id is the artist name
                 }
               }}
             />

@@ -728,7 +728,7 @@ export default function Dream() {
                 realtime()
                   .ref('users/' + auth().currentUser.uid + '/messages')
                   .child(pickedImage.artist[0])
-                  .child(pickedImage.date)
+                  .child(pickedImage.date.toString())
                   .remove();
                 // remove image on storage
                 storageRef
