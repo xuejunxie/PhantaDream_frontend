@@ -24,6 +24,7 @@ const hapticOptions = {
 };
 
 import {COLORS, productID, SIZES} from '../common/globalValues';
+import {useDispatch, useSelector} from 'react-redux';
 
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faTimes} from '@fortawesome/free-solid-svg-icons';
@@ -34,6 +35,8 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
 export default ShareModal = (
+  avatar,
+  artName,
   pickedImage,
   shareModalVisible,
   setShareModalVisible,
@@ -82,13 +85,13 @@ export default ShareModal = (
   };
 
   return (
-    <Modal animationType="slide" transparent={true} visible={shareModalVisible}>
+    <Modal animationType="fade" transparent={true} visible={shareModalVisible}>
       <View
         style={{
           flex: 1,
           justifyContent: 'center',
           alignItems: 'center',
-          backgroundColor: 'rgba(0,0,0,0)',
+          backgroundColor: 'rgba(0,0,0,0.5)',
         }}>
         <View
           style={{
@@ -160,7 +163,7 @@ export default ShareModal = (
                 </Text>
               </Neomorph>
             </TouchableOpacity>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               onPress={() => {
                 excuteShare('private');
                 setShareModalVisible(false);
@@ -185,7 +188,7 @@ export default ShareModal = (
                   Private club
                 </Text>
               </Neomorph>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
           <Text
             style={{

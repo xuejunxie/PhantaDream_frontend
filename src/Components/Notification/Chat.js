@@ -46,6 +46,7 @@ const ChatUI = ({route, navigation}) => {
   const {name, avatar, id, type} = route.params;
   const messages = useSelector(state => state.user?.data?.messages)?.[id];
   const myAvatar = useSelector(state => state.user?.data?.avatar);
+  const artName = useSelector(state => state.user.data?.artName);
   const [inputText, setInputText] = useState(''); //initial text of TextInput
   const scrollViewRef = useRef();
 
@@ -396,6 +397,8 @@ const ChatUI = ({route, navigation}) => {
       </KeyboardAvoidingView>
       {shareModalVisible &&
         ShareModal(
+          myAvatar,
+          artName,
           messages[pickedImage]?.image,
           shareModalVisible,
           setShareModalVisible,
