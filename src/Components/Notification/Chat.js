@@ -394,6 +394,12 @@ const ChatUI = ({route, navigation}) => {
           </NeomorphFlex>
         </View>
       </KeyboardAvoidingView>
+      {shareModalVisible &&
+        ShareModal(
+          messages[pickedImage]?.image,
+          shareModalVisible,
+          setShareModalVisible,
+        )}
     </View>
   );
 };

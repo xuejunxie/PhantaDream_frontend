@@ -24,53 +24,24 @@ const hapticOptions = {
 };
 
 import {COLORS, productID, SIZES} from '../common/globalValues';
-import axios from 'axios';
-import {Buffer} from 'buffer';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {getStatusBarHeight} from 'react-native-status-bar-height';
 
-import uuid from 'react-native-uuid';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {
-  faBolt,
-  faCopy,
-  faDownload,
-  faShare,
-  faTimes,
-  faTrash,
-} from '@fortawesome/free-solid-svg-icons';
-
-import {CameraRoll} from '@react-native-camera-roll/camera-roll';
+import {faTimes} from '@fortawesome/free-solid-svg-icons';
 
 // firebase things
 import realtime from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import storage from '@react-native-firebase/storage';
 
-import artists from '../Dream/artists.json';
-
-import RadioButtonRN from 'radio-buttons-react-native';
-import ImageMarker from 'react-native-image-marker';
-import {useDispatch, useSelector} from 'react-redux';
-import {IAP} from '../Dream/PaymentIAP';
-import {
-  BUY_CHARGE_LOADING,
-  FILL_CHARGE,
-  SET_CHARGE_ORDER,
-  SET_PRODUCT_ID,
-} from '../../redux/types';
-
-export default function ShareModal(
+export default ShareModal = (
   pickedImage,
   shareModalVisible,
   setShareModalVisible,
-) {
+) => {
   const excuteShare = place => {
     // upload image to firebase storage create an entry on firestore
 
     const imageId = pickedImage.id;
-    const image = pickedImage.image;
     const prompt = pickedImage.prompt;
     const date = pickedImage.date;
     const artist = pickedImage.artist;
@@ -117,7 +88,7 @@ export default function ShareModal(
           flex: 1,
           justifyContent: 'center',
           alignItems: 'center',
-          backgroundColor: 'rgba(0,0,0,0.5)',
+          backgroundColor: 'rgba(0,0,0,0)',
         }}>
         <View
           style={{
@@ -230,4 +201,4 @@ export default function ShareModal(
       </View>
     </Modal>
   );
-}
+};
