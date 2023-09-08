@@ -7,13 +7,15 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   scrollView,
+  Alert,
+  Modal,
   Keyboard,
 } from 'react-native';
 import {Neomorph, NeomorphFlex} from 'react-native-neomorph-shadows';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faChevronLeft, faUserCircle} from '@fortawesome/free-solid-svg-icons';
 import {useSelector} from 'react-redux';
-import {COLORS, defaultAvatar, serverURL} from '../common/globalValues';
+import {COLORS, SIZES, defaultAvatar, serverURL} from '../common/globalValues';
 import {ScrollView} from 'react-native-gesture-handler';
 import realtime from '@react-native-firebase/database';
 import {Avatar} from '@rneui/themed';
@@ -22,6 +24,23 @@ import axios from 'axios';
 import auth from '@react-native-firebase/auth';
 import uuid from 'react-native-uuid';
 import storage from '@react-native-firebase/storage';
+import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
+import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
+const hapticOptions = {
+  enableVibrateFallback: true,
+  ignoreAndroidSystemSettings: false,
+};
+import {CameraRoll} from '@react-native-camera-roll/camera-roll';
+import {
+  faBolt,
+  faCopy,
+  faDownload,
+  faShare,
+  faTimes,
+  faTrash,
+} from '@fortawesome/free-solid-svg-icons';
+import ImageOperator from './ImageOperator';
+import ShareModal from './ShareModal';
 
 const ChatUI = ({route, navigation}) => {
   const {name, avatar, id, type} = route.params;
@@ -163,6 +182,11 @@ const ChatUI = ({route, navigation}) => {
       });
   };
 
+  // image view
+
+  const [pickedImage, setPickedImage] = useState(null); // pickedImage = image object when user pick an image from the gallery
+  const [shareModalVisible, setShareModalVisible] = useState(false);
+
   return (
     <View
       style={{
@@ -211,17 +235,19 @@ const ChatUI = ({route, navigation}) => {
           onLayout={() => scrollViewRef.current.scrollToEnd({animated: true})}>
           {Object.keys(messages)
             .sort((a, b) => a - b)
-            .map(key => {
+            .map(time => {
               return (
                 <View
-                  key={key}
+                  key={time}
                   style={{
                     margin: 8,
                   }}>
                   <NeomorphFlex
                     inner={false}
                     style={{
-                      alignSelf: messages[key].send ? 'flex-end' : 'flex-start',
+                      alignSelf: messages[time].send
+                        ? 'flex-end'
+                        : 'flex-start',
                       shadowRadius: 3,
                       borderRadius: 15,
                       backgroundColor: COLORS.primary,
@@ -231,16 +257,16 @@ const ChatUI = ({route, navigation}) => {
                         maxWidth: 300,
                         alignSelf: 'flex-start',
                         borderRadius: 15,
-                        backgroundColor: messages[key].send
+                        backgroundColor: messages[time].send
                           ? COLORS.blue
                           : COLORS.primary,
                       }}>
                       {type == 'private club request' ||
-                        (messages[key]?.type === 'new art work request' && (
+                        (messages[time]?.type === 'new art work request' && (
                           <View
                             style={{
                               padding: 2,
-                              flexDirection: messages[key].send
+                              flexDirection: messages[time].send
                                 ? 'row-reverse'
                                 : 'row',
                             }}>
@@ -257,7 +283,7 @@ const ChatUI = ({route, navigation}) => {
                                 }}
                                 resizeMode="cover"
                                 source={
-                                  messages[key].send ? myAvatar : defaultAvatar
+                                  messages[time].send ? myAvatar : defaultAvatar
                                 }
                               />
                             </View>
@@ -267,15 +293,15 @@ const ChatUI = ({route, navigation}) => {
                                 margin: 10,
                                 maxWidth: 270,
                                 fontSize: 18,
-                                textAlign: messages[key].send
+                                textAlign: messages[time].send
                                   ? 'right'
                                   : 'left',
                               }}>
-                              {messages[key].message}
+                              {messages[time].message}
                             </Text>
                           </View>
                         ))}
-                      {messages[key]?.type === 'new art work' && (
+                      {messages[time]?.type === 'new art work' && (
                         <View>
                           {/* <Text
                             style={{
@@ -286,23 +312,32 @@ const ChatUI = ({route, navigation}) => {
                             }}>
                             {name}:
                           </Text> */}
-                          {messages[key].image ? (
-                            <CachedImage
-                              style={{
-                                height: 300,
-                                width: 300,
-                                borderRadius: 15,
-                                overflow: 'hidden',
-                              }}
-                              resizeMode="cover"
-                              source={
-                                messages[key].image
-                                  ? messages[key].image.imageURL
-                                  : latestImage
-                              }
-                            />
+                          {messages[time].image ? (
+                            ImageOperator(
+                              time,
+                              messages[time].image.imageURL,
+                              messages[time].prompt,
+                              latestImage,
+                              pickedImage,
+                              setPickedImage,
+                              setShareModalVisible,
+                            )
                           ) : (
-                            <Text>{messages[key]?.message}</Text>
+                            // <CachedImage
+                            //   style={{
+                            //     height: 300,
+                            //     width: 300,
+                            //     borderRadius: 15,
+                            //     overflow: 'hidden',
+                            //   }}
+                            //   resizeMode="cover"
+                            //   source={
+                            //     messages[time].image
+                            //       ? messages[time].image.imageURL
+                            //       : latestImage
+                            //   }
+                            // />
+                            <Text>{messages[time]?.message}</Text>
                           )}
                         </View>
                       )}

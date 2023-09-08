@@ -7,16 +7,16 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
+  TextInput,
   TouchableOpacity,
   ActivityIndicator,
   Modal,
   Alert,
   RefreshControl,
 } from 'react-native';
-import {TextInput} from 'react-native-paper';
 
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
-import {Neomorph} from 'react-native-neomorph-shadows';
+import {Neomorph, NeomorphFlex} from 'react-native-neomorph-shadows';
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 const hapticOptions = {
   enableVibrateFallback: true,
@@ -730,6 +730,11 @@ export default function Dream() {
                   .child(pickedImage.artist[0])
                   .child(pickedImage.date.toString())
                   .remove();
+                realtime()
+                  .ref('users/' + auth().currentUser.uid + '/messages')
+                  .child(pickedImage.artist[0])
+                  .child((pickedImage.date - 1).toString())
+                  .remove();
                 // remove image on storage
                 storageRef
                   .child('images/' + pickedImage.id + '.png')
@@ -996,6 +1001,7 @@ export default function Dream() {
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
+            marginStart: 10,
           }}>
           <View>
             <Text style={{color: 'gray', fontSize: 15, marginRight: 10}}>
@@ -1103,78 +1109,103 @@ export default function Dream() {
 
         <View>
           {!loading && (
-            <TextInput
-              multiline={true}
-              onChangeText={text => {
-                setPrompt(text);
-                setArtistSuggestionVisible(true);
-                refreshArtist();
-              }}
-              onBlur={() => {
-                setArtistSuggestionVisible(false);
-                setPlaceHolder(placeholder_template);
-              }}
-              value={prompt}
+            <View
               style={{
-                backgroundColor: 'rgba(0,0,0,0)',
-                // align text to center
-                textAlign: 'center',
-              }}
-              onFocus={() => {
-                // Clear the placeholder text when focused
-                setPlaceHolder('');
-              }}
-              placeholder={placeHolder}
-              returnKeyType="send"
-              numberOfLines={1}
-              blurOnSubmit={true}
-              onSubmitEditing={() => {
-                //haptic feedback
-                ReactNativeHapticFeedback.trigger(
-                  'impactMedium',
-                  hapticOptions,
-                );
-                if (Charge > 0) {
-                  setLoading(true);
-                  if (images[0].id === 'empty') {
-                    // set the first image to loading
-                    setImages([
-                      {
-                        id: 'empty',
-                        image: loading_image,
-                        prompt: '',
-                        date: new Date().getTime(),
-                        loading: true,
-                        selected: false,
-                      },
-                    ]);
-                    // force update the view
-                  } else {
-                    // add a new image with loading
+                width: '100%',
+                bottom: 0,
+                marginBottom: 5,
+                alignItems: 'center',
+                marginTop: 10,
+              }}>
+              <NeomorphFlex
+                inner={true}
+                style={{
+                  shadowRadius: 3,
+                  borderRadius: 15,
+                  backgroundColor: COLORS.primary,
+                  width: 400,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <TextInput
+                  multiline={true}
+                  onChangeText={text => {
+                    setPrompt(text);
+                    setArtistSuggestionVisible(true);
+                    refreshArtist();
+                  }}
+                  onBlur={() => {
+                    setArtistSuggestionVisible(false);
+                    setPlaceHolder(placeholder_template);
+                  }}
+                  value={prompt}
+                  style={{
+                    backgroundColor: 'rgba(0,0,0,0)',
+                    // align text to center
+                    padding: 10,
+                    margin: 5,
+                    maxHeight: 200,
+                    width: '100%',
+                    textAlign: 'center',
+                    fontSize: 18,
+                  }}
+                  onFocus={() => {
+                    // Clear the placeholder text when focused
+                    setPlaceHolder('');
+                  }}
+                  placeholder={placeHolder}
+                  returnKeyType="send"
+                  numberOfLines={1}
+                  blurOnSubmit={true}
+                  onSubmitEditing={() => {
+                    //haptic feedback
+                    ReactNativeHapticFeedback.trigger(
+                      'impactMedium',
+                      hapticOptions,
+                    );
+                    if (Charge > 0) {
+                      setLoading(true);
+                      if (images[0].id === 'empty') {
+                        // set the first image to loading
+                        setImages([
+                          {
+                            id: 'empty',
+                            image: loading_image,
+                            prompt: '',
+                            date: new Date().getTime(),
+                            loading: true,
+                            selected: false,
+                          },
+                        ]);
+                        // force update the view
+                      } else {
+                        // add a new image with loading
 
-                    setImages([
-                      ...images.map(item => {
-                        item.selected = false;
-                        return item;
-                      }),
-                      {
-                        id: 'loading',
-                        image: loading_image,
-                        prompt: '',
-                        date: new Date().getTime(),
-                        loading: true,
-                        selected: false,
-                      },
-                    ]);
-                  }
-                  setPickedImage(null);
-                  send();
-                } else {
-                  setChargeModalVisible(true);
-                }
-                setArtistSuggestionVisible(false);
-              }}
-            />
+                        setImages([
+                          ...images.map(item => {
+                            item.selected = false;
+                            return item;
+                          }),
+                          {
+                            id: 'loading',
+                            image: loading_image,
+                            prompt: '',
+                            date: new Date().getTime(),
+                            loading: true,
+                            selected: false,
+                          },
+                        ]);
+                      }
+                      setPickedImage(null);
+                      send();
+                    } else {
+                      setChargeModalVisible(true);
+                    }
+                    setArtistSuggestionVisible(false);
+                  }}
+                />
+              </NeomorphFlex>
+            </View>
           )}
         </View>
       </View>
