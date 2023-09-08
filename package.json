@@ -47,6 +47,7 @@
     "react-native-apple-payment": "^1.1.1",
     "react-native-device-info": "^10.3.0",
     "react-native-dotenv": "^3.4.2",
+    "react-native-double-tap": "^1.0.1",
     "react-native-file-access": "^2.5.3",
     "react-native-gesture-handler": "^2.8.0",
     "react-native-haptic-feedback": "^1.14.0",
