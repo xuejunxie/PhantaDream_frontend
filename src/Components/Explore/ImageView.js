@@ -17,8 +17,6 @@ import {useRoute} from '@react-navigation/native';
 import {CachedImage} from '@georstat/react-native-image-cache';
 
 const ImageView = (image, likes, liked, dispatch, showAvatar) => {
-  const [imageButton, setImageButton] = useState(false);
-
   var lastTap = null;
   const handleDoubleTap = (image, liked, dispatch) => {
     const now = Date.now();
@@ -26,8 +24,6 @@ const ImageView = (image, likes, liked, dispatch, showAvatar) => {
     if (lastTap && now - lastTap < DOUBLE_PRESS_DELAY) {
       like(image, liked, dispatch);
     } else {
-      setImageButton(true);
-
       lastTap = now;
     }
   };
