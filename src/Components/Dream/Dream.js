@@ -727,12 +727,20 @@ export default function Dream() {
                   .remove();
                 realtime()
                   .ref('users/' + auth().currentUser.uid + '/messages')
-                  .child(pickedImage.artist[0])
+                  .child(
+                    pickedImage?.artist[0]
+                      ? pickedImage.artist[0]
+                      : 'undefined',
+                  )
                   .child(pickedImage.date.toString())
                   .remove();
                 realtime()
                   .ref('users/' + auth().currentUser.uid + '/messages')
-                  .child(pickedImage.artist[0])
+                  .child(
+                    pickedImage?.artist[0]
+                      ? pickedImage.artist[0]
+                      : 'undefined',
+                  )
                   .child((pickedImage.date - 1).toString())
                   .remove();
                 // remove image on storage
