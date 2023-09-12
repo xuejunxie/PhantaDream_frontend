@@ -1,5 +1,5 @@
 diff --git a/node_modules/radio-buttons-react-native/RadioButtonRN.js b/node_modules/radio-buttons-react-native/RadioButtonRN.js
-index 4756e29..4436a16 100644
+index 4756e29..801821d 100644
 --- a/node_modules/radio-buttons-react-native/RadioButtonRN.js
 +++ b/node_modules/radio-buttons-react-native/RadioButtonRN.js
 @@ -1,7 +1,8 @@
@@ -30,13 +30,14 @@ index 4756e29..4436a16 100644
              }).start();
          });
      }
-@@ -173,7 +175,13 @@ class RadioButtonRN extends React.Component {
+@@ -173,7 +175,14 @@ class RadioButtonRN extends React.Component {
                                      color: textColor
                                  }, textStyle]}>
                                      {item.label}
-+            
++        
 +                                    <FontAwesomeIcon icon={faBolt} size={15} color={'gray'} />
-+                                    +
++                                    {" "}+{" "}
++                                    {item.heartLabel}
 +                                    <FontAwesomeIcon icon={faHeart} size={15} color={'#E2725B'} />
 +                                    {item.subscription && "/month"}
                                  </Text>
@@ -44,7 +45,7 @@ index 4756e29..4436a16 100644
                              </View>
                          </TouchableOpacity>
                      )
-@@ -200,15 +208,12 @@ const styles = StyleSheet.create({
+@@ -200,15 +209,12 @@ const styles = StyleSheet.create({
          marginTop: 10
      },
      leftProductBox: {

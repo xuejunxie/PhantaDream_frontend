@@ -883,6 +883,7 @@ export default function Dream() {
   const chargePurchaseSelection = [
     {
       label: '$0.99 for 100 ',
+      heartLabel: '10 ',
       productID: productID.charge1,
       subscription: false,
       price: 0.99,
@@ -890,6 +891,7 @@ export default function Dream() {
     },
     {
       label: '$9.99 for 2000 ',
+      heartLabel: '200 ',
       productID: productID.charge2,
       subscription: false,
       price: 19.99,
@@ -897,6 +899,7 @@ export default function Dream() {
     },
     {
       label: '$99.99 for 40000 ',
+      heartLabel: '4000 ',
       productID: productID.charge3,
       subscription: false,
       price: 99.99,
