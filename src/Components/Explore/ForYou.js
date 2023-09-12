@@ -129,7 +129,7 @@ export default function ForYou() {
             color: '#E2725B',
             fontSize: 20,
           }}>
-          {hearts}
+          {hearts > 1000 ? (hearts / 1000).toFixed(0) + 'k' : hearts}
         </Text>
 
         <FontAwesomeIcon icon={faHeart} size={25} color={COLORS.red} />

@@ -98,6 +98,7 @@ export default function Notification() {
   const [masterDataSource, setMasterDataSource] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const messagesObject = useSelector(state => state.user?.data?.messages);
+  const userArtName = useSelector(state => state.user?.data?.artName);
   const [messages, setMessages] = useState([]);
 
   const fetchMessages = () => {
@@ -114,7 +115,7 @@ export default function Notification() {
           return {
             id: senderID,
             avatar: messagesObject[senderID][youLastMessageTime].image.imageURL,
-            name: senderID,
+            name: senderID === 'undefined' ? userArtName : senderID,
             lastMessage: messagesObject[senderID][youLastMessageTime].prompt,
             time: youLastMessageTime,
             byNow: msToTime(new Date().getTime() - youLastMessageTime) + ' ago',

@@ -899,7 +899,7 @@ export default function Dream() {
       label: '$99.99 for 40000 ',
       productID: productID.charge3,
       subscription: false,
-      price: 399.99,
+      price: 99.99,
       charge: 40000,
     },
   ];
