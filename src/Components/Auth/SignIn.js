@@ -34,7 +34,7 @@ import {UPDATE_USER} from '../../redux/types';
 import axios from 'axios';
 
 const newUserCharge = 100;
-const newUserHeart = 100;
+const newUserHeart = 10;
 const serverURL = 'http://phantaspace.ddns.net:7865/sdapi/v1/';
 
 const storageRef = storage().ref();

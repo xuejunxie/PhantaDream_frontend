@@ -183,7 +183,7 @@ export default function Dream() {
       .ref('/users/' + auth().currentUser.uid)
       .update({
         charge: realtime.ServerValue.increment(change),
-        heart: realtime.ServerValue.increment(change),
+        heart: realtime.ServerValue.increment(change / 10),
       });
     realtime().ref(`/users/${auth().currentUser.uid}/bills`).push({
       amount: price,
