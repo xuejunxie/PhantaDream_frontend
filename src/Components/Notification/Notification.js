@@ -115,7 +115,7 @@ export default function Notification() {
           return {
             id: senderID,
             avatar: messagesObject[senderID][youLastMessageTime].image.imageURL,
-            name: senderID === 'undefined' ? userArtName : senderID,
+            name: senderID == 'undefined' ? userArtName : senderID,
             lastMessage: messagesObject[senderID][youLastMessageTime].prompt,
             time: youLastMessageTime,
             byNow: msToTime(new Date().getTime() - youLastMessageTime) + ' ago',
@@ -157,8 +157,8 @@ export default function Notification() {
   };
 
   const listItem = ({sender, index}) => {
-    // console.log(sender);
-
+    console.log(sender);
+    // console.log(sender.name);
     // console.log(imageURL);
     return (
       <TouchableOpacity

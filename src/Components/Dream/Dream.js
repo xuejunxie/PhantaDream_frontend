@@ -1147,6 +1147,7 @@ export default function Dream() {
                   }}
                   onBlur={() => {
                     setArtistSuggestionVisible(false);
+                    setArtistsUsed([]);
                     setPlaceHolder(placeholder_template);
                   }}
                   value={prompt}
