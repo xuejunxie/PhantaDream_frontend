@@ -30,8 +30,8 @@ export default function Explore() {
 
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
-    {key: 'first', title: 'For you'},
-    {key: 'second', title: 'Hot'},
+    {key: 'first', title: 'Artworks'},
+    {key: 'second', title: 'Artists'},
     // {key: 'third', title: 'Private club'},
   ]);
 

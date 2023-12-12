@@ -131,7 +131,7 @@ function Home(): JSX.Element {
         }}
         component={Market}
       /> */}
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Notification"
         options={{
           tabBarLabel: 'Chat',
@@ -140,7 +140,7 @@ function Home(): JSX.Element {
           ),
         }}
         component={Notification}
-      />
+      /> */}
 
       <Tab.Screen
         name="Me"

@@ -114,11 +114,13 @@ export default function Notification() {
         if (type === 'new art work') {
           return {
             id: senderID,
-            avatar: messagesObject[senderID][youLastMessageTime].image.imageURL,
+            avatar:
+              messagesObject[senderID][youLastMessageTime]?.image?.imageURL,
             name: senderID == 'undefined' ? userArtName : senderID,
             lastMessage: messagesObject[senderID][youLastMessageTime].prompt,
             time: youLastMessageTime,
             byNow: msToTime(new Date().getTime() - youLastMessageTime) + ' ago',
+            type: type,
           };
         }
       });

@@ -587,7 +587,7 @@ export default function Dream() {
                   </Text>
                 </Neomorph>
               </TouchableOpacity>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 onPress={() => {
                   excuteShare('private');
                   setShareModalVisible(false);
@@ -612,7 +612,7 @@ export default function Dream() {
                     Private club
                   </Text>
                 </Neomorph>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
             <Text
               style={{
