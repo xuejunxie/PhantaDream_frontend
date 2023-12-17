@@ -46,12 +46,23 @@ export default function Artists() {
                 artist: artist,
               })
             }>
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: 'bold',
+                marginTop: 30,
+                marginBottom: -30,
+                textAlign: 'center', // Add this line
+              }}>
+              {artist}
+            </Text>
             {ImageView(
               artists[artist],
               likes,
-              isLiked(image),
+              isLiked(artists[artist]),
               dispatch,
               (showAvatar = false),
+              (showPrompt = 0),
             )}
           </TouchableOpacity>
         ))}

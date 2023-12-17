@@ -16,7 +16,14 @@ import * as RootNavigation from '../common/RootNavigation';
 import {useRoute} from '@react-navigation/native';
 import {CachedImage} from '@georstat/react-native-image-cache';
 
-const ImageView = (image, likes, liked, dispatch, showAvatar) => {
+const ImageView = (
+  image,
+  likes,
+  liked,
+  dispatch,
+  showAvatar,
+  showPrompt = 1,
+) => {
   var lastTap = null;
   const handleDoubleTap = (image, liked, dispatch) => {
     const now = Date.now();
@@ -141,9 +148,11 @@ const ImageView = (image, likes, liked, dispatch, showAvatar) => {
             Likes: {likes[image.id] ? likes[image.id] : image.likes}
           </Text>
         </View>
-        <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
-          {image.prompt}
-        </Text>
+        {showPrompt === 1 && (
+          <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
+            {image.prompt}
+          </Text>
+        )}
       </View>
     </View>
   );

@@ -37,10 +37,16 @@ export default ArtistPage = ({route, navigation}) => {
           alignItems: 'center',
           padding: 10,
         }}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={{
+            marginRight: 10,
+            position: 'absolute',
+            left: 20,
+            top: 35,
+          }}>
           <FontAwesomeIcon icon={faChevronLeft} size={20} />
         </TouchableOpacity>
-        <Text style={{fontSize: 20, marginLeft: 10}}>{Artist}</Text>
       </View>
       <ScrollView>
         {artwork.map(image => (
@@ -51,7 +57,7 @@ export default ArtistPage = ({route, navigation}) => {
                 image: image,
               })
             }>
-            {ImageView(image, {}, false, () => {}, (showAvatar = false))}
+            {ImageView(image, {}, false, () => {}, (showAvatar = true))}
           </TouchableOpacity>
         ))}
       </ScrollView>
