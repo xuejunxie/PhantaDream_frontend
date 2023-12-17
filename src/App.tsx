@@ -41,6 +41,7 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {navigationRef} from './Components/common/RootNavigation';
 import UserPage from './Components/Explore/UserPage';
+import ArtistPage from './Components/Explore/ArtistPage';
 import editData from './editData';
 import Notification from './Components/Notification/Notification';
 import Chat from './Components/Notification/Chat';
@@ -177,6 +178,7 @@ function App(): JSX.Element {
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="UserPage" component={UserPage} />
         <Stack.Screen name="Chat" component={Chat} />
+        <Stack.Screen name="ArtistPage" component={ArtistPage} />
       </Stack.Navigator>
     </NavigationContainer>
   );

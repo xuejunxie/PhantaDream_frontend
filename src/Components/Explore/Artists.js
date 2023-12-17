@@ -42,7 +42,7 @@ export default function Artists() {
           <TouchableOpacity
             key={artist}
             onPress={() =>
-              navigation.navigate('Artist', {
+              navigation.navigate('ArtistPage', {
                 artist: artist,
               })
             }>
