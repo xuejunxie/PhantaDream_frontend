@@ -9,13 +9,14 @@ import {
 
 import {COLORS} from '../common/globalValues';
 import Hot from './Hot';
+import Artists from './Artists';
 import ForYou from './ForYou';
 import Following from './Following';
 import PrivateClub from './PrivateClub';
 
 const FirstRoute = () => <ForYou />;
 
-const SecondRoute = () => <Hot />;
+const SecondRoute = () => <Artists  />
 
 const ThirdRoute = () => <PrivateClub />;
 

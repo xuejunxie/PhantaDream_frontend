@@ -372,7 +372,7 @@ export default function Dream() {
               .ref('/users/' + auth().currentUser.uid + '/generated')
               .child(imageId)
               .set(generatedImageMeta);
-            addArtistToMessage(artistsUsed[0], generatedImageMeta);
+            // addArtistToMessage(artistsUsed[0], generatedImageMeta);
             // save the url wit the image entry to local storage
             image_entry.imageURL = url;
             AsyncStorage.setItem(imageId, JSON.stringify(image_entry));
