@@ -13,6 +13,9 @@ const SIZES = {
 
 const defaultAvatar = 'https://phantadream.ai/dummy_avatar.png';
 
+const avatarRootURL =
+  'https://firebasestorage.googleapis.com:443/v0/b/phantadream-9656a.appspot.com/o/users%2F';
+
 const productID = {
   // In-App Purchase
   charge1: 'charge1.phantadream',
@@ -22,4 +25,4 @@ const productID = {
 
 const serverURL = 'http://phantaspace.ddns.net:7865/sdapi/v1/';
 
-export {COLORS, SIZES, defaultAvatar, productID, serverURL};
+export {COLORS, SIZES, defaultAvatar, productID, serverURL, avatarRootURL};

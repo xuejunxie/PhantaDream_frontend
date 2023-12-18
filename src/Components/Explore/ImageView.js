@@ -1,8 +1,13 @@
-import React, {useState} from 'react';
+import React, {useEffect} from 'react';
 import {View, Text, Image} from 'react-native';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import {Neomorph} from 'react-native-neomorph-shadows';
-import {COLORS, SIZES, defaultAvatar} from '../common/globalValues';
+import {
+  COLORS,
+  SIZES,
+  avatarRootURL,
+  defaultAvatar,
+} from '../common/globalValues';
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 const hapticOptions = {
   enableVibrateFallback: true,
@@ -15,6 +20,7 @@ import like from '../common/like';
 import * as RootNavigation from '../common/RootNavigation';
 import {useRoute} from '@react-navigation/native';
 import {CachedImage} from '@georstat/react-native-image-cache';
+import storage from '@react-native-firebase/storage';
 
 const ImageView = (
   image,
@@ -110,9 +116,7 @@ const ImageView = (
                 }}>
                 <CachedImage
                   source={
-                    image?.owner?.avatar !== ''
-                      ? image.owner.avatar
-                      : defaultAvatar
+                    avatarRootURL + image.owner.id + '%2Favatar?alt=media'
                   }
                   style={{
                     width: 30,

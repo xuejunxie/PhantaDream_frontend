@@ -49,16 +49,20 @@ export default ArtistPage = ({route, navigation}) => {
         </TouchableOpacity>
       </View>
       <ScrollView>
+        <Text
+          style={{
+            fontSize: 20,
+            fontWeight: 'bold',
+            marginTop: 30,
+            marginBottom: -30,
+            textAlign: 'center', // Add this line
+          }}>
+          {Artist}
+        </Text>
         {artwork.map(image => (
-          <TouchableOpacity
-            key={image.id}
-            onPress={() =>
-              navigation.navigate('Image', {
-                image: image,
-              })
-            }>
+          <View key={image.id}>
             {ImageView(image, {}, false, () => {}, (showAvatar = true))}
-          </TouchableOpacity>
+          </View>
         ))}
       </ScrollView>
     </View>
