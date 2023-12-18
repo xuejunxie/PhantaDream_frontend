@@ -5,6 +5,21 @@ import realtime from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 
 export default function editData() {
+  // write a script to remove all published images before august from images of Firestore database
+  // console.log(new Date('2023-08-30').getTime());
+  // firestore()
+  //   .collection('images')
+  //   .where('date', '<', new Date('2023-08-30').getTime())
+  //   .get()
+  //   .then(querySnapshot => {
+  //     querySnapshot.forEach(documentSnapshot => {
+  //       console.log(documentSnapshot.data());
+  //       firestore()
+  //         .collection('images')
+  //         .doc(documentSnapshot.data().id)
+  //         .delete();
+  //     });
+  //   });
   //   get all image from firestore
   //   firestore()
   //     .collection('images')

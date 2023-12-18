@@ -993,8 +993,20 @@ export default function Dream() {
   const [artistsUsed, setArtistsUsed] = useState([]);
 
   const refreshArtist = () => {
-    const artist = artists[Math.floor(Math.random() * artists.length)];
-    setArtistSeggestion(artist.artist);
+    // const artist = artists[Math.floor(Math.random() * artists.length)];
+    // setArtistSeggestion(artist.artist);
+    // setArtistSuggestion based on the last word of the prompt
+    const promptArray = prompt.split(' ');
+    const lastWord = promptArray[promptArray.length - 1];
+    // console.log(lastWord);
+    // find the closest artist
+    const artistList = artists.filter(artist => {
+      return artist.artist.startsWith(lastWord);
+    });
+    // console.log(artistList);
+    if (artistList.length > 0) {
+      setArtistSeggestion(artistList[0].artist);
+    }
   };
 
   useEffect(() => {

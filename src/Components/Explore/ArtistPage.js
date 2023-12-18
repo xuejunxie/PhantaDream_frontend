@@ -29,6 +29,29 @@ export default ArtistPage = ({route, navigation}) => {
       });
   }, []);
 
+  // write a script to get the first google image search reasult as the artist avatar
+  const [artistAvatar, setArtistAvatar] = useState('');
+  useEffect(() => {
+    fetch(
+      'https://www.googleapis.com/customsearch/v1?key=' +
+        'AIzaSyA-8h6GZ2iXm1zZ1LQ8J7gWY0X3Uy5qG9U' +
+        '&cx=' +
+        '013036536707430787589:_pqjad5hr1a' +
+        '&q=' +
+        Artist +
+        '&searchType=image',
+    )
+      .then(response => response.json())
+      .then(responseJson => {
+        if (responseJson.items) {
+          setArtistAvatar(responseJson.items[0].link);
+        }
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  }, []);
+
   return (
     <View>
       <View
@@ -59,6 +82,21 @@ export default ArtistPage = ({route, navigation}) => {
           }}>
           {Artist}
         </Text>
+        {/* <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginTop: 20,
+          }}>
+          <Avatar
+            size={100}
+            source={{
+              uri: artistAvatar,
+            }}
+          />
+        </View> */}
+
         {artwork.map(image => (
           <View key={image.id}>
             {ImageView(image, {}, false, () => {}, (showAvatar = true))}
