@@ -38,6 +38,7 @@ import {
   faShare,
   faTimes,
   faTrash,
+  faVideo,
 } from '@fortawesome/free-solid-svg-icons';
 
 import {CameraRoll} from '@react-native-camera-roll/camera-roll';
@@ -80,10 +81,7 @@ export default function Dream() {
   // const [heart, setHeart] = useState(false);
   const Charge = useSelector(state => state.user.data?.charge);
   const artistList = useSelector(state => state.user.data?.artistList);
-  const [CopyButtonPressed, setCopyButtonPressed] = useState(false);
-  const [saveButtonPressed, setSaveButtonPressed] = useState(false);
-  const [shareButtonPressed, setShareButtonPressed] = useState(false);
-  const [deleteButtonPressed, setDeleteButtonPressed] = useState(false);
+
   const [pickedImage, setPickedImage] = useState(null); // pickedImage = image object when user pick an image from the gallery
 
   const scrollViewRef = useRef();
@@ -413,7 +411,7 @@ export default function Dream() {
               shadowRadius: 5,
               borderRadius: 25,
               backgroundColor: COLORS.primary,
-              width: 60,
+              width: 100,
               height: 40,
               justifyContent: 'center',
               alignItems: 'center',
@@ -429,33 +427,60 @@ export default function Dream() {
     return <FontAwesomeIcon icon={name} size={20} color={'gray'} />;
   };
 
+  const renderText = text => {
+    return (
+      <Text
+        style={{
+          fontSize: 20,
+          fontWeight: 'bold',
+          color: 'gray',
+        }}>
+        {text}
+      </Text>
+    );
+  };
+
+  const [VideoButtonPressed, setVideoButtonPressed] = useState(false);
+  const [CopyButtonPressed, setCopyButtonPressed] = useState(false);
+  const [saveButtonPressed, setSaveButtonPressed] = useState(false);
+  const [shareButtonPressed, setShareButtonPressed] = useState(false);
+  const [deleteButtonPressed, setDeleteButtonPressed] = useState(false);
+
   const actionButtons = () => {
     return (
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-evenly',
-        }}>
-        {operations(
-          CopyButtonPressed,
-          setCopyButtonPressed,
-          renderIcon(faCopy),
-        )}
-        {operations(
-          saveButtonPressed,
-          setSaveButtonPressed,
-          renderIcon(faDownload),
-        )}
-        {operations(
-          shareButtonPressed,
-          setShareButtonPressed,
-          renderIcon(faShare),
-        )}
-        {operations(
-          deleteButtonPressed,
-          setDeleteButtonPressed,
-          renderIcon(faTrash),
-        )}
+      <View>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-evenly',
+          }}>
+          {operations(
+            saveButtonPressed,
+            setSaveButtonPressed,
+            renderText('Save'),
+          )}
+          {operations(
+            shareButtonPressed,
+            setShareButtonPressed,
+            renderText('Share'),
+          )}
+          {operations(
+            deleteButtonPressed,
+            setDeleteButtonPressed,
+            renderText('Delete'),
+          )}
+        </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-evenly',
+          }}>
+          {operations(
+            VideoButtonPressed,
+            setVideoButtonPressed,
+            renderText('Animate'),
+          )}
+        </View>
       </View>
     );
   };
