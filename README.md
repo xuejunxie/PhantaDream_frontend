@@ -1,35 +1,177 @@
-This is PhantaDream frontend
+# PhantaDream
 
-Steps to run the project:
+**AI-powered art creation and NFT social platform — React Native mobile app.**
 
-- Replace "phantaspace.ddns.net" anywhere with new server address
-- npm install
-- npx patch-package
-- cd ios && pod install && cd ..
-- npm run ios
+PhantaDream is the companion mobile application to the [PhantaSpace](https://phanta.space) metaverse. It lets users generate AI artwork, discover and follow artists, collect and trade NFTs, and earn Phanton tokens — all from iOS and Android.
 
-170 charactors Promotional Text:
-PhantaDream fuse the artist and the community with AI customize art. Create, trade, earn royalties, and connect with fans. Join now and redefine art with us!
+---
 
-Description :
-Introducing PhantaDream - the revolutionary app that fuses art, technology and community to redefine the way we experience and create art. With our cutting-edge AI-based Generative Content technology, PhantaDream empowers artists to profit from the unique styles they create and connect with the communities that admire their work. As a user, you'll have access to customized, generated art pieces derived from the styles of famous artists, and the ability to like, trade and collect these unique creations. And for artists, PhantaDream provides a platform to claim earned royalties, interact with fans, and showcase their best works. Join the PhantaDream community today and experience art like never before!
+## Features
 
-longer description:
-PhantaDream is a revolutionary new app that aims to redefine the way we think about art. By fusing the worlds of art, technology, and community, PhantaDream offers a unique platform for artists to profit from their art styles and connect with the communities that enjoy them.
+### 🎨 AI Dream Studio
+Generate images with a stable diffusion backend. Prompt, tweak, and publish artwork directly from your phone.
 
-At the core of PhantaDream is our advanced AI-powered Generative Art Creation (AIGC) technology, which allows users to create customized artworks based on the styles of famous artists. This gives users the opportunity to explore new artistic styles and push the boundaries of creativity.
+### 🌍 Explore
+- Discover trending AI artworks and artist profiles
+- Follow artists and build a personalised feed (For You, Following, Hot)
+- Like, comment, and share artwork
 
-In addition to creating their own art, users can also like and trade artworks with others on the platform. Each transaction on PhantaDream includes a built-in royalty system that pays artists for the use of their art styles. This means that artists can earn money from their work, even if they didn't create the final artwork themselves.
+### 🖼️ NFT Marketplace
+Buy and sell AI-generated NFTs. Integrated with on-chain wallet via ethers.js.
 
-For artists, PhantaDream provides an unprecedented opportunity to connect with their fans and interact with other artists in the community. Users can claim their royalties, upload their artwork, answer questions, and share their insights and experiences with others. With PhantaDream, artists have a direct connection to the people who appreciate their work, giving them a powerful new way to grow their careers.
+### 💬 Notifications & Chat
+Real-time notifications and in-app messaging powered by Firebase Realtime Database.
 
-PhantaDream is more than just an app; it's a new way of thinking about art and how it can be created, shared, and appreciated. It offers users the ability to customize art, trade and like others, earn royalties, connect with fans and Artists, and create a new, more equitable and sustainable ecosystem for artists.
+### 🪙 Phanton Token & In-App Purchases
+- Earn and spend Phanton utility tokens
+- Top up with in-app purchases (Apple IAP / Google Play Billing)
 
-By downloading PhantaDream, you'll be joining a community of creative, passionate people from all around the world who are pushing the boundaries of what art can be. Whether you're an artist, an art enthusiast, or simply someone who wants to try something new, PhantaDream is the perfect way to get involved.
+### 👤 Profile & Account
+- Apple Sign-In and email authentication
+- Manage published artwork and liked posts
+- Billing and subscription management
 
-keywords:
-AI, Art, AIGC, Artist, Creative, Community, inspiration, NFT, loyalty
+---
 
-Notes:
+## Tech Stack
 
-The in-app purchase can be found in the "Dream" tab, click the little "⚡️“ icon. You will be able to see it.
+| Layer | Technology |
+|---|---|
+| Framework | React Native 0.71, TypeScript |
+| Navigation | React Navigation (Stack + Material Bottom Tabs) |
+| State management | Redux + redux-thunk |
+| Backend / Auth | Firebase (Auth, Firestore, Realtime DB, Storage, Messaging) |
+| AI image generation | Custom Stable Diffusion API (`serverURL` in `globalValues.js`) |
+| Web3 | ethers.js |
+| In-app purchases | react-native-iap |
+| Apple Sign-In | `@invertase/react-native-apple-authentication` |
+| UI components | React Native Elements (`@rneui`), Neomorph Shadows, FontAwesome |
+| Image handling | Camera Roll, Image Picker, Image Marker, cached images |
+| iOS dependencies | CocoaPods |
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js ≥ 16
+- Xcode (for iOS builds)
+- Android Studio (for Android builds)
+- A Firebase project with iOS app configured
+- CocoaPods (`sudo gem install cocoapods`)
+
+### Install
+
+```bash
+git clone https://github.com/phantaspace/PhantaDream_frontend.git
+cd PhantaDream_frontend
+npm install
+```
+
+### iOS setup
+
+1. Download your `GoogleService-Info.plist` from the [Firebase Console](https://console.firebase.google.com) and place it at `ios/GoogleService-Info.plist`.
+2. Install pods:
+
+```bash
+cd ios && pod install && cd ..
+```
+
+3. Run on simulator:
+
+```bash
+npx react-native run-ios
+```
+
+### Android setup
+
+1. Download your `google-services.json` from the Firebase Console and place it at `android/app/google-services.json`.
+2. Run on emulator:
+
+```bash
+npx react-native run-android
+```
+
+### Environment
+
+The app reads a few values from `src/Components/common/globalValues.js`:
+
+| Variable | Description |
+|---|---|
+| `serverURL` | Stable Diffusion API endpoint |
+| `avatarRootURL` | Firebase Storage avatar root URL |
+| `defaultAvatar` | Fallback avatar image URL |
+| `productID` | In-app purchase product IDs |
+
+Update these values for your own deployment.
+
+> **Note:** `GoogleService-Info.plist` and `google-services.json` contain Firebase credentials. They are **not committed** to this repo. Obtain them from your Firebase project settings.
+
+---
+
+## Project Structure
+
+```
+PhantaDream_frontend/
+├── src/
+│   ├── App.tsx                     # Root component + navigation stack
+│   ├── AppWithProviders.tsx        # Redux + Firebase providers wrapper
+│   ├── Providers.tsx               # Context providers
+│   ├── Components/
+│   │   ├── Auth/                   # Sign-in (Apple, email)
+│   │   ├── Dream/                  # AI image generation studio
+│   │   │   ├── IAP/                # In-app purchase flows
+│   │   │   ├── components/         # Dream UI components
+│   │   │   └── utils/              # Generation helpers
+│   │   ├── Explore/                # Browse artworks and artist pages
+│   │   ├── Market/                 # NFT marketplace
+│   │   ├── Me/                     # Profile, account, billing
+│   │   ├── Notification/           # Real-time chat and notifications
+│   │   └── common/                 # Shared values, hooks, utilities
+│   └── redux/
+│       └── reducers/               # Redux state slices
+├── ios/                            # iOS native project (Xcode)
+├── android/                        # Android native project (Gradle)
+├── patches/                        # patch-package fixes for RN dependencies
+├── App.js                          # Entry point
+└── package.json
+```
+
+---
+
+## Firebase Setup
+
+This app uses the following Firebase services:
+
+- **Authentication** — Apple Sign-In, email/password
+- **Firestore** — user profiles, artwork metadata, likes
+- **Realtime Database** — notifications, chat messages
+- **Storage** — user-uploaded and AI-generated images
+- **Cloud Messaging** — push notifications
+
+You will need a Firebase project with these services enabled. Place the config files (`GoogleService-Info.plist` for iOS, `google-services.json` for Android) in the correct locations before building.
+
+---
+
+## Contributing
+
+Pull requests are welcome. Please:
+
+1. Fork the repo and create a feature branch from `main`.
+2. Run the linter: `npx eslint src/`
+3. Open a pull request with a clear description.
+
+---
+
+## License
+
+MIT License
+
+---
+
+## Links
+
+- **PhantaSpace web app:** [https://phanta.space](https://phanta.space)
+- **Smart contracts:** [PhantaSpace_contract](https://github.com/xuejunxie/PhantaSpace_contract)
+- **Web3 frontend:** [PhantaSpace_Web3](https://github.com/xuejunxie/PhantaSpace_Web3)
