@@ -9,13 +9,14 @@ import {
 
 import {COLORS} from '../common/globalValues';
 import Hot from './Hot';
+import Artists from './Artists';
 import ForYou from './ForYou';
 import Following from './Following';
 import PrivateClub from './PrivateClub';
 
 const FirstRoute = () => <ForYou />;
 
-const SecondRoute = () => <Hot />;
+const SecondRoute = () => <Artists  />
 
 const ThirdRoute = () => <PrivateClub />;
 
@@ -30,8 +31,8 @@ export default function Explore() {
 
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
-    {key: 'first', title: 'For you'},
-    {key: 'second', title: 'Hot'},
+    {key: 'first', title: 'Artworks'},
+    {key: 'second', title: 'Artists'},
     // {key: 'third', title: 'Private club'},
   ]);
 

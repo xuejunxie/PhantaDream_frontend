@@ -1,8 +1,13 @@
-import React, {useState} from 'react';
+import React, {useEffect} from 'react';
 import {View, Text, Image} from 'react-native';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import {Neomorph} from 'react-native-neomorph-shadows';
-import {COLORS, SIZES} from '../common/globalValues';
+import {
+  COLORS,
+  SIZES,
+  avatarRootURL,
+  defaultAvatar,
+} from '../common/globalValues';
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 const hapticOptions = {
   enableVibrateFallback: true,
@@ -15,11 +20,27 @@ import like from '../common/like';
 import * as RootNavigation from '../common/RootNavigation';
 import {useRoute} from '@react-navigation/native';
 import {CachedImage} from '@georstat/react-native-image-cache';
+import storage from '@react-native-firebase/storage';
 
-const defaultAvatar =
-  'https://i0.wp.com/bangla.indiarag.com/wp-content/uploads/2019/01/dummy-snapcode-avatar@2x.png';
+const ImageView = (
+  image,
+  likes,
+  liked,
+  dispatch,
+  showAvatar,
+  showPrompt = 1,
+) => {
+  var lastTap = null;
+  const handleDoubleTap = (image, liked, dispatch) => {
+    const now = Date.now();
+    const DOUBLE_PRESS_DELAY = 300;
+    if (lastTap && now - lastTap < DOUBLE_PRESS_DELAY) {
+      like(image, liked, dispatch);
+    } else {
+      lastTap = now;
+    }
+  };
 
-const ImageView = (image, likes, liked, dispatch, showAvatar) => {
   return (
     <View
       key={image.id}
@@ -31,7 +52,7 @@ const ImageView = (image, likes, liked, dispatch, showAvatar) => {
       }}>
       <TouchableWithoutFeedback
         onPress={() => {
-          like(image, liked, dispatch);
+          handleDoubleTap(image, liked, dispatch);
           ReactNativeHapticFeedback.trigger('impactMedium', hapticOptions);
         }}>
         <Neomorph
@@ -95,7 +116,7 @@ const ImageView = (image, likes, liked, dispatch, showAvatar) => {
                 }}>
                 <CachedImage
                   source={
-                    image?.owner?.avatar ? image.owner.avatar : defaultAvatar
+                    avatarRootURL + image.owner.id + '%2Favatar?alt=media'
                   }
                   style={{
                     width: 30,
@@ -131,9 +152,11 @@ const ImageView = (image, likes, liked, dispatch, showAvatar) => {
             Likes: {likes[image.id] ? likes[image.id] : image.likes}
           </Text>
         </View>
-        <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
-          Prompt: {image.prompt}
-        </Text>
+        {showPrompt === 1 && (
+          <Text style={{color: 'gray', fontSize: 15, marginTop: 10}}>
+            {image.prompt}
+          </Text>
+        )}
       </View>
     </View>
   );

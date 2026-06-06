@@ -16,7 +16,6 @@
     "@fortawesome/react-native-fontawesome": "^0.3.0",
     "@georstat/react-native-image-cache": "^2.3.0",
     "@invertase/react-native-apple-authentication": "^2.2.2",
-    "@parse/react-native": "^0.0.1-alpha.18",
     "@react-native-async-storage/async-storage": "~1.17.3",
     "@react-native-camera-roll/camera-roll": "^5.2.0",
     "@react-native-community/art": "^1.2.0",
@@ -40,7 +39,6 @@
     "dotenv": "^16.0.3",
     "env": "^0.0.2",
     "ethers": "^5.7.2",
-    "parse": "^4.1.0",
     "patch-package": "^6.5.0",
     "radio-buttons-react-native": "^1.0.4",
     "react": "18.1.0",
@@ -49,9 +47,9 @@
     "react-native-apple-payment": "^1.1.1",
     "react-native-device-info": "^10.3.0",
     "react-native-dotenv": "^3.4.2",
+    "react-native-double-tap": "^1.0.1",
     "react-native-file-access": "^2.5.3",
     "react-native-gesture-handler": "^2.8.0",
-    "react-native-get-random-values": "^1.9.0",
     "react-native-haptic-feedback": "^1.14.0",
     "react-native-iap": "^12.5.0",
     "react-native-image-marker": "^0.6.3",
@@ -69,8 +67,8 @@
     "react-redux": "^8.0.5",
     "redux-devtools-extension": "^2.13.9",
     "redux-thunk": "^2.4.2",
-    "typescript": "^4.6.3",
-    "uuid": "^9.0.0"
+    "string-similarity": "^4.0.4",
+    "typescript": "^4.6.3"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

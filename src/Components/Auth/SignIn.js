@@ -26,17 +26,18 @@ import {
 } from '@invertase/react-native-apple-authentication';
 import firestore from '@react-native-firebase/firestore';
 import realtime from '@react-native-firebase/database';
+import storage from '@react-native-firebase/storage';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch} from 'react-redux';
 import {UPDATE_USER} from '../../redux/types';
+import axios from 'axios';
 
-import Parse from 'parse/react-native.js';
+const newUserCharge = 100;
+const newUserHeart = 10;
+const serverURL = 'http://phantaspace.ddns.net:7865/sdapi/v1/';
 
-import 'react-native-get-random-values';
-import {v4 as uuidv4} from 'uuid';
-
-const newUserCharge = 20;
-const newUserHeart = 20;
+const storageRef = storage().ref();
 
 export default function SignIn({navigation}) {
   const [pressed, setPressed] = useState(false);
@@ -82,192 +83,151 @@ export default function SignIn({navigation}) {
   //   }
   // }, []);
 
-  // async function signInButton() {
-  //   // Start the sign-in request
-  //   const appleAuthRequestResponse = await appleAuth.performRequest({
-  //     requestedOperation: appleAuth.Operation.LOGIN,
-  //     requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
-  //   });
-
-  //   // Ensure Apple returned a user identityToken
-  //   if (!appleAuthRequestResponse.identityToken) {
-  //     throw new Error('Apple Sign-In failed - no identify token returned');
-  //   }
-
-  //   // Create a Firebase credential from the response
-  //   const {identityToken, nonce} = appleAuthRequestResponse;
-  //   // storeTokens(identityToken, nonce);
-
-  //   const appleCredential = auth.AppleAuthProvider.credential(
-  //     identityToken,
-  //     nonce,
-  //   );
-
-  //   // Sign the user in with the credential
-  //   auth()
-  //     .signInWithCredential(appleCredential)
+  // generate avatar, and store it in the database, add it to the user data
+  // const generate_avatar = (username) => {
+  //   axios
+  //     .post(serverURL + 'txt2img', {
+  //       prompt: username,
+  //       steps: 20,
+  //       width: 768,
+  //       height: 768,
+  //       cfg_scale: 7,
+  //       seed: seed,
+  //     })
   //     .then(res => {
-  //       const user = res.user;
-  //       if (res.additionalUserInfo.isNewUser) {
-  //         // create a new user data entry in the database
-  //         var userName = appleAuthRequestResponse.fullName;
-  //         if (userName == null) {
-  //           userName = {
-  //             familyName: 'Joe',
-  //             givenName: 'Average',
-  //           };
-  //         }
-  //         // check the user name is Chinese
-  //         const inChinese = /[\u4e00-\u9fa5]/.test(userName.givenName);
+  //       const avatar = res.data.image[0];
+  //       // upload the avatar to the storage
+  //       const storageRef = storage().ref();
+  //       const reference = storage().ref(
+  //         `/users/${auth().currentUser.uid}/avatar`,
+  //       );
+  //       const task = reference.putFile(avatar);
 
-  //         const userData = {
-  //           email: appleAuthRequestResponse.email,
-  //           fullName: userName,
-  //           charge: newUserCharge,
-  //           heart: newUserHeart,
-  //           avatar: defaultAvatar,
-  //           artName: inChinese
-  //             ? userName.familyName + ' ' + userName.givenName
-  //             : userName.givenName + ' ' + userName.familyName,
-  //           handleName: {
-  //             name: inChinese
-  //               ? userName.familyName + userName.givenName
-  //               : userName.givenName +
-  //                 userName.familyName +
-  //                 Math.floor(Math.random() * 10000),
-  //             time: 0,
-  //           },
-  //         };
+  async function signInButton() {
+    // Start the sign-in request
+    const appleAuthRequestResponse = await appleAuth.performRequest({
+      requestedOperation: appleAuth.Operation.LOGIN,
+      requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+    });
 
-  //         dispatch({type: UPDATE_USER, payload: userData});
-
-  //         realtime()
-  //           .ref('/users/' + user.uid)
-  //           .set(userData);
-  //       } else {
-  //         // get the user data from the database
-  //         realtime()
-  //           .ref('/users/' + user.uid)
-  //           .once('value')
-  //           .then(snapshot => {
-  //             const userData = snapshot.val();
-  //             dispatch({type: UPDATE_USER, payload: userData});
-  //             if (userData.active == false) {
-  //               Alert.alert(
-  //                 'Your account has been deactivated',
-  //                 'Do you want to reactivate your account?',
-  //                 [
-  //                   {
-  //                     text: 'Cancel',
-  //                     onPress: () => {
-  //                       auth().signOut();
-  //                     },
-  //                   },
-  //                   {
-  //                     text: 'OK',
-  //                     onPress: () => {
-  //                       realtime()
-  //                         .ref('users/' + user.uid)
-  //                         .update({active: true});
-  //                     },
-  //                   },
-  //                 ],
-  //                 {cancelable: false},
-  //               );
-  //             }
-  //           });
-  //       }
-
-  //       navigation.navigate('Home');
-  //     });
-  // }
-
-  const signInButton = async function () {
-    try {
-      let response = {};
-      let appleId = '';
-      let appleToken = '';
-      var appleEmail = '';
-      let fullName = '';
-      if (Platform.OS === 'ios') {
-        // Performs login request requesting user email
-        response = await appleAuth.performRequest({
-          requestedOperation: appleAuth.Operation.LOGIN,
-          requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
-        });
-        // On iOS, user ID and email are easily retrieved from request
-        appleId = response.user;
-        appleToken = response.identityToken;
-        appleEmail = response.email;
-        fullName = response.fullName;
-      } else if (Platform.OS === 'android') {
-        // Configure the request
-        appleAuthAndroid.configure({
-          // The Service ID you registered with Apple
-          clientId: 'YOUR_SERVICE_IO',
-          // Return URL added to your Apple dev console
-          redirectUri: 'YOUR_SERVICE_URL',
-          responseType: appleAuthAndroid.ResponseType.ALL,
-          scope: appleAuthAndroid.Scope.ALL,
-        });
-        response = await appleAuthAndroid.signIn();
-        // Decode user ID and email from token returned from Apple,
-        // this is a common workaround for Apple sign-in via web API
-        const decodedIdToken = jwt_decode(response.id_token);
-        appleId = decodedIdToken.sub;
-        appleToken = response.id_token;
-        appleEmail = decodedIdToken.email;
-      }
-      appleEmail = 'test@test.com';
-
-      console.log('appleId', appleId);
-      console.log('appleToken', appleToken);
-      console.log('appleEmail', appleEmail);
-      // Format authData to provide correctly for Apple linkWith on Parse
-      const authData = {
-        id: appleId,
-        token: appleToken,
-      };
-      // Log in or sign up on Parse using this Apple credentials
-      let userToLogin = new Parse.User();
-
-      userToLogin.set('username', 'test@test.com');
-
-      userToLogin.set('email', 'test@test.com');
-
-      const uniqueId = uuidv4();
-      userToLogin.set('userId', uniqueId);
-
-      return await userToLogin
-        .linkWith('apple', {
-          authData: authData,
-        })
-        .then(async loggedInUser => {
-          // logIn returns the corresponding ParseUser object
-          Alert.alert(
-            'Success!',
-            `User ${loggedInUser.get('username')} has successfully signed in!`,
-          );
-          // To verify that this is in fact the current user, currentAsync can be used
-          const currentUser = await Parse.User.currentAsync();
-          console.log(loggedInUser === currentUser);
-          // Navigation.navigate takes the user to the screen named after the one
-          // passed as parameter
-          navigation.navigate('Home');
-          return true;
-        })
-        .catch(async error => {
-          // Error can be caused by wrong parameters or lack of Internet connection
-          Alert.alert('Error 1 !', error.message);
-          return false;
-        });
-    } catch (error) {
-      // Error can be caused by wrong parameters or lack of Internet connection
-      console.log('Error 2 !', error);
-      Alert.alert('Error 2 !', error);
-      return false;
+    // Ensure Apple returned a user identityToken
+    if (!appleAuthRequestResponse.identityToken) {
+      throw new Error('Apple Sign-In failed - no identify token returned');
     }
-  };
+
+    // Create a Firebase credential from the response
+    const {identityToken, nonce} = appleAuthRequestResponse;
+    // storeTokens(identityToken, nonce);
+    const appleCredential = auth.AppleAuthProvider.credential(
+      identityToken,
+      nonce,
+    );
+    // Sign the user in with the credential
+    auth()
+      .signInWithCredential(appleCredential)
+      .then(res => {
+        const user = res.user;
+        if (res.additionalUserInfo.isNewUser) {
+          // create a new user data entry in the database
+          var userName = appleAuthRequestResponse.fullName;
+          if (userName == null) {
+            userName = {
+              familyName: 'Joe',
+              givenName: 'Average',
+            };
+          }
+          // check the user name is Chinese
+          const inChinese = /[\u4e00-\u9fa5]/.test(userName.givenName);
+
+          const userData = {
+            email: appleAuthRequestResponse.email,
+            fullName: userName,
+            charge: newUserCharge,
+            heart: newUserHeart,
+            avatar: '',
+            artName: inChinese
+              ? userName.familyName + ' ' + userName.givenName
+              : userName.givenName + ' ' + userName.familyName,
+            handleName: {
+              name: inChinese
+                ? userName.familyName + userName.givenName
+                : userName.givenName +
+                  userName.familyName +
+                  Math.floor(Math.random() * 10000),
+              time: 0,
+            },
+          };
+
+          dispatch({type: UPDATE_USER, payload: userData});
+
+          realtime()
+            .ref('/users/' + user.uid)
+            .set(userData);
+
+          // generate avatar, and store it in the database, add it to the user data
+          axios
+            .post(serverURL + 'txt2img', {
+              prompt: userName.familyName + ' ' + userName.givenName,
+              steps: 20,
+              width: 768,
+              height: 768,
+              cfg_scale: 7,
+            })
+            .then(res => {
+              const avatar = `data:image/png;base64,${res.data.images[0]}`;
+
+              const imageRef = storageRef.child(
+                'users/' + user.uid + '/avatar',
+              );
+              imageRef.putString(avatar, 'data_url').then(() => {
+                imageRef.getDownloadURL().then(url => {
+                  realtime()
+                    .ref(`/users/${user.uid}/avatar`)
+                    .set(url)
+                    .catch(e => console.log(e));
+                });
+              });
+            })
+            .catch(e => {
+              console.log(e);
+            });
+        } else {
+          // get the user data from the database
+          realtime()
+            .ref('/users/' + user.uid)
+            .once('value')
+            .then(snapshot => {
+              const userData = snapshot.val();
+              dispatch({type: UPDATE_USER, payload: userData});
+              if (userData.active == false) {
+                Alert.alert(
+                  'Your account has been deactivated',
+                  'Do you want to reactivate your account?',
+                  [
+                    {
+                      text: 'Cancel',
+                      onPress: () => {
+                        auth().signOut();
+                      },
+                    },
+                    {
+                      text: 'OK',
+                      onPress: () => {
+                        realtime()
+                          .ref('users/' + user.uid)
+                          .update({active: true});
+                      },
+                    },
+                  ],
+                  {cancelable: false},
+                );
+              }
+            });
+        }
+
+        navigation.navigate('Home');
+      });
+  }
 
   return (
     <View

@@ -225,7 +225,7 @@ export default UserPage = ({route, navigation}) => {
                 }}>
                 followers
               </Text>
-              <Text
+              {/* <Text
                 style={{
                   color: 'gray',
                   fontSize: 15,
@@ -240,7 +240,7 @@ export default UserPage = ({route, navigation}) => {
                   marginLeft: 5,
                 }}>
                 in private club
-              </Text>
+              </Text> */}
             </View>
           </View>
         </View>
@@ -261,7 +261,7 @@ export default UserPage = ({route, navigation}) => {
               ? followingButton()
               : followButton()}
           </TouchableWithoutFeedback>
-          {host?.messages?.privateClubRequest?.[auth().currentUser.uid] ? (
+          {/* {host?.messages?.privateClubRequest?.[auth().currentUser.uid] ? (
             host?.messages?.privateClubRequest?.[auth().currentUser.uid]
               .approved ? (
               <TouchableWithoutFeedback
@@ -292,7 +292,7 @@ export default UserPage = ({route, navigation}) => {
               onPress={handleAskToJoin}>
               {joinPrivateClubButton()}
             </TouchableWithoutFeedback>
-          )}
+          )} */}
         </View>
       </View>
     );

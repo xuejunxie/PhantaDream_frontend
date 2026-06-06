@@ -6,11 +6,13 @@ import {
   Text,
   ScrollView,
   Alert,
+  Image,
 } from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 
 // import { useMoralis, useMoralisWeb3Api, useMoralisWeb3ApiCall } from "react-moralis";
-import {COLORS} from '../common/globalValues';
+import {COLORS, defaultAvatar} from '../common/globalValues';
+
 import {Avatar, ListItem} from '@rneui/themed';
 
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
@@ -81,9 +83,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
   },
 });
-
-const defaultAvatar =
-  'https://i0.wp.com/bangla.indiarag.com/wp-content/uploads/2019/01/dummy-snapcode-avatar@2x.png?ssl=1';
 
 const Account = () => {
   // set user name
@@ -246,16 +245,16 @@ const Account = () => {
         icon: faUserFriends,
         onPress: simpleNavigate('Follower'),
       },
-      {
-        title: 'Private Clubs',
-        icon: faSkullCrossbones,
-        onPress: simpleNavigate('PrivateClubs'),
-      },
-      {
-        title: 'Private Club members',
-        icon: faUsers,
-        onPress: simpleNavigate('PrivateClubMembers'),
-      },
+      // {
+      //   title: 'Private Clubs',
+      //   icon: faSkullCrossbones,
+      //   onPress: simpleNavigate('PrivateClubs'),
+      // },
+      // {
+      //   title: 'Private Club members',
+      //   icon: faUsers,
+      //   onPress: simpleNavigate('PrivateClubMembers'),
+      // },
       {
         title: 'Notifications',
         icon: faBell,
@@ -286,16 +285,29 @@ const Account = () => {
               uploadAvatar();
             }}>
             <View style={styles.userImage}>
-              <CachedImage
-                style={{
-                  height: 80,
-                  width: 80,
-                  borderRadius: 40,
-                  overflow: 'hidden',
-                }}
-                resizeMode="cover"
-                source={avatar}
-              />
+              {avatar == '' ? (
+                <Image
+                  style={{
+                    height: 80,
+                    width: 80,
+                    borderRadius: 40,
+                    overflow: 'hidden',
+                  }}
+                  resizeMode="cover"
+                  source={{uri: defaultAvatar}}
+                />
+              ) : (
+                <CachedImage
+                  style={{
+                    height: 80,
+                    width: 80,
+                    borderRadius: 40,
+                    overflow: 'hidden',
+                  }}
+                  resizeMode="cover"
+                  source={avatar}
+                />
+              )}
             </View>
           </TouchableOpacity>
           <View

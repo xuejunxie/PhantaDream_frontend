@@ -7,16 +7,16 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
+  TextInput,
   TouchableOpacity,
   ActivityIndicator,
   Modal,
   Alert,
   RefreshControl,
 } from 'react-native';
-import {TextInput} from 'react-native-paper';
 
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
-import {Neomorph} from 'react-native-neomorph-shadows';
+import {Neomorph, NeomorphFlex} from 'react-native-neomorph-shadows';
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 const hapticOptions = {
   enableVibrateFallback: true,
@@ -38,6 +38,7 @@ import {
   faShare,
   faTimes,
   faTrash,
+  faVideo,
 } from '@fortawesome/free-solid-svg-icons';
 
 import {CameraRoll} from '@react-native-camera-roll/camera-roll';
@@ -68,6 +69,8 @@ const tabBarHeight = 29;
 
 var scrollViewHeight = 0;
 
+const storageRef = storage().ref();
+
 export default function Dream() {
   const dispatch = useDispatch();
   const prompt = useSelector(state => state.dream.prompt);
@@ -76,13 +79,9 @@ export default function Dream() {
   const [loading, setLoading] = useState(false);
   // const [charge, setCharge] = useState(0);
   // const [heart, setHeart] = useState(false);
-  // const Charge = useSelector(state => state.user.data?.charge);
-  const Charge = 100;
+  const Charge = useSelector(state => state.user.data?.charge);
+  const artistList = useSelector(state => state.user.data?.artistList);
 
-  const [CopyButtonPressed, setCopyButtonPressed] = useState(false);
-  const [saveButtonPressed, setSaveButtonPressed] = useState(false);
-  const [shareButtonPressed, setShareButtonPressed] = useState(false);
-  const [deleteButtonPressed, setDeleteButtonPressed] = useState(false);
   const [pickedImage, setPickedImage] = useState(null); // pickedImage = image object when user pick an image from the gallery
 
   const scrollViewRef = useRef();
@@ -94,6 +93,9 @@ export default function Dream() {
   // load all the image from AsyncStorage
   const [images, setImages] = useState([]);
 
+  const placeholder_template = '🤯 Tap here to write down your dream';
+
+  const [placeHolder, setPlaceHolder] = useState(placeholder_template);
   // image object fields:
   // id: imageId same as the key
   // image: image_file (base64) in string
@@ -113,13 +115,12 @@ export default function Dream() {
 
   const loadImages = async () => {
     const allKeys = await AsyncStorage.getAllKeys();
+    // console.log(allKeys);
 
-    // remove keys with "Parse" prefix
+    // remove keys with "auth_" prefix
     const keys = allKeys.filter(key => {
       return key.indexOf('Parse') === -1;
     });
-
-    console.log(keys);
     if (keys.length === 0) {
       setImages([initImage]);
     } else {
@@ -136,13 +137,10 @@ export default function Dream() {
       });
       setImages(sourtedResult);
     }
-
-    console.log('images', images);
   };
   useEffect(() => {
     // AsyncStorage.clear();
     loadImages();
-
     // loadBalance();
   }, []);
 
@@ -183,7 +181,7 @@ export default function Dream() {
       .ref('/users/' + auth().currentUser.uid)
       .update({
         charge: realtime.ServerValue.increment(change),
-        heart: realtime.ServerValue.increment(change),
+        heart: realtime.ServerValue.increment(change / 10),
       });
     realtime().ref(`/users/${auth().currentUser.uid}/bills`).push({
       amount: price,
@@ -232,6 +230,62 @@ export default function Dream() {
       });
   };
 
+  const addArtist = artist => {
+    realtime()
+      .ref('/users/' + auth().currentUser.uid)
+      .update({
+        artistList: {
+          preferred: artistList?.preferred
+            ? [...new Set(artistList?.preferred.concat(artist))]
+            : [artist],
+        },
+      });
+  };
+
+  function replaceNonUrlCharsWithUnderscore(inputString) {
+    // Define a regular expression that matches non-URL acceptable characters
+    var regex = /[^A-Za-z0-9\-._~:/?#[\]@!$&'()*+,;=]/g;
+
+    // Use the replace method to replace matched characters with underscores
+    var resultString = inputString.replace(regex, '_');
+
+    return resultString;
+  }
+
+  const addArtistToMessage = (artist, image_entry) => {
+    //set a message to the artist
+    realtime()
+      .ref(
+        `/users/${auth().currentUser.uid}/messages/${artist}/${(
+          image_entry.date - 1
+        ).toString()}/`,
+      )
+      .set({
+        message: image_entry.prompt.replace(`, ${artist} art style`, ''),
+        type: 'new art work request',
+        timestamp: image_entry.date - 1,
+        read: false,
+        send: true,
+        // image: image_entry,
+      });
+
+    // set a message from the artist
+    realtime()
+      .ref(
+        `/users/${
+          auth().currentUser.uid
+        }/messages/${artist}/${image_entry.date.toString()}/`,
+      )
+      .set({
+        prompt: image_entry.prompt.replace(`, ${artist} art style`, ''),
+        type: 'new art work',
+        timestamp: image_entry.date,
+        read: false,
+        send: false,
+        image: image_entry,
+      });
+  };
+
   // dynamically adjust vertical offset of keyboard avoiding view
   useEffect(() => {
     const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
@@ -253,72 +307,39 @@ export default function Dream() {
 
   const send = async () => {
     const imageId = uuid.v1();
-    // const userId = auth().currentUser.uid;
+    const userId = auth().currentUser.uid;
     const seed = Math.floor(Math.random() * 1e8);
+
     axios
       .post(serverURL + 'txt2img', {
         prompt: prompt,
-        step: 20,
-        width: 800,
-        height: 800,
+        steps: 20,
+        width: 768,
+        height: 768,
         cfg_scale: 7,
-        // user: userId,
-        // img_name: imageId,
-        // seed: seed,
-        // model: 1,
+        seed: seed,
       })
       .then(function (response) {
         console.log('send');
-        // console.log(response.data);
-        // const taskID = response.data.task_id;
 
-        // const statusURL = serverURL + 'status/' + taskID;
-        // const imageURL = serverURL + userId + '/' + imageId;
-        // const getImage = async () => {
-        //   await axios
-        //     .get(statusURL)
-        //     .then(function (response) {
-        //       // console.log(response.data.state);
-        //       if (response.data.state === 'SUCCESS') {
-        //         axios
-        //           .get(imageURL, {responseType: 'arraybuffer'})
-        //           .then(function (response) {
-        const image_data = Buffer.from(
-          response.data.images[0],
-          'binary',
-        ).toString('base64');
         const image_file = `data:image/png;base64,${response.data.images[0]}`;
-        //             // const image_file = URL.createObjectURL(response.data);
-        setPrompt('');
-        //             // save the image locally with AsyncStorage
-        //             const generatedImageMeta = {
-        //               id: imageId,
-        //               imageURL: imageURL,
-        //               prompt: prompt,
-        //               date: new Date().getTime(),
-        //               artist: artistsUsed,
-        //               seed: seed,
-        //               model: 1,
-        //             };
-        //             // save the image information to user database
-        //             realtime()
-        //               .ref('/users/' + auth().currentUser.uid + '/generated')
-        //               .child(imageId)
-        //               .set(generatedImageMeta);
 
-        const image_entry = {
+        setPrompt('');
+        const currentTime = new Date().getTime();
+        // save the image state
+        var image_entry = {
           id: imageId,
           image: image_file,
-          // imageURL: imageURL,
+          imageURL: '',
           prompt: prompt,
-          date: new Date().getTime(),
+          date: currentTime,
           artist: artistsUsed,
           seed: seed,
           model: 1,
         };
-        //             AsyncStorage.setItem(imageId, JSON.stringify(image_entry));
-        //             // replace the last image with the new image
+        // replace the last image with the new image
         image_entry.loading = false;
+        AsyncStorage.setItem(imageId, JSON.stringify(image_entry));
         image_entry.selected = true;
         if (images[0].id === 'empty') {
           setImages([image_entry]);
@@ -327,30 +348,49 @@ export default function Dream() {
         }
         setLoading(false);
         setPickedImage(image_entry);
+        addArtist(artistsUsed[0]);
         setArtistsUsed([]);
-        //             spendCharge();
-        //           });
-        //       } else {
-        //         console.log('get');
+        spendCharge();
+        setPlaceHolder(placeholder_template);
 
-        //         setTimeout(getImage, 5000);
-        //       }
-        //     })
-        //     .catch(function (error) {
-        //       console.log('get sattus error', error);
-        //       send();
-        //       setTimeout(getImage, 5000);
-
-        //       return;
-        //     });
-        // };
-        // getImage();
+        // save the image information to user database
+        const imageRef = storageRef.child('images/' + imageId + '.png');
+        imageRef.putString(image_file, 'data_url').then(() => {
+          imageRef.getDownloadURL().then(url => {
+            const generatedImageMeta = {
+              id: imageId,
+              imageURL: url,
+              prompt: prompt,
+              date: currentTime,
+              artist: artistsUsed,
+              seed: seed,
+              model: 1,
+            };
+            realtime()
+              .ref('/users/' + auth().currentUser.uid + '/generated')
+              .child(imageId)
+              .set(generatedImageMeta);
+            // addArtistToMessage(artistsUsed[0], generatedImageMeta);
+            // save the url wit the image entry to local storage
+            image_entry.imageURL = url;
+            AsyncStorage.setItem(imageId, JSON.stringify(image_entry));
+            console.log('image uploaded');
+            if (images[0].id === 'empty') {
+              setImages([image_entry]);
+            } else {
+              setImages([...images, image_entry]);
+            }
+          });
+        });
       })
       .catch(function (error) {
         console.log('get post response error', error);
-        send();
+        // send();
         return;
       });
+
+    // check progress using get from http://phantaspace.ddns.net:7865/sdapi/v1/progress
+    // if progress is not 100, keep checking
   };
   // buttom press components
   const operations = (press, setPress, icon) => {
@@ -371,7 +411,7 @@ export default function Dream() {
               shadowRadius: 5,
               borderRadius: 25,
               backgroundColor: COLORS.primary,
-              width: 60,
+              width: 100,
               height: 40,
               justifyContent: 'center',
               alignItems: 'center',
@@ -387,33 +427,60 @@ export default function Dream() {
     return <FontAwesomeIcon icon={name} size={20} color={'gray'} />;
   };
 
+  const renderText = text => {
+    return (
+      <Text
+        style={{
+          fontSize: 20,
+          fontWeight: 'bold',
+          color: 'gray',
+        }}>
+        {text}
+      </Text>
+    );
+  };
+
+  const [VideoButtonPressed, setVideoButtonPressed] = useState(false);
+  const [CopyButtonPressed, setCopyButtonPressed] = useState(false);
+  const [saveButtonPressed, setSaveButtonPressed] = useState(false);
+  const [shareButtonPressed, setShareButtonPressed] = useState(false);
+  const [deleteButtonPressed, setDeleteButtonPressed] = useState(false);
+
   const actionButtons = () => {
     return (
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-evenly',
-        }}>
-        {operations(
-          CopyButtonPressed,
-          setCopyButtonPressed,
-          renderIcon(faCopy),
-        )}
-        {operations(
-          saveButtonPressed,
-          setSaveButtonPressed,
-          renderIcon(faDownload),
-        )}
-        {operations(
-          shareButtonPressed,
-          setShareButtonPressed,
-          renderIcon(faShare),
-        )}
-        {operations(
-          deleteButtonPressed,
-          setDeleteButtonPressed,
-          renderIcon(faTrash),
-        )}
+      <View>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-evenly',
+          }}>
+          {operations(
+            saveButtonPressed,
+            setSaveButtonPressed,
+            renderText('Save'),
+          )}
+          {operations(
+            shareButtonPressed,
+            setShareButtonPressed,
+            renderText('Share'),
+          )}
+          {operations(
+            deleteButtonPressed,
+            setDeleteButtonPressed,
+            renderText('Delete'),
+          )}
+        </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-evenly',
+          }}>
+          {operations(
+            VideoButtonPressed,
+            setVideoButtonPressed,
+            renderText('Animate'),
+          )}
+        </View>
       </View>
     );
   };
@@ -423,6 +490,7 @@ export default function Dream() {
     if (pickedImage) {
       if (CopyButtonPressed) {
         setPrompt(pickedImage.prompt);
+        setArtistsUsed(pickedImage.artist);
       }
     }
   }, [CopyButtonPressed]);
@@ -544,7 +612,7 @@ export default function Dream() {
                   </Text>
                 </Neomorph>
               </TouchableOpacity>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 onPress={() => {
                   excuteShare('private');
                   setShareModalVisible(false);
@@ -569,7 +637,7 @@ export default function Dream() {
                     Private club
                   </Text>
                 </Neomorph>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
             <Text
               style={{
@@ -613,68 +681,108 @@ export default function Dream() {
     const prompt = pickedImage.prompt;
     const date = pickedImage.date;
     const artist = pickedImage.artist;
-    const storageRef = storage().ref();
     const seed = pickedImage.seed;
-    const imageRef = storageRef.child('images/' + imageId + '.png');
+    const url = pickedImage.imageURL;
 
-    imageRef
-      .putString(image, 'data_url')
+    const imageMeta = {
+      url: url,
+      id: imageId,
+      prompt: prompt,
+      date: date,
+      artist: artist,
+      creator: auth().currentUser.uid,
+      owner: {
+        id: auth().currentUser.uid,
+        avatar: avatar,
+        artName: artName,
+      },
+      likes: 0,
+      seed: seed,
+      model: 1,
+      public: true,
+    };
+    // store image meta on firestore
+    firestore()
+      .collection('images')
+      .doc(imageId)
+      .set(imageMeta)
       .then(() => {
-        imageRef.getDownloadURL().then(url => {
-          const imageMeta = {
-            url: url,
-            id: imageId,
-            prompt: prompt,
-            date: date,
-            artist: artist,
-            creator: auth().currentUser.uid,
-            owner: {
-              id: auth().currentUser.uid,
-              avatar: avatar,
-              artName: artName,
-            },
-            likes: 0,
-            seed: seed,
-            model: 1,
-            public: true,
-          };
-          // store image meta on firestore
-          firestore()
-            .collection('images')
-            .doc(imageId)
-            .set(imageMeta)
-            .then(() => {
-              Alert.alert('Image Shared!');
-            });
-
-          // store published image on user's published images
-          realtime()
-            .ref('users/' + auth().currentUser.uid + '/' + place)
-            .child(imageId)
-            .set(imageMeta);
-        });
-      })
-      .catch(error => {
-        console.log(error);
+        Alert.alert('Image Shared!');
       });
+
+    // store published image on user's published images
+    realtime()
+      .ref('users/' + auth().currentUser.uid + '/' + place)
+      .child(imageId)
+      .set(imageMeta);
   };
 
   // delete photo
   useEffect(() => {
     if (pickedImage) {
       if (deleteButtonPressed) {
-        if (images.length === 1) {
-          setImages([initImage]);
-        } else {
-          setImages(
-            images.filter(image => {
-              return image.id !== pickedImage.id;
-            }),
-          );
-        }
-        AsyncStorage.removeItem(pickedImage.id);
-        setPickedImage(null);
-        setDeleteButtonPressed(false);
+        Alert.alert(
+          'Delete',
+          'Are you sure you want to delete?',
+          [
+            {
+              text: 'Cancel',
+              onPress: () => {
+                setDeleteButtonPressed(false);
+              },
+              style: 'cancel',
+            },
+            {
+              text: 'OK',
+              onPress: () => {
+                if (images.length === 1) {
+                  setImages([initImage]);
+                } else {
+                  setImages(
+                    images.filter(image => {
+                      return image.id !== pickedImage.id;
+                    }),
+                  );
+                }
+                AsyncStorage.removeItem(pickedImage.id);
+                // remove image on users' generated images and messages
+                realtime()
+                  .ref('users/' + auth().currentUser.uid + '/generated')
+                  .child(pickedImage.id)
+                  .remove();
+                realtime()
+                  .ref('users/' + auth().currentUser.uid + '/messages')
+                  .child(
+                    pickedImage?.artist[0]
+                      ? pickedImage.artist[0]
+                      : 'undefined',
+                  )
+                  .child(pickedImage.date.toString())
+                  .remove();
+                realtime()
+                  .ref('users/' + auth().currentUser.uid + '/messages')
+                  .child(
+                    pickedImage?.artist[0]
+                      ? pickedImage.artist[0]
+                      : 'undefined',
+                  )
+                  .child((pickedImage.date - 1).toString())
+                  .remove();
+                // remove image on storage
+                storageRef
+                  .child('images/' + pickedImage.id + '.png')
+                  .delete()
+                  .then(() => {
+                    console.log('image deleted');
+                  });
+
+                setPickedImage(null);
+                setDeleteButtonPressed(false);
+              },
+            },
+          ],
+          {cancelable: false},
+        );
       }
     }
   }, [deleteButtonPressed]);
@@ -807,25 +915,28 @@ export default function Dream() {
 
   const chargePurchaseSelection = [
     {
-      label: '$0.99 for 30 ',
+      label: '$0.99 for 100 ',
+      heartLabel: '10 ',
       productID: productID.charge1,
       subscription: false,
       price: 0.99,
-      charge: 30,
+      charge: 100,
     },
     {
-      label: '$19.99 for 800 ',
+      label: '$9.99 for 2000 ',
+      heartLabel: '200 ',
       productID: productID.charge2,
       subscription: false,
       price: 19.99,
-      charge: 800,
+      charge: 2000,
     },
     {
-      label: '$399.99 for 20000 ',
+      label: '$99.99 for 40000 ',
+      heartLabel: '4000 ',
       productID: productID.charge3,
       subscription: false,
-      price: 399.99,
-      charge: 20000,
+      price: 99.99,
+      charge: 40000,
     },
   ];
 
@@ -905,9 +1016,22 @@ export default function Dream() {
   const [artistSeggestion, setArtistSeggestion] = useState('');
   const [artistSuggestionVisible, setArtistSuggestionVisible] = useState(false);
   const [artistsUsed, setArtistsUsed] = useState([]);
+
   const refreshArtist = () => {
-    const artist = artists[Math.floor(Math.random() * artists.length)];
-    setArtistSeggestion(artist.artist);
+    // const artist = artists[Math.floor(Math.random() * artists.length)];
+    // setArtistSeggestion(artist.artist);
+    // setArtistSuggestion based on the last word of the prompt
+    const promptArray = prompt.split(' ');
+    const lastWord = promptArray[promptArray.length - 1];
+    // console.log(lastWord);
+    // find the closest artist
+    const artistList = artists.filter(artist => {
+      return artist.artist.startsWith(lastWord);
+    });
+    // console.log(artistList);
+    if (artistList.length > 0) {
+      setArtistSeggestion(artistList[0].artist);
+    }
   };
 
   useEffect(() => {
@@ -916,26 +1040,78 @@ export default function Dream() {
 
   const artistView = () => {
     return (
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginTop: 20,
-          marginBottom: 20,
-        }}>
-        <TouchableOpacity
-          onPress={() => {
-            refreshArtist();
-            setPrompt(prompt + ', ' + artistSeggestion);
-            setArtistsUsed([...artistsUsed, artistSeggestion]);
-            refreshArtist();
+      <ScrollView
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
+        keyboardShouldPersistTaps="always">
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginStart: 10,
           }}>
-          <Text style={{color: 'gray', fontSize: 15, marginRight: 10}}>
-            Tap here to add artist style: {artistSeggestion}
-          </Text>
-        </TouchableOpacity>
-      </View>
+          <View>
+            <Text style={{color: 'gray', fontSize: 15, marginRight: 10}}>
+              add artist style:
+            </Text>
+          </View>
+          <View>
+            <TouchableOpacity
+              onPress={() => {
+                // refreshArtist();
+                setPrompt(prompt + ', ' + artistSeggestion + ' art style');
+                setArtistsUsed([...artistsUsed, artistSeggestion]);
+                // refreshArtist();
+                setArtistSuggestionVisible(false);
+              }}
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderWidth: 10,
+                height: 40,
+                marginRight: 10,
+                borderColor: COLORS.blue,
+                backgroundColor: COLORS.blue,
+                borderRadius: 10,
+              }}>
+              <Text style={{color: 'black', fontSize: 15, marginRight: 10}}>
+                {artistSeggestion}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          {artistList?.preferred.map(artist => {
+            return (
+              <View key={artist}>
+                <TouchableOpacity
+                  onPress={() => {
+                    // refreshArtist();
+                    setPrompt(prompt + ', ' + artist + ' art style');
+                    setArtistsUsed([...artistsUsed, artist]);
+                    // refreshArtist();
+                    setArtistSuggestionVisible(false);
+                  }}
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    borderWidth: 10,
+                    height: 40,
+                    marginRight: 10,
+                    borderColor: COLORS.blue,
+                    backgroundColor: COLORS.blue,
+                    borderRadius: 10,
+                  }}>
+                  <Text style={{color: 'black', fontSize: 15, marginRight: 10}}>
+                    {artist}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            );
+          })}
+        </View>
+      </ScrollView>
     );
   };
 
@@ -977,78 +1153,110 @@ export default function Dream() {
           {buyChargeLoadingModal()}
         </ScrollView>
 
+        {artistSuggestionVisible && artistView()}
+
         <View>
           {!loading && (
-            <TextInput
-              multiline={true}
-              onChangeText={text => {
-                setPrompt(text);
-                setArtistSuggestionVisible(true);
-                refreshArtist();
-              }}
-              onBlur={() => {
-                setArtistSuggestionVisible(false);
-              }}
-              value={prompt}
+            <View
               style={{
-                backgroundColor: 'rgba(0,0,0,0)',
-                // align text to center
-                textAlign: 'center',
-              }}
-              placeholder="🤯 Tap here to write down your dream "
-              returnKeyType="send"
-              numberOfLines={1}
-              blurOnSubmit={true}
-              onSubmitEditing={() => {
-                //haptic feedback
-                ReactNativeHapticFeedback.trigger(
-                  'impactMedium',
-                  hapticOptions,
-                );
-                if (Charge > 0) {
-                  setLoading(true);
-                  if (images[0].id === 'empty') {
-                    // set the first image to loading
-                    setImages([
-                      {
-                        id: 'empty',
-                        image: loading_image,
-                        prompt: '',
-                        date: new Date().getTime(),
-                        loading: true,
-                        selected: false,
-                      },
-                    ]);
-                    // force update the view
-                  } else {
-                    // add a new image with loading
+                width: '100%',
+                bottom: 0,
+                marginBottom: 5,
+                alignItems: 'center',
+                marginTop: 10,
+              }}>
+              <NeomorphFlex
+                inner={true}
+                style={{
+                  shadowRadius: 3,
+                  borderRadius: 15,
+                  backgroundColor: COLORS.primary,
+                  width: 400,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <TextInput
+                  multiline={true}
+                  onChangeText={text => {
+                    setPrompt(text);
+                    setArtistSuggestionVisible(true);
+                    refreshArtist();
+                  }}
+                  onBlur={() => {
+                    setArtistSuggestionVisible(false);
+                    setArtistsUsed([]);
+                    setPlaceHolder(placeholder_template);
+                  }}
+                  value={prompt}
+                  style={{
+                    backgroundColor: 'rgba(0,0,0,0)',
+                    // align text to center
+                    padding: 10,
+                    margin: 5,
+                    maxHeight: 200,
+                    width: '100%',
+                    textAlign: 'center',
+                    fontSize: 18,
+                  }}
+                  onFocus={() => {
+                    // Clear the placeholder text when focused
+                    setPlaceHolder('');
+                  }}
+                  placeholder={placeHolder}
+                  returnKeyType="send"
+                  numberOfLines={1}
+                  blurOnSubmit={true}
+                  onSubmitEditing={() => {
+                    //haptic feedback
+                    ReactNativeHapticFeedback.trigger(
+                      'impactMedium',
+                      hapticOptions,
+                    );
+                    if (Charge > 0) {
+                      setLoading(true);
+                      if (images[0].id === 'empty') {
+                        // set the first image to loading
+                        setImages([
+                          {
+                            id: 'empty',
+                            image: loading_image,
+                            prompt: '',
+                            date: new Date().getTime(),
+                            loading: true,
+                            selected: false,
+                          },
+                        ]);
+                        // force update the view
+                      } else {
+                        // add a new image with loading
 
-                    setImages([
-                      ...images.map(item => {
-                        item.selected = false;
-                        return item;
-                      }),
-                      {
-                        id: 'loading',
-                        image: loading_image,
-                        prompt: '',
-                        date: new Date().getTime(),
-                        loading: true,
-                        selected: false,
-                      },
-                    ]);
-                  }
-                  setPickedImage(null);
-                  send();
-                } else {
-                  setChargeModalVisible(true);
-                }
-                setArtistSuggestionVisible(false);
-              }}
-            />
+                        setImages([
+                          ...images.map(item => {
+                            item.selected = false;
+                            return item;
+                          }),
+                          {
+                            id: 'loading',
+                            image: loading_image,
+                            prompt: '',
+                            date: new Date().getTime(),
+                            loading: true,
+                            selected: false,
+                          },
+                        ]);
+                      }
+                      setPickedImage(null);
+                      send();
+                    } else {
+                      setChargeModalVisible(true);
+                    }
+                    setArtistSuggestionVisible(false);
+                  }}
+                />
+              </NeomorphFlex>
+            </View>
           )}
         </View>
-        {artistSuggestionVisible && artistView()}
       </View>
     </KeyboardAvoidingView>
   );

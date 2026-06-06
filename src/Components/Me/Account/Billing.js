@@ -84,8 +84,9 @@ export default Billing = () => {
                   {' for '}
                   {bills[key].chargeOrder}
                   <FontAwesomeIcon icon={faBolt} color={'gray'} />
-                  +
-                  <FontAwesomeIcon icon={faHeart} color={COLORS.red} />
+                  {/* + */}
+                  {/* {bills[key].chargeOrder / 10} */}
+                  {/* <FontAwesomeIcon icon={faHeart} color={COLORS.red} /> */}
                 </ListItem.Subtitle>
               </ListItem.Content>
             </ListItem>

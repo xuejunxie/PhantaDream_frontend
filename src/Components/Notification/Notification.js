@@ -4,6 +4,8 @@ import {
   View,
   Text,
   ScrollView,
+  Image,
+  ImageBackground,
   FlatList,
   Alert,
 } from 'react-native';
@@ -96,49 +98,34 @@ export default function Notification() {
   const [masterDataSource, setMasterDataSource] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const messagesObject = useSelector(state => state.user?.data?.messages);
-  const [messages, setMessages] = useState({});
+  const userArtName = useSelector(state => state.user?.data?.artName);
+  const [messages, setMessages] = useState([]);
 
   const fetchMessages = () => {
     if (messagesObject) {
-      const messagePromises = Object.keys(messagesObject).map(key => {
-        var youLastMessage = Object.values(messagesObject[key])[
-          Object.keys(messagesObject[key]).length - 1
-        ].message;
-        // Show only limited length of message
-        const length = 34;
-        youLastMessage =
-          youLastMessage.length > length
-            ? youLastMessage.slice(0, length) + '...'
-            : youLastMessage;
+      const messagePromises = Object.keys(messagesObject).map(senderID => {
+        // find the last message with smallest key value
+        const youLastMessageTime = Math.max(
+          ...Object.keys(messagesObject[senderID]),
+        );
 
-        const youLastMessageTime = Object.keys(messagesObject[key])[
-          Object.keys(messagesObject[key]).length - 1
-        ];
-        return Promise.all([
-          realtime().ref(`/users/${key}/artName`).once('value'),
-          realtime().ref(`/users/${key}/avatar`).once('value'),
-        ]).then(([nameSnapshot, avatarSnapshot]) => {
-          const youName = nameSnapshot.val();
-          const youAvatar = avatarSnapshot.val();
+        const type = messagesObject[senderID][youLastMessageTime].type;
+
+        if (type === 'new art work') {
           return {
-            id: key,
-            avatar: youAvatar,
-            name: youName,
-            lastMessage: youLastMessage,
+            id: senderID,
+            avatar:
+              messagesObject[senderID][youLastMessageTime]?.image?.imageURL,
+            name: senderID == 'undefined' ? userArtName : senderID,
+            lastMessage: messagesObject[senderID][youLastMessageTime].prompt,
             time: youLastMessageTime,
             byNow: msToTime(new Date().getTime() - youLastMessageTime) + ' ago',
+            type: type,
           };
-        });
+        }
       });
-      Promise.all(messagePromises).then(messages => {
-        const messagesObj = {};
-        messages.forEach(message => {
-          messagesObj[message.id] = message;
-        });
-        setMessages(messagesObj);
-        // setFilteredDataSource(messages);
-        // setMasterDataSource(messages);
-      });
+
+      setMessages(messagePromises.sort((a, b) => b.time - a.time));
     }
   };
 
@@ -171,16 +158,20 @@ export default function Notification() {
     }
   };
 
-  const listItem = ({you, index}) => {
+  const listItem = ({sender, index}) => {
+    console.log(sender);
+    // console.log(sender.name);
+    // console.log(imageURL);
     return (
       <TouchableOpacity
         style={styles.listItem}
         key={index}
         onPress={() =>
           RootNavigation.navigate('Chat', {
-            name: you.artName,
-            avatar: you.avatar,
-            id: you.id,
+            name: sender?.name,
+            avatar: sender?.avatar,
+            id: sender?.id,
+            type: sender?.type,
           })
         }>
         <CachedImage
@@ -191,13 +182,16 @@ export default function Notification() {
             overflow: 'hidden',
           }}
           resizeMode="cover"
-          source={you.avatar}
+          source={sender?.avatar}
         />
+
         <View style={styles.listItemContent}>
-          <Text style={styles.name}>{you.name}</Text>
-          <Text style={styles.message}>{you.lastMessage}</Text>
+          <Text style={styles.name}>{sender?.name}</Text>
+          <Text style={styles.message}>{sender?.lastMessage}</Text>
         </View>
-        <Text style={styles.time}>{you.byNow}</Text>
+        <Text style={styles.time}>{sender?.byNow}</Text>
+
+        {/* </ImageBackground> */}
       </TouchableOpacity>
     );
   };
@@ -211,23 +205,12 @@ export default function Notification() {
           }}
         />
         <View style={styles.list}>
-          {Object.keys(messages).length > 0 &&
-            Object.keys(messages)
-              .sort((a, b) => messages[b].time - messages[a].time)
-              .map((key, index) => {
-                return listItem({you: messages[key], index});
-              })}
+          {messages?.length > 0 &&
+            messages.map((message, index) => {
+              return listItem({sender: message, index});
+            })}
         </View>
       </ScrollView>
-      {/* <View style={styles.searchSection}>
-        <TextInput
-          style={styles.input}
-          onChangeText={text => searchFilterFunction(text)}
-          value={search}
-          underlineColorAndroid="transparent"
-          placeholder="Search Here"
-        />
-      </View> */}
     </View>
   );
 }
