@@ -4,8 +4,9 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {Alert, LogBox} from 'react-native';
 
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
-import Explore from './Components/Explore/Explore';
-import Dream from './Components/Dream/Dream';
+import Feed from './Components/Chain/Feed';
+import Create from './Components/Chain/Create';
+import {ChainScreen} from './Components/Chain/ChainPlayer';
 import Me from './Components/Me/Me';
 import {COLORS} from './Components/common/globalValues';
 import Market from './Components/Market/Market';
@@ -30,6 +31,8 @@ import {
   faComment,
   faComments,
   faCommentAlt,
+  faPlay,
+  faPlus,
 } from '@fortawesome/free-solid-svg-icons';
 
 import SignIn from './Components/Auth/SignIn';
@@ -85,30 +88,24 @@ function Home(): JSX.Element {
       // inactiveColor="#3e2465"
       barStyle={{backgroundColor: COLORS.primary}}>
       <Tab.Screen
-        name="Dream"
+        name="Feed"
         options={{
-          tabBarLabel: 'Dream',
-          tabBarIcon: ({color, focused}) => {
-            return (
-              <FontAwesomeIcon
-                icon={faMagicWandSparkles}
-                color={color}
-                size={20}
-              />
-            );
-          },
-        }}
-        component={Dream}
-      />
-      <Tab.Screen
-        name="Explorer"
-        options={{
-          tabBarLabel: 'Explore',
+          tabBarLabel: '接龙',
           tabBarIcon: ({color}) => (
-            <FontAwesomeIcon icon={faMagnifyingGlass} color={color} size={20} />
+            <FontAwesomeIcon icon={faPlay} color={color} size={20} />
           ),
         }}
-        component={Explore}
+        component={Feed}
+      />
+      <Tab.Screen
+        name="Create"
+        options={{
+          tabBarLabel: '发起',
+          tabBarIcon: ({color}) => (
+            <FontAwesomeIcon icon={faPlus} color={color} size={20} />
+          ),
+        }}
+        component={Create}
       />
       {/* <Tab.Screen
         name="Market"
@@ -146,7 +143,7 @@ function Home(): JSX.Element {
       <Tab.Screen
         name="Me"
         options={{
-          tabBarLabel: 'Me',
+          tabBarLabel: '我',
           tabBarIcon: ({color}) => (
             <FontAwesomeIcon icon={faUser} color={color} size={20} />
           ),
@@ -179,6 +176,7 @@ function App(): JSX.Element {
         <Stack.Screen name="UserPage" component={UserPage} />
         <Stack.Screen name="Chat" component={Chat} />
         <Stack.Screen name="ArtistPage" component={ArtistPage} />
+        <Stack.Screen name="Chain" component={ChainScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

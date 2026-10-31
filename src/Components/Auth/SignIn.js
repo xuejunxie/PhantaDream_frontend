@@ -32,6 +32,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch} from 'react-redux';
 import {UPDATE_USER} from '../../redux/types';
 import axios from 'axios';
+import {USE_EMULATORS, DUMMY_ACCOUNT} from '../../devEmulators';
 
 const newUserCharge = 100;
 const newUserHeart = 10;
@@ -102,6 +103,26 @@ export default function SignIn({navigation}) {
   //         `/users/${auth().currentUser.uid}/avatar`,
   //       );
   //       const task = reference.putFile(avatar);
+
+  // Dev only: sign in (or sign up) the dummy account on the local auth emulator.
+  async function dummySignIn() {
+    const {email, password, artName} = DUMMY_ACCOUNT;
+    const res = await auth()
+      .signInWithEmailAndPassword(email, password)
+      .catch(() => auth().createUserWithEmailAndPassword(email, password));
+    const ref = realtime().ref('/users/' + res.user.uid);
+    if (!(await ref.once('value')).exists()) {
+      await ref.set({
+        email,
+        artName,
+        charge: newUserCharge,
+        heart: newUserHeart,
+        avatar: '',
+      });
+    }
+    dispatch({type: UPDATE_USER, payload: (await ref.once('value')).val()});
+    navigation.navigate('Home');
+  }
 
   async function signInButton() {
     // Start the sign-in request
@@ -321,6 +342,13 @@ export default function SignIn({navigation}) {
             signInButton();
           }}
         />
+        {USE_EMULATORS && (
+          <Pressable onPress={dummySignIn} style={{marginTop: 16}}>
+            <Text style={{color: 'gray', fontSize: 16}}>
+              测试账号登录 (emulator)
+            </Text>
+          </Pressable>
+        )}
       </View>
       <View
         style={{
