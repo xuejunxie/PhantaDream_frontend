@@ -51,6 +51,10 @@ target 'PhantaDream' do
         if config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'].to_f < 12.4
           config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.4'
         end
+        # Xcode 14+: resource bundles otherwise demand their own signing team on device builds.
+        if target.respond_to?(:product_type) && target.product_type == 'com.apple.product-type.bundle'
+          config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+        end
       end
       if target.name == 'BoringSSL-GRPC'
         target.source_build_phase.files.each do |file|
