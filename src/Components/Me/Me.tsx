@@ -9,13 +9,13 @@ import {
 
 import {COLORS} from '../common/globalValues';
 
-import Published from './Published';
+import ChainList from '../Chain/ChainList';
 import Liked from './Liked';
 import Account from './Account';
 
-const FirstRoute = () => <Published />;
+const FirstRoute = () => <ChainList field="participants" />;
 
-const SecondRoute = () => <Liked />;
+const SecondRoute = () => <ChainList field="likedBy" />;
 
 const ThirdRoute = () => <Liked />;
 
@@ -33,10 +33,10 @@ export default function Me() {
 
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
-    {key: 'first', title: 'Published'},
-    {key: 'second', title: 'Liked'},
+    {key: 'first', title: '我的接龙'},
+    {key: 'second', title: '赞过'},
     // {key: 'third', title: 'Messages'},
-    {key: 'forth', title: 'Account'},
+    {key: 'forth', title: '账号'},
   ]);
 
   const frame = useSafeAreaFrame();
